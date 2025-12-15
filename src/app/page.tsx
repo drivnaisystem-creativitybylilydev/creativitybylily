@@ -147,15 +147,15 @@ export default function Home() {
         <CustomerFavorites />
       </section>
 
+      {/* Featured Events Section - Moved Higher */}
+      <Suspense fallback={null}>
+        <FeaturedEvents />
+      </Suspense>
+
       {/* Product Carousel Section */}
       <section className="py-20 bg-[#faf8f5]">
         <ProductCarousel />
       </section>
-
-      {/* Featured Events Section */}
-      <Suspense fallback={null}>
-        <FeaturedEvents />
-      </Suspense>
 
       {/* Footer */}
       <footer id="contact" className="py-16" style={{ backgroundColor: 'var(--soft-pink)' }}>

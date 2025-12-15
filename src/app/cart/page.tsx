@@ -95,26 +95,49 @@ export default function CartPage() {
                     <p className="text-sm text-gray-500 mt-1">{item.product.category}</p>
                   </div>
                   <div className="flex items-center justify-between mt-4">
-                    <div className="flex items-center gap-3">
-                      <button
-                        onClick={() => updateQuantity(item.product.id, item.quantity - 1, item.variantId)}
-                        className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors"
-                        aria-label="Decrease quantity"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-                        </svg>
-                      </button>
-                      <span className="text-gray-800 font-medium w-8 text-center">{item.quantity}</span>
-                      <button
-                        onClick={() => updateQuantity(item.product.id, item.quantity + 1, item.variantId)}
-                        className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors"
-                        aria-label="Increase quantity"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                        </svg>
-                      </button>
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-center gap-3">
+                        <button
+                          onClick={() => {
+                            try {
+                              updateQuantity(item.product.id, item.quantity - 1, item.variantId);
+                            } catch (err: any) {
+                              alert(err.message);
+                            }
+                          }}
+                          className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors"
+                          aria-label="Decrease quantity"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                          </svg>
+                        </button>
+                        <span className="text-gray-800 font-medium w-8 text-center">{item.quantity}</span>
+                        <button
+                          onClick={() => {
+                            try {
+                              updateQuantity(item.product.id, item.quantity + 1, item.variantId);
+                            } catch (err: any) {
+                              alert(err.message);
+                            }
+                          }}
+                          disabled={(item.product.inventory_count || 0) <= item.quantity}
+                          className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          aria-label="Increase quantity"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                          </svg>
+                        </button>
+                      </div>
+                      {(item.product.inventory_count || 0) === 0 && (
+                        <p className="text-xs text-red-600 font-medium">Out of Stock</p>
+                      )}
+                      {(item.product.inventory_count || 0) > 0 && (item.product.inventory_count || 0) <= item.quantity && (
+                        <p className="text-xs text-orange-600 font-medium">
+                          Only {item.product.inventory_count} available
+                        </p>
+                      )}
                     </div>
                     <div className="text-right">
                       <p className="text-lg font-semibold text-[color:var(--logo-pink)]">

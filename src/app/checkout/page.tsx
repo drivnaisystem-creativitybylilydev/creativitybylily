@@ -331,6 +331,19 @@ export default function CheckoutPage() {
       const data = await response.json();
 
       if (!response.ok) {
+        // Handle inventory errors specifically
+        if (data.error === 'Insufficient inventory' && data.details) {
+          const inventoryErrors = Array.isArray(data.details) 
+            ? data.details.join('\n')
+            : data.details;
+          alert(
+            `${data.message || 'Some items are no longer available:'}\n\n${inventoryErrors}\n\nPlease update your cart and try again.`
+          );
+          // Refresh the page to update cart with current inventory
+          window.location.reload();
+          return;
+        }
+        
         const errorMsg = data.error || 'Failed to create order';
         const details = data.details ? ` (${data.details})` : '';
         throw new Error(errorMsg + details);

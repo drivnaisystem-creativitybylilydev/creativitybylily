@@ -43,9 +43,10 @@ export default async function EventsPage() {
                 const endDate = event.end_date ? new Date(event.end_date) : null;
 
                 return (
-                  <div
+                  <Link
                     key={event.id}
-                    className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
+                    href={`/events/${event.id}`}
+                    className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow block"
                   >
                     {event.image_url && (
                       <div className="relative aspect-video w-full bg-gray-100">
@@ -95,18 +96,14 @@ export default async function EventsPage() {
                           <span>{event.location}</span>
                         </div>
                       </div>
-                      {event.link && (
-                        <a
-                          href={event.link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-block text-[color:var(--logo-pink)] hover:opacity-80 font-medium text-sm"
-                        >
-                          Learn More →
-                        </a>
-                      )}
+                      <div className="inline-flex items-center text-[color:var(--logo-pink)] hover:opacity-80 font-medium text-sm">
+                        <span>View Details</span>
+                        <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </div>
                     </div>
-                  </div>
+                  </Link>
                 );
               })}
             </div>

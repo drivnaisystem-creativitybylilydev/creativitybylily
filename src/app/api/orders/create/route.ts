@@ -53,6 +53,49 @@ export async function POST(request: Request) {
       );
     }
 
+    // Validate inventory before creating order
+    const productIds = items.map((item: any) => item.productId);
+    const { data: products, error: productsError } = await supabase
+      .from('products')
+      .select('id, inventory_count, title')
+      .in('id', productIds);
+
+    if (productsError) {
+      console.error('Error fetching products for inventory check:', productsError);
+      return NextResponse.json(
+        { error: 'Failed to validate inventory', details: productsError.message },
+        { status: 500 }
+      );
+    }
+
+    // Check inventory for each item
+    const inventoryErrors: string[] = [];
+    for (const item of items) {
+      const product = products?.find((p) => p.id === item.productId);
+      if (!product) {
+        inventoryErrors.push(`Product not found: ${item.productId}`);
+        continue;
+      }
+
+      const availableInventory = product.inventory_count || 0;
+      if (availableInventory < item.quantity) {
+        inventoryErrors.push(
+          `${product.title}: Only ${availableInventory} available, but ${item.quantity} requested`
+        );
+      }
+    }
+
+    if (inventoryErrors.length > 0) {
+      return NextResponse.json(
+        { 
+          error: 'Insufficient inventory',
+          details: inventoryErrors,
+          message: 'Some items in your cart are no longer available in the requested quantity. Please update your cart and try again.'
+        },
+        { status: 400 }
+      );
+    }
+
     // Generate order number (fallback if RPC fails)
     let orderNumber: string;
     try {
@@ -137,6 +180,25 @@ export async function POST(request: Request) {
         },
         { status: 500 }
       );
+    }
+
+    // Decrease inventory for each product
+    for (const item of items) {
+      const product = products?.find((p) => p.id === item.productId);
+      if (product) {
+        const newInventory = Math.max(0, (product.inventory_count || 0) - item.quantity);
+        
+        const { error: updateError } = await supabase
+          .from('products')
+          .update({ inventory_count: newInventory })
+          .eq('id', item.productId);
+
+        if (updateError) {
+          console.error(`Error updating inventory for product ${item.productId}:`, updateError);
+          // Don't fail the order if inventory update fails, but log it
+          // The order was already created, so we'll just log the error
+        }
+      }
     }
 
     // Email functionality temporarily disabled - will re-enable at launch

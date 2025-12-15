@@ -70,7 +70,14 @@ export default async function ProductDetailPage(props: PageProps) {
           </div>
           <div className="flex flex-col gap-6">
             <div>
-              <h1 className="font-serif text-3xl font-light text-gray-800 mb-2">{product.title}</h1>
+              <div className="flex items-center gap-3 mb-2">
+                <h1 className="font-serif text-3xl font-light text-gray-800">{product.title}</h1>
+                {(product.inventory_count || 0) === 0 && (
+                  <span className="bg-red-500 text-white text-xs font-bold px-3 py-1.5 rounded-full">
+                    Out of Stock
+                  </span>
+                )}
+              </div>
               <p className="text-sm text-gray-500">Handcrafted on Cape Cod</p>
             </div>
             <div className="text-2xl font-semibold text-[color:var(--logo-pink)]">${product.price}</div>

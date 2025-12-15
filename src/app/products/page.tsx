@@ -98,7 +98,9 @@ export default function ProductsPage() {
                       src={product.image_url}
                       alt={product.title}
                       fill
-                      className="object-cover group-hover:scale-110 transition-transform duration-500"
+                      className={`object-cover group-hover:scale-110 transition-transform duration-500 ${
+                        (product.inventory_count || 0) === 0 ? 'opacity-60' : ''
+                      }`}
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                     />
                     {/* Category Badge */}
@@ -107,6 +109,14 @@ export default function ProductsPage() {
                         {product.category}
                       </span>
                     </div>
+                    {/* Out of Stock Badge */}
+                    {(product.inventory_count || 0) === 0 && (
+                      <div className="absolute top-3 right-3">
+                        <span className="bg-red-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                          Out of Stock
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </Link>
                 <div className="p-6">
@@ -126,12 +136,21 @@ export default function ProductsPage() {
                     >
                       View Details →
                     </Link>
-                    <button
-                      onClick={() => addItem(product, 1)}
-                      className="flex-1 bg-[color:var(--logo-pink)] text-white px-4 py-2 rounded-full text-sm font-medium hover:opacity-90 transition-opacity"
-                    >
-                      Add to Cart
-                    </button>
+                    {(product.inventory_count || 0) > 0 ? (
+                      <button
+                        onClick={() => addItem(product, 1)}
+                        className="flex-1 bg-[color:var(--logo-pink)] text-white px-4 py-2 rounded-full text-sm font-medium hover:opacity-90 transition-opacity"
+                      >
+                        Add to Cart
+                      </button>
+                    ) : (
+                      <button
+                        disabled
+                        className="flex-1 bg-gray-300 text-gray-500 px-4 py-2 rounded-full text-sm font-medium cursor-not-allowed"
+                      >
+                        Out of Stock
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>

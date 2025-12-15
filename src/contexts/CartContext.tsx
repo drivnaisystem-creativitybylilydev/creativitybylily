@@ -18,6 +18,7 @@ type CartContextType = {
   getTotalPrice: () => number;
   getTotalItems: () => number;
   isInCart: (productId: string, variantId?: string) => boolean;
+  getItemQuantity: (productId: string, variantId?: string) => number;
 };
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -50,6 +51,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [items, isLoaded]);
 
   const addItem = (product: Product, quantity: number = 1, variantId?: string) => {
+    const inventoryCount = product.inventory_count || 0;
+    
     setItems((prevItems) => {
       const existingItemIndex = prevItems.findIndex(
         (item) => item.product.id === product.id && item.variantId === variantId
@@ -58,9 +61,22 @@ export function CartProvider({ children }: { children: ReactNode }) {
       if (existingItemIndex >= 0) {
         // Update quantity if item already exists
         const updated = [...prevItems];
-        updated[existingItemIndex].quantity += quantity;
+        const currentQuantity = updated[existingItemIndex].quantity;
+        const newQuantity = currentQuantity + quantity;
+        
+        // Check if adding this quantity would exceed inventory
+        if (newQuantity > inventoryCount) {
+          throw new Error(`Only ${inventoryCount} available in stock`);
+        }
+        
+        updated[existingItemIndex].quantity = newQuantity;
         return updated;
       } else {
+        // Check if adding new item would exceed inventory
+        if (quantity > inventoryCount) {
+          throw new Error(`Only ${inventoryCount} available in stock`);
+        }
+        
         // Add new item
         return [...prevItems, { product, quantity, variantId }];
       }
@@ -81,13 +97,24 @@ export function CartProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    setItems((prevItems) =>
-      prevItems.map((item) =>
+    setItems((prevItems) => {
+      const item = prevItems.find(
+        (item) => item.product.id === productId && item.variantId === variantId
+      );
+      
+      if (item) {
+        const inventoryCount = item.product.inventory_count || 0;
+        if (quantity > inventoryCount) {
+          throw new Error(`Only ${inventoryCount} available in stock`);
+        }
+      }
+
+      return prevItems.map((item) =>
         item.product.id === productId && item.variantId === variantId
           ? { ...item, quantity }
           : item
-      )
-    );
+      );
+    });
   };
 
   const clearCart = () => {
@@ -110,6 +137,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
     );
   };
 
+  const getItemQuantity = (productId: string, variantId?: string) => {
+    const item = items.find(
+      (item) => item.product.id === productId && item.variantId === variantId
+    );
+    return item ? item.quantity : 0;
+  };
+
   return (
     <CartContext.Provider
       value={{
@@ -121,6 +155,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         getTotalPrice,
         getTotalItems,
         isInCart,
+        getItemQuantity,
       }}
     >
       {children}

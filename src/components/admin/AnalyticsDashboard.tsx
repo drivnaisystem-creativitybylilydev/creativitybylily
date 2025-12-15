@@ -209,16 +209,29 @@ export default function AnalyticsDashboard() {
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                label={({ status, percentage }) => `${status}: ${percentage.toFixed(1)}%`}
-                outerRadius={80}
+                label={false}
+                outerRadius={100}
+                innerRadius={50}
                 fill="#8884d8"
                 dataKey="count"
+                stroke="#ffffff"
+                strokeWidth={2}
               >
                 {data.orderStatusBreakdown.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
-              <Tooltip />
+              <Tooltip 
+                formatter={(value: any, name: any, props: any) => [
+                  `${value} (${props.payload.percentage.toFixed(1)}%)`,
+                  props.payload.status
+                ]}
+              />
+              <Legend 
+                verticalAlign="bottom" 
+                height={36}
+                formatter={(value, entry: any) => `${value} (${entry.payload.percentage.toFixed(1)}%)`}
+              />
             </PieChart>
           </ResponsiveContainer>
         </div>
