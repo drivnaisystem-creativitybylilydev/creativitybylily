@@ -1,26 +1,47 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #fefcf9;
+  --foreground: #2d2d2d;
+  --brand: #d4a574;
+  --brand-contrast: #ffffff;
+  --accent-pink: #f4c2c2;
+  --warm-beige: #f7f0e8;
+  --soft-pink: #f8e8e8;
+  --logo-pink: #ff72a6; /* matches logo script tone */
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-inter);
+  --font-serif: var(--font-playfair);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #1a1a1a;
+    --foreground: #f5f5f5;
+    --brand: #d97706;
+    --brand-contrast: #1a1a1a;
+    --accent-pink: #f8b5c1;
+    --warm-beige: #2a2a2a;
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter), system-ui, sans-serif;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  padding: 0 16px;
+  border-radius: 8px;
+  background: var(--brand);
+  color: var(--brand-contrast);
 }

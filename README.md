@@ -1,22 +1,33 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+This is a Next.js project with mock e‑commerce pages and Shopify placeholders.
 
 ## Getting Started
 
-First, run the development server:
+Install dependencies and run the dev server:
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000 when ready.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Pages:
+- `/` – home template (Next default)
+- `/products` – mock product grid
+- `/products/[id]` – product detail stub
+
+Assets:
+- Place sample images under `public/sample/` as `1.jpg`, `2.jpg`, `3.jpg`, `4.jpg` (or update paths in `src/app/products/mock-data.ts`).
+
+Environment placeholders (Shopify):
+Create `.env.local` with:
+
+```bash
+SHOPIFY_STORE_DOMAIN=your-store.myshopify.com
+SHOPIFY_STOREFRONT_API_TOKEN=your_token
+```
+
+Do not commit secrets. Keep Admin API tokens server-side only.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
