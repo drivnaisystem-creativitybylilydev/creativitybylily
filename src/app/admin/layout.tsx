@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import AdminAuthWrapper from '@/components/admin/AdminAuthWrapper';
 import AdminLogoutButton from '@/components/admin/AdminLogoutButton';
+import NotificationBadge from '@/components/admin/NotificationBadge';
 
 export default function AdminLayout({
   children,
@@ -32,9 +33,10 @@ export default function AdminLayout({
                   <nav className="hidden md:flex items-center gap-6">
                     <Link
                       href="/admin/orders"
-                      className="text-gray-700 hover:text-[color:var(--logo-pink)] transition-colors font-medium"
+                      className="text-gray-700 hover:text-[color:var(--logo-pink)] transition-colors font-medium relative"
                     >
                       Orders
+                      <NotificationBadge type="orders" />
                     </Link>
                     <Link
                       href="/admin/products"
@@ -50,9 +52,17 @@ export default function AdminLayout({
                     </Link>
                     <Link
                       href="/admin/events"
-                      className="text-gray-700 hover:text-[color:var(--logo-pink)] transition-colors font-medium"
+                      className="text-gray-700 hover:text-[color:var(--logo-pink)] transition-colors font-medium relative"
                     >
                       Events
+                      <NotificationBadge type="events" />
+                    </Link>
+                    <Link
+                      href="/admin/returns"
+                      className="text-gray-700 hover:text-[color:var(--logo-pink)] transition-colors font-medium relative"
+                    >
+                      Returns
+                      <NotificationBadge type="returns" />
                     </Link>
                   </nav>
                 </div>

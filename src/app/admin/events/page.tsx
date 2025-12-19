@@ -1,6 +1,7 @@
 import { createAdminClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import { Suspense } from 'react';
+import MarkAsViewed from '@/components/admin/MarkAsViewed';
 
 type EventFilter = 'all' | 'upcoming' | 'past';
 
@@ -29,8 +30,11 @@ async function EventsList({ filter }: { filter: EventFilter }) {
     );
   }
 
+  const eventIds = events?.map((e: any) => e.id) || [];
+
   return (
     <div className="space-y-4">
+      <MarkAsViewed type="events" ids={eventIds} />
       {events && events.length > 0 ? (
         events.map((event: any) => {
           const startDate = new Date(event.start_date);

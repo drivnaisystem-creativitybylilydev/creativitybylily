@@ -17,6 +17,7 @@ export async function POST(request: Request) {
     }
 
     const {
+      userId,
       items,
       shippingAddress,
       billingAddress,
@@ -123,6 +124,7 @@ export async function POST(request: Request) {
     const { data: order, error: orderError } = await supabase
       .from('orders')
       .insert({
+        user_id: userId || null, // Link to user account if logged in
         order_number: orderNumber,
         status: 'pending',
         subtotal,

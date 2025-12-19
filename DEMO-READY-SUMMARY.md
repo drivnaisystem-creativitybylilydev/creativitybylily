@@ -102,9 +102,10 @@
 ## 💬 What to Explain
 
 ### About Payment
-- "Payment processing (Stripe) will be integrated using your business details before launch"
-- "The checkout flow is complete - we just need your Stripe account to process payments"
+- "Payment processing (Square) will be integrated using your existing Square account"
+- "The checkout flow is complete - we just need your Square API keys to process payments"
 - "Orders are being created in the system, ready for payment integration"
+- "Your online and in-person sales will all be in one Square dashboard"
 
 ### About Shipping
 - "Shipping labels generate automatically with one click"
@@ -122,7 +123,7 @@
 
 ## ⚠️ Known Limitations (Be Ready to Explain)
 
-1. **Payment**: Demo mode - will integrate with client's Stripe account
+1. **Payment**: Demo mode - will integrate with client's existing Square account
 2. **Email**: Code ready, needs Resend API key setup
 3. **User Accounts**: Guest checkout works, user accounts can be added
 4. **Inventory**: Database tracks it, management UI can be added
@@ -149,7 +150,7 @@
 
 ## 🎉 You're Ready!
 
-Everything is set up for a successful demo. The system is fully functional except for payment processing, which you'll integrate with your client's Stripe account after the demo.
+Everything is set up for a successful demo. The system is fully functional except for payment processing, which you'll integrate with your client's existing Square account after the demo.
 
 **Key Points to Emphasize:**
 - ✅ Complete e-commerce functionality

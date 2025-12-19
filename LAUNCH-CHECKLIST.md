@@ -17,31 +17,30 @@
 
 ## 🔴 CRITICAL - Must Complete Before Launch
 
-### 1. **Stripe Payment Integration** ⚠️ **BLOCKER**
+### 1. **Square Payment Integration** ⚠️ **BLOCKER**
 **Status**: ❌ Not Started  
 **Priority**: 🔴 **CRITICAL** - Cannot accept real payments without this
 
 **What needs to be done:**
-- [ ] Schedule call with client (use `README-STRIPE-CALL.md` as guide)
-- [ ] Collect business details, bank info, verification documents
-- [ ] Create/configure Stripe account with client
-- [ ] Complete Stripe business verification
-- [ ] Get Stripe API keys:
-  - `STRIPE_PUBLISHABLE_KEY` (public key)
-  - `STRIPE_SECRET_KEY` (secret key)
-  - `STRIPE_WEBHOOK_SECRET` (for webhooks)
-- [ ] Install Stripe SDK: `npm install stripe @stripe/stripe-js`
-- [ ] Create payment intent API route (`src/app/api/payments/create-intent/route.ts`)
-- [ ] Add Stripe Elements to checkout page
-- [ ] Create webhook handler (`src/app/api/webhooks/stripe/route.ts`)
+- [ ] Schedule call with client (use `README-SQUARE-CALL.md` as guide)
+- [ ] Client already has Square account ✓ (used for in-person sales)
+- [ ] Enable online payments in Square Dashboard
+- [ ] Get Square API credentials:
+  - `SQUARE_APPLICATION_ID` (client-side)
+  - `SQUARE_ACCESS_TOKEN` (server-side)
+  - `SQUARE_LOCATION_ID` (identifies payment location)
+- [ ] Install Square SDK: `npm install square`
+- [ ] Create payment API route (`src/app/api/payments/create/route.ts`)
+- [ ] Add Square Web Payments SDK to checkout page
+- [ ] Create webhook handler (`src/app/api/webhooks/square/route.ts`)
 - [ ] Test payment flow end-to-end
-- [ ] Update orders table to store payment intent IDs
+- [ ] Update orders table to store Square payment IDs
 
 **Files to create/modify:**
-- `src/app/api/payments/create-intent/route.ts` (new)
-- `src/app/api/webhooks/stripe/route.ts` (new)
-- `src/app/checkout/page.tsx` (add Stripe Elements)
-- `.env.local` (add Stripe keys)
+- `src/app/api/payments/create/route.ts` (new)
+- `src/app/api/webhooks/square/route.ts` (new)
+- `src/app/checkout/page.tsx` (add Square Web Payments)
+- `.env.local` (add Square keys)
 
 **Estimated time**: 2-3 hours (after client call)
 
@@ -88,9 +87,9 @@
 - [ ] `SHIPPO_USE_TEST_ADDRESS` (set to `false` for production)
 - [ ] `RESEND_API_KEY` (after email setup)
 - [ ] `RESEND_FROM_EMAIL` (after email setup)
-- [ ] `STRIPE_PUBLISHABLE_KEY` (after Stripe setup)
-- [ ] `STRIPE_SECRET_KEY` (after Stripe setup)
-- [ ] `STRIPE_WEBHOOK_SECRET` (after Stripe setup)
+- [ ] `SQUARE_APPLICATION_ID` (after Square setup)
+- [ ] `SQUARE_ACCESS_TOKEN` (after Square setup)
+- [ ] `SQUARE_LOCATION_ID` (after Square setup)
 
 **Estimated time**: 10 minutes
 
@@ -209,7 +208,7 @@ Before going live, test these flows:
 - [ ] Add items to cart
 - [ ] View cart (verify shipping calculation)
 - [ ] Go through checkout
-- [ ] Complete payment (test with Stripe test card)
+- [ ] Complete payment (test with Square sandbox or small real payment)
 - [ ] Receive order confirmation email
 - [ ] Search for products
 - [ ] View event details
@@ -229,7 +228,7 @@ Before going live, test these flows:
 ## 🎯 Launch Timeline Estimate
 
 **Minimum viable launch** (Critical items only):
-- Stripe setup: 2-3 hours
+- Square setup: 2-3 hours
 - Email setup: 30-45 min
 - Environment verification: 10 min
 - Production config: 30 min
@@ -248,14 +247,14 @@ Before going live, test these flows:
 - [ ] Final test of checkout flow
 - [ ] Verify all environment variables are set in Vercel
 - [ ] Test email delivery
-- [ ] Check Stripe dashboard is ready
+- [ ] Check Square dashboard is ready
 - [ ] Verify domain is connected (if using custom domain)
 - [ ] Test admin dashboard access
 - [ ] Have client test a real order (small test purchase)
 
 **After launch:**
 - [ ] Monitor error logs in Vercel
-- [ ] Check Stripe dashboard for payments
+- [ ] Check Square dashboard for payments
 - [ ] Verify emails are sending
 - [ ] Monitor first few orders closely
 - [ ] Be available for quick fixes if needed
@@ -264,7 +263,7 @@ Before going live, test these flows:
 
 ## 📞 Support Resources
 
-- **Stripe Setup**: `README-STRIPE-CALL.md`
+- **Square Setup**: `README-SQUARE-CALL.md`
 - **Email Setup**: `README-EMAIL-SETUP.md`
 - **Shippo Setup**: `README-SHIPPO-SETUP.md`
 - **Vercel Deployment**: [Vercel Docs](https://vercel.com/docs)
@@ -272,5 +271,5 @@ Before going live, test these flows:
 ---
 
 **Last Updated**: Based on current codebase state  
-**Next Steps**: Start with Stripe setup call with client
+**Next Steps**: Start with Square setup call with client
 

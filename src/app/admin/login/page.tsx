@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { supabase } from '@/lib/supabase/client';
+import { adminSupabase } from '@/lib/supabase/admin-client';
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -20,7 +20,7 @@ export default function AdminLoginPage() {
     setError('');
 
     try {
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+      const { data, error: signInError } = await adminSupabase.auth.signInWithPassword({
         email: formData.email,
         password: formData.password,
       });
@@ -31,14 +31,14 @@ export default function AdminLoginPage() {
 
       if (data.user) {
         // Check if user is admin
-        const { data: adminCheck } = await supabase
+        const { data: adminCheck } = await adminSupabase
           .from('admin_users')
           .select('*')
           .eq('user_id', data.user.id)
           .single();
 
         if (!adminCheck) {
-          await supabase.auth.signOut();
+          await adminSupabase.auth.signOut();
           throw new Error('Access denied. Admin privileges required.');
         }
 

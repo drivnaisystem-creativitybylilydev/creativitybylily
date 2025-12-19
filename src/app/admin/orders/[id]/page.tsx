@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import OrderStatusUpdate from '@/components/admin/OrderStatusUpdate';
 import ShippingLabelButton from '@/components/admin/ShippingLabelButton';
+import DeleteOrderButton from '@/components/admin/DeleteOrderButton';
 
 export default async function OrderDetailPage({
   params,
@@ -73,7 +74,10 @@ export default async function OrderDetailPage({
               })}
             </p>
           </div>
-          <OrderStatusUpdate orderId={id} currentStatus={order.status} />
+          <div className="flex items-center gap-3">
+            <OrderStatusUpdate orderId={id} currentStatus={order.status} />
+            <DeleteOrderButton orderId={id} orderNumber={order.order_number} />
+          </div>
         </div>
       </div>
 

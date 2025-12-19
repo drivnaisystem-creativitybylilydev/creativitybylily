@@ -1,5 +1,7 @@
 import { createAdminClient } from '@/lib/supabase/server';
 import Link from 'next/link';
+import MarkAsViewed from '@/components/admin/MarkAsViewed';
+import DeleteOrderButtonInline from '@/components/admin/DeleteOrderButtonInline';
 
 export default async function AdminOrdersPage() {
   const supabase = createAdminClient();
@@ -17,8 +19,12 @@ export default async function AdminOrdersPage() {
     );
   }
 
+  // Mark all orders as viewed when admin visits this page
+  const orderIds = orders?.map((o: any) => o.id) || [];
+
   return (
     <div>
+      <MarkAsViewed type="orders" ids={orderIds} />
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="text-4xl font-light text-gray-900 mb-2">Orders</h1>
@@ -108,12 +114,15 @@ export default async function AdminOrdersPage() {
                       })}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      <Link
-                        href={`/admin/orders/${order.id}`}
-                        className="text-[color:var(--logo-pink)] hover:opacity-80 font-medium"
-                      >
-                        View →
-                      </Link>
+                      <div className="flex items-center gap-4">
+                        <Link
+                          href={`/admin/orders/${order.id}`}
+                          className="text-[color:var(--logo-pink)] hover:opacity-80 font-medium"
+                        >
+                          View →
+                        </Link>
+                        <DeleteOrderButtonInline orderId={order.id} orderNumber={order.order_number} />
+                      </div>
                     </td>
                   </tr>
                 ))}

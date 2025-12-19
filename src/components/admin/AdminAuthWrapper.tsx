@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { supabase } from '@/lib/supabase/client';
+import { adminSupabase } from '@/lib/supabase/admin-client';
 
 export default function AdminAuthWrapper({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -21,8 +21,8 @@ export default function AdminAuthWrapper({ children }: { children: React.ReactNo
       }
 
       try {
-        // Check if user is signed in
-        const { data: { session } } = await supabase.auth.getSession();
+        // Check if user is signed in (using admin client)
+        const { data: { session } } = await adminSupabase.auth.getSession();
 
         if (!session) {
           router.push('/admin/login');
@@ -30,14 +30,14 @@ export default function AdminAuthWrapper({ children }: { children: React.ReactNo
         }
 
         // Check if user is admin
-        const { data: adminCheck } = await supabase
+        const { data: adminCheck } = await adminSupabase
           .from('admin_users')
           .select('*')
           .eq('user_id', session.user.id)
           .single();
 
         if (!adminCheck) {
-          await supabase.auth.signOut();
+          await adminSupabase.auth.signOut();
           router.push('/admin/login');
           return;
         }
@@ -54,7 +54,7 @@ export default function AdminAuthWrapper({ children }: { children: React.ReactNo
     checkAuth();
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = adminSupabase.auth.onAuthStateChange((event, session) => {
       // Get current pathname dynamically (not from closure)
       const currentPath = window.location.pathname;
       const isAuthPage = currentPath === '/admin/login' || 

@@ -28,12 +28,12 @@
 
 ## 🔴 Critical Before Demo
 
-### 1. **Payment Processing (Stripe)**
-**Status**: ✅ **DEMO MODE ADDED** (Payment will be integrated with client's details)
+### 1. **Payment Processing (Square)**
+**Status**: ✅ **DEMO MODE ADDED** (Payment will be integrated with client's existing Square account)
 - **Current**: Demo mode banner added to checkout
 - **For demo**: Orders create successfully, payment integration explained
-- **After demo**: Will integrate Stripe with client's business details
-- **What to explain**: "Payment processing will be integrated using your Stripe account before launch"
+- **After demo**: Will integrate Square with client's existing account
+- **What to explain**: "Payment processing will be integrated using your existing Square account - all your sales in one place"
 
 **Time needed**: Already done ✅
 
@@ -120,14 +120,14 @@
 
 ### Minimum Setup (30 minutes)
 1. ✅ Verify all environment variables are set
-2. ⚠️ Decide on payment: Stripe test mode OR demo mode banner
+2. ⚠️ Decide on payment: Square sandbox mode OR demo mode banner
 3. ✅ Test one complete order flow
 4. ✅ Test label generation and printing
 5. ✅ Clean up test data
 
 ### Full Setup (2-3 hours)
 1. ✅ Everything above
-2. ✅ Add Stripe payment integration
+2. ✅ Add Square payment integration
 3. ✅ Set up email (Resend)
 4. ✅ Switch to real addresses
 5. ✅ Test complete end-to-end flow
@@ -153,7 +153,7 @@
 ### Potential Questions to Prepare For
 - "How do I add new products?" → Show admin dashboard
 - "How do I print labels?" → Show one-click label generation
-- "What about payment?" → Explain Stripe integration plan
+- "What about payment?" → Explain Square integration plan (client already has account)
 - "Can customers track orders?" → Show tracking number display
 - "What about inventory?" → Explain it's in database, can add management UI
 
@@ -191,11 +191,12 @@
 
 ---
 
-## 🎯 Recommended: Add Stripe Before Demo
+## 🎯 Recommended: Add Square Before Demo
 
 **Why**: Shows complete, production-ready system
 **Time**: 2-3 hours
 **Impact**: High - client sees full checkout flow
+**Bonus**: Client already has Square account, so setup is faster
 
 **If you don't have time**: Add a "Demo Mode" banner and explain payment integration is next step.
 

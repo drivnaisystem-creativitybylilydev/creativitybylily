@@ -161,6 +161,28 @@ export type Database = {
         Insert: Omit<Database['public']['Tables']['events']['Row'], 'id' | 'created_at' | 'updated_at'>;
         Update: Partial<Database['public']['Tables']['events']['Update']>;
       };
+      returns: {
+        Row: {
+          id: string;
+          return_number: string;
+          order_id: string;
+          user_id: string | null;
+          status: 'pending' | 'approved' | 'shipped' | 'received' | 'processed' | 'refunded' | 'rejected';
+          reason: string | null;
+          return_items: any; // JSONB array
+          refund_amount: number;
+          return_shipping_cost: number;
+          return_address: any; // JSONB
+          return_tracking_number: string | null;
+          return_label_url: string | null;
+          admin_notes: string | null;
+          refund_transaction_id: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Omit<Database['public']['Tables']['returns']['Row'], 'id' | 'return_number' | 'created_at' | 'updated_at'>;
+        Update: Partial<Database['public']['Tables']['returns']['Update']>;
+      };
     };
   };
 };
@@ -192,4 +214,5 @@ export type OrderItem = Database['public']['Tables']['order_items']['Row'];
 export type CartItem = Database['public']['Tables']['cart_items']['Row'];
 export type Shipment = Database['public']['Tables']['shipments']['Row'];
 export type Event = Database['public']['Tables']['events']['Row'];
+export type Return = Database['public']['Tables']['returns']['Row'];
 

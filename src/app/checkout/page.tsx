@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/contexts/CartContext';
 import Link from 'next/link';
+import { supabase } from '@/lib/supabase/client';
 
 type ShippingFormData = {
   email: string;
@@ -28,6 +29,7 @@ export default function CheckoutPage() {
   const [shippingCost, setShippingCost] = useState<number | null>(null);
   const [isCalculatingShipping, setIsCalculatingShipping] = useState(false);
   const [shippingError, setShippingError] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
   const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
   
   const [formData, setFormData] = useState<ShippingFormData>({
@@ -55,6 +57,17 @@ export default function CheckoutPage() {
   
   const tax = subtotal * 0.0625; // 6.25% tax (adjust as needed)
   const total = subtotal + shipping + tax;
+
+  // Check if user is logged in
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        setUserId(session.user.id);
+      }
+    };
+    checkUser();
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -272,6 +285,7 @@ export default function CheckoutPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          userId: userId || null, // Include user ID if logged in
           items: items.map(item => ({
             productId: item.product.id,
             variantId: item.variantId,

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { supabase } from '@/lib/supabase/client';
+import { adminSupabase } from '@/lib/supabase/admin-client';
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
@@ -19,7 +19,7 @@ export default function ForgotPasswordPage() {
     setSuccess(false);
 
     try {
-      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
+      const { error: resetError } = await adminSupabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}/admin/reset-password`,
       });
 

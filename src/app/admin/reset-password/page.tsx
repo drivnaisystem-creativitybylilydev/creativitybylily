@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { supabase } from '@/lib/supabase/client';
+import { adminSupabase } from '@/lib/supabase/admin-client';
 
 function ResetPasswordForm() {
   const router = useRouter();
@@ -20,7 +20,7 @@ function ResetPasswordForm() {
 
   useEffect(() => {
     // Listen for Supabase auth state changes, including password recovery
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const { data: { subscription } } = adminSupabase.auth.onAuthStateChange(async (event, session) => {
       console.log('Auth state change:', event, session);
       
       if (event === 'PASSWORD_RECOVERY') {
@@ -55,7 +55,7 @@ function ResetPasswordForm() {
         setError('Reset token not found in URL. Please try clicking the link from your email again, or request a new reset email.');
       } else {
         // Check if we have a session (user might already be authenticated)
-        supabase.auth.getSession().then(({ data: { session } }) => {
+        adminSupabase.auth.getSession().then(({ data: { session } }) => {
           if (session) {
             // User has a session, allow password reset
             setHasToken(true);
@@ -97,7 +97,7 @@ function ResetPasswordForm() {
       // Check if we're in recovery mode (from PASSWORD_RECOVERY event)
       if (isRecoveryMode) {
         // User is already in recovery mode, just update the password
-        const { error: updateError } = await supabase.auth.updateUser({
+        const { error: updateError } = await adminSupabase.auth.updateUser({
           password: formData.password,
         });
 
@@ -123,7 +123,7 @@ function ResetPasswordForm() {
 
       if (accessToken) {
         // Set the session with the token
-        const { error: sessionError } = await supabase.auth.setSession({
+        const { error: sessionError } = await adminSupabase.auth.setSession({
           access_token: accessToken,
           refresh_token: refreshToken || '',
         });
@@ -133,7 +133,7 @@ function ResetPasswordForm() {
         }
       } else {
         // No token in URL - check if we have a session
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        const { data: { session }, error: sessionError } = await adminSupabase.auth.getSession();
         
         if (!session || sessionError) {
           throw new Error('No valid reset session found. Please use the link from your email or request a new password reset.');
@@ -141,7 +141,7 @@ function ResetPasswordForm() {
       }
 
       // Update the password
-      const { error: updateError } = await supabase.auth.updateUser({
+      const { error: updateError } = await adminSupabase.auth.updateUser({
         password: formData.password,
       });
 

@@ -2,21 +2,22 @@
 
 ## 🔴 Critical (Required for Launch)
 
-### 1. **Payment Processing (Stripe Integration)**
+### 1. **Payment Processing (Square Integration)**
    - **Status**: ❌ Not Started
    - **What's needed**:
-     - Install Stripe SDK (`npm install stripe @stripe/stripe-js`)
-     - Create Stripe account and get API keys
-     - Add payment form to checkout page
-     - Create payment intent API route
+     - Install Square SDK (`npm install square`)
+     - Client already has Square account ✓ (used for in-person sales)
+     - Get API credentials from Square Developer Dashboard
+     - Add payment form to checkout page (Square Web Payments SDK)
+     - Create payment API route
      - Handle payment confirmation
-     - Store payment intent ID in orders table
+     - Store Square payment ID in orders table
      - Handle webhooks for payment status updates
    - **Files to create/modify**:
-     - `src/app/api/payments/create-intent/route.ts`
-     - `src/app/api/webhooks/stripe/route.ts`
-     - `src/app/checkout/page.tsx` (add Stripe Elements)
-     - `.env.local` (add `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`)
+     - `src/app/api/payments/create/route.ts`
+     - `src/app/api/webhooks/square/route.ts`
+     - `src/app/checkout/page.tsx` (add Square Web Payments)
+     - `.env.local` (add `SQUARE_APPLICATION_ID`, `SQUARE_ACCESS_TOKEN`, `SQUARE_LOCATION_ID`)
 
 ### 2. **Email Automation (Re-enable at Launch)**
    - **Status**: ⏸️ Temporarily Disabled
@@ -153,7 +154,7 @@
 
 ## 🎯 Recommended Launch Order
 
-1. **Stripe Payment Integration** (Critical - can't accept real orders without this)
+1. **Square Payment Integration** (Critical - can't accept real orders without this)
 2. **Email Setup** (Important - customers expect order confirmations)
 3. **Rollo Integration** (Important - needed for shipping workflow)
 4. **User Authentication** (Can launch without, but better UX)
