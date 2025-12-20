@@ -61,3 +61,5 @@ CREATE POLICY "Admins can view all returns" ON returns
       WHERE admin_users.user_id = auth.uid()
     )
   );
+
+

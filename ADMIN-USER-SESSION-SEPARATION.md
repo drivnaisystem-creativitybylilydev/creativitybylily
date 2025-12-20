@@ -52,3 +52,5 @@ Created separate Supabase clients with different storage mechanisms:
 - Regular user sessions persist for better UX
 - Both can be active simultaneously in different tabs
 - No more auto-login conflicts!
+
+

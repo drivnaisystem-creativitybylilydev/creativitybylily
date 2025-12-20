@@ -245,3 +245,5 @@ const footerSignature = {
 };
 
 export default ShippingConfirmationEmail;
+
+

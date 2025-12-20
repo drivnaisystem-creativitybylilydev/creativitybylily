@@ -100,3 +100,5 @@ Edit `NotificationBadge.tsx`:
 - Visiting a list page marks ALL items on that page as viewed (not just visible ones)
 - Badges refresh automatically, no page reload needed
 - System works for any admin user (not user-specific)
+
+

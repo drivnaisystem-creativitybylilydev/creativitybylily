@@ -171,3 +171,5 @@ Before testing, make sure:
 **If none of these work**, the issue might be with Supabase's email service. Consider:
 - Using a custom SMTP provider
 - Or disabling email confirmation for development
+
+

@@ -21,3 +21,5 @@ END $$;
 -- Create indexes for performance
 CREATE INDEX IF NOT EXISTS idx_orders_admin_viewed ON orders(admin_viewed_at) WHERE admin_viewed_at IS NULL;
 CREATE INDEX IF NOT EXISTS idx_returns_admin_viewed ON returns(admin_viewed_at) WHERE admin_viewed_at IS NULL;
+
+

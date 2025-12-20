@@ -45,3 +45,5 @@ export default function NotificationBadge({ type }: { type: 'orders' | 'returns'
     </span>
   );
 }
+
+

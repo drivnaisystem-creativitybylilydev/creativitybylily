@@ -39,3 +39,5 @@ export const adminSupabase = (supabaseUrl && supabaseAnonKey)
         autoRefreshToken: false,
       },
     });
+
+

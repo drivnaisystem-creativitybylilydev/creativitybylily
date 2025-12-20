@@ -193,3 +193,5 @@ If emails aren't working:
 ---
 
 **That's it!** Once you add the API key and restart, emails should start working automatically. 🎉
+
+

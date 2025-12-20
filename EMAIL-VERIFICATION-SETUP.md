@@ -110,3 +110,5 @@ If you want to skip email verification during development:
 ---
 
 **Status**: ✅ Code is ready. Just need to enable email confirmations in Supabase Dashboard.
+
+

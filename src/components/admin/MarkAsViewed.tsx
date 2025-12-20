@@ -36,3 +36,5 @@ export default function MarkAsViewed({
 
   return null;
 }
+
+

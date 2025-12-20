@@ -135,3 +135,5 @@ All emails include:
 ---
 
 **Bottom Line**: Resend is extremely affordable and perfect for your needs! The free tier will likely cover you for months, and $20/month for 50,000 emails is a great deal.
+
+
