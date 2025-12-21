@@ -127,8 +127,8 @@ export default function PrivacyPolicyPage() {
             <div className="mt-4 p-4 bg-gray-50 rounded-lg">
               <p className="text-gray-700">
                 <strong>creativity by lily</strong><br />
-                Email: info@creativitybylily.com<br />
-                Website: creativitybylily.com
+                Email: creativitybylilyco@gmail.com<br />
+                Website: creativitybylilyco.com
               </p>
             </div>
           </section>

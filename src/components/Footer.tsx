@@ -37,7 +37,7 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="#contact" className="text-gray-900 hover:text-[color:var(--logo-pink)] transition-colors text-sm">
+                <Link href="/contact" className="text-gray-900 hover:text-[color:var(--logo-pink)] transition-colors text-sm">
                   Contact
                 </Link>
               </li>
@@ -59,9 +59,9 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <a href="mailto:info@creativitybylily.com" className="text-gray-900 hover:text-[color:var(--logo-pink)] transition-colors text-sm">
+                <Link href="/contact" className="text-gray-900 hover:text-[color:var(--logo-pink)] transition-colors text-sm">
                   Contact Us
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -97,8 +97,32 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Copyright Section with Pink Separator */}
+        {/* Legal Links & Copyright Section */}
         <div className="border-t-2 border-[color:var(--logo-pink)] pt-8">
+          {/* Legal Links Row */}
+          <div className="flex flex-wrap items-center justify-center gap-4 md:gap-6 mb-6">
+            <Link href="/privacy" className="text-gray-900 hover:text-[color:var(--logo-pink)] transition-colors text-sm">
+              Privacy Policy
+            </Link>
+            <span className="text-gray-400">•</span>
+            <Link href="/terms" className="text-gray-900 hover:text-[color:var(--logo-pink)] transition-colors text-sm">
+              Terms of Service
+            </Link>
+            <span className="text-gray-400">•</span>
+            <Link href="/returns" className="text-gray-900 hover:text-[color:var(--logo-pink)] transition-colors text-sm">
+              Returns & Exchanges
+            </Link>
+            <span className="text-gray-400">•</span>
+            <Link href="/shipping" className="text-gray-900 hover:text-[color:var(--logo-pink)] transition-colors text-sm">
+              Shipping Policy
+            </Link>
+            <span className="text-gray-400">•</span>
+            <Link href="/cookies" className="text-gray-900 hover:text-[color:var(--logo-pink)] transition-colors text-sm">
+              Cookie Policy
+            </Link>
+          </div>
+          
+          {/* Copyright */}
           <p className="text-center text-gray-900 text-sm">
             © {currentYear} Creativity by Lily. All rights reserved.
           </p>

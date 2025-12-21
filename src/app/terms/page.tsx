@@ -150,7 +150,7 @@ export default function TermsOfServicePage() {
             <div className="mt-4 p-4 bg-gray-50 rounded-lg">
               <p className="text-gray-700">
                 <strong>creativity by lily</strong><br />
-                Email: info@creativitybylily.com<br />
+                Email: creativitybylilyco@gmail.com<br />
                 Website: creativitybylily.com
               </p>
             </div>

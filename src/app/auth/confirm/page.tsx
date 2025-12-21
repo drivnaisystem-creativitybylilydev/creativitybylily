@@ -13,6 +13,11 @@ export default function ConfirmEmailPage() {
   useEffect(() => {
     const verifyEmail = async () => {
       try {
+        // Make sure we're in the browser
+        if (typeof window === 'undefined') {
+          return;
+        }
+
         // Supabase sends tokens in the URL hash fragment (after #)
         // Format: #access_token=xxx&type=signup&expires_in=3600
         const hashParams = new URLSearchParams(window.location.hash.substring(1));

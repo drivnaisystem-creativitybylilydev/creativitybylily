@@ -118,7 +118,7 @@ export default function ReturnsPage() {
           <section>
             <h2 className="font-serif text-2xl font-light text-gray-900 mb-4">Damaged or Defective Items</h2>
             <p className="text-gray-700 leading-relaxed mb-4">
-              If you receive a damaged or defective item, please contact us immediately at <a href="mailto:info@creativitybylily.com" className="text-[color:var(--logo-pink)] hover:underline">info@creativitybylily.com</a> with:
+              If you receive a damaged or defective item, please contact us immediately at <a href="mailto:creativitybylilyco@gmail.com" className="text-[color:var(--logo-pink)] hover:underline">creativitybylilyco@gmail.com</a> with:
             </p>
             <ul className="list-disc list-inside text-gray-700 space-y-2 ml-4">
               <li>Your order number</li>
@@ -145,7 +145,7 @@ export default function ReturnsPage() {
             <div className="mt-4 p-4 bg-gray-50 rounded-lg">
               <p className="text-gray-700">
                 <strong>creativity by lily</strong><br />
-                Email: <a href="mailto:info@creativitybylily.com" className="text-[color:var(--logo-pink)] hover:underline">info@creativitybylily.com</a><br />
+                Email: <a href="mailto:creativitybylilyco@gmail.com" className="text-[color:var(--logo-pink)] hover:underline">creativitybylilyco@gmail.com</a><br />
                 Website: creativitybylily.com
               </p>
             </div>

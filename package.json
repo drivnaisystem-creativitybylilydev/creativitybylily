@@ -20,7 +20,8 @@
     "react-dom": "19.1.0",
     "recharts": "^3.5.1",
     "resend": "^6.5.2",
-    "shippo": "^2.15.0"
+    "shippo": "^2.15.0",
+    "square": "^43.2.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

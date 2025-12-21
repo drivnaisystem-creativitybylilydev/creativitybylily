@@ -32,6 +32,13 @@ export default function CheckoutPage() {
   const [userId, setUserId] = useState<string | null>(null);
   const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
   
+  // Square payment state
+  const [squarePayment, setSquarePayment] = useState<any>(null);
+  const [cardElementLoaded, setCardElementLoaded] = useState(false);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
+  const cardElementRef = useRef<HTMLDivElement>(null);
+  const squareApplicationId = process.env.NEXT_PUBLIC_SQUARE_APPLICATION_ID;
+  
   const [formData, setFormData] = useState<ShippingFormData>({
     email: '',
     firstName: '',
@@ -68,6 +75,102 @@ export default function CheckoutPage() {
     };
     checkUser();
   }, []);
+
+  // Load Square Web Payments SDK
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
+    if (!squareApplicationId) {
+      console.error('Square Application ID not found. Check NEXT_PUBLIC_SQUARE_APPLICATION_ID in .env.local');
+      setPaymentError('Payment system not configured. Please contact support.');
+      return;
+    }
+
+    // Add CSS to control Square iframe height and remove extra spacing
+    if (!document.getElementById('square-form-styles')) {
+      const style = document.createElement('style');
+      style.id = 'square-form-styles';
+      style.textContent = `
+        #sq-card-container {
+          padding-bottom: 0 !important;
+        }
+        #sq-card-container iframe {
+          height: 56px !important;
+          min-height: 56px !important;
+          max-height: 56px !important;
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    // Check if Square script is already loaded
+    if ((window as any).Square) {
+      initializeSquare();
+      return;
+    }
+
+    // Load Square Web Payments SDK script (use sandbox for testing, production for live)
+    const script = document.createElement('script');
+    const isSandbox = process.env.NEXT_PUBLIC_SQUARE_ENVIRONMENT === 'sandbox';
+    script.src = isSandbox 
+      ? 'https://sandbox.web.squarecdn.com/v1/square.js'
+      : 'https://web.squarecdn.com/v1/square.js';
+    script.type = 'text/javascript';
+    script.async = true;
+    script.onload = () => {
+      console.log('Square script loaded, initializing...');
+      initializeSquare();
+    };
+    script.onerror = (error) => {
+      console.error('Failed to load Square script:', error);
+      setPaymentError('Failed to load payment system. Please check your internet connection and refresh the page.');
+    };
+    document.body.appendChild(script);
+
+    return () => {
+      // Cleanup - style will persist for the session
+    };
+  }, [squareApplicationId]);
+
+  const initializeSquare = async () => {
+    if (!squareApplicationId || !cardElementRef.current) return;
+    
+    try {
+      const Square = (window as any).Square;
+      if (!Square || !Square.payments) {
+        throw new Error('Square SDK not loaded');
+      }
+      
+      const environment = process.env.NEXT_PUBLIC_SQUARE_ENVIRONMENT === 'sandbox' ? 'sandbox' : 'production';
+      const payments = Square.payments(squareApplicationId, environment);
+      
+      // Create card payment method - check if it returns a promise
+      let card;
+      try {
+        card = await payments.card();
+      } catch (err) {
+        // If card() doesn't return a promise, try calling it directly
+        card = payments.card();
+      }
+      
+      // Try mount first, then attach as fallback
+      if (card && typeof card.mount === 'function') {
+        await card.mount(cardElementRef.current);
+      } else if (card && typeof card.attach === 'function') {
+        await card.attach(cardElementRef.current);
+      } else {
+        throw new Error('Card element does not have mount or attach method');
+      }
+      
+      setCardElementLoaded(true);
+      setSquarePayment(card);
+      console.log('Square card element mounted successfully');
+    } catch (error: any) {
+      console.error('Error initializing Square:', error);
+      console.error('Square object:', (window as any).Square);
+      setPaymentError(`Failed to initialize payment system: ${error?.message || 'Unknown error'}`);
+    }
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -276,9 +379,44 @@ export default function CheckoutPage() {
     }
 
     setIsProcessing(true);
+    setPaymentError(null);
 
     try {
-      // Create order in database
+      // Step 1: Process payment with Square
+      if (!squarePayment) {
+        throw new Error('Payment form not loaded. Please refresh the page and try again.');
+      }
+
+      // Tokenize the card
+      const tokenResult = await squarePayment.tokenize();
+      if (tokenResult.status !== 'OK') {
+        throw new Error(tokenResult.errors?.[0]?.detail || 'Failed to process payment information');
+      }
+
+      // Generate idempotency key (prevents duplicate charges)
+      const idempotencyKey = `${Date.now()}-${Math.random().toString(36).substring(7)}`;
+
+      // Create payment
+      const paymentResponse = await fetch('/api/payments/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sourceId: tokenResult.token,
+          idempotencyKey,
+          amount: total,
+          currency: 'USD',
+        }),
+      });
+
+      const paymentData = await paymentResponse.json();
+
+      if (!paymentResponse.ok) {
+        throw new Error(paymentData.error || 'Payment processing failed');
+      }
+
+      // Step 2: Create order in database (only after successful payment)
       const response = await fetch('/api/orders/create', {
         method: 'POST',
         headers: {
@@ -331,6 +469,7 @@ export default function CheckoutPage() {
           tax,
           shippingCost: shipping,  // Calculated shipping or 0 for free shipping
           total,
+          paymentId: paymentData.payment?.id, // Store Square payment ID
         }),
       });
 
@@ -400,23 +539,6 @@ export default function CheckoutPage() {
         <h1 className="font-serif text-5xl font-light text-gray-900 mb-12">Checkout</h1>
 
         <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Demo Mode Banner */}
-          <div className="lg:col-span-3 mb-6">
-            <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4">
-              <div className="flex items-start gap-3">
-                <svg className="w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <div>
-                  <h3 className="font-semibold text-blue-900 mb-1">Demo Mode - Payment Integration Coming Soon</h3>
-                  <p className="text-sm text-blue-800">
-                    This checkout is fully functional for demo purposes. Orders will be created in the system. 
-                    Payment processing (Stripe) will be integrated before launch using your business details.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
 
           {/* Shipping Information */}
           <div className="lg:col-span-2 space-y-6">
@@ -634,6 +756,44 @@ export default function CheckoutPage() {
                   </div>
                 </div>
               </div>
+
+              {/* Payment Information */}
+              <div className="bg-white rounded-2xl shadow-sm p-8 mt-6">
+                <h2 className="font-serif text-3xl font-light text-gray-900 mb-6">Payment Information</h2>
+                
+                {paymentError && (
+                  <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-red-800 text-sm">{paymentError}</p>
+                  </div>
+                )}
+
+                {!cardElementLoaded && (
+                  <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p className="text-blue-800 text-sm">Loading secure payment form...</p>
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900 mb-2">
+                    Card Details *
+                  </label>
+                  <div 
+                    id="sq-card-container" 
+                    ref={cardElementRef} 
+                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg bg-white focus-within:ring-2 focus-within:ring-[color:var(--logo-pink)] focus-within:border-[color:var(--logo-pink)] transition-all"
+                    style={{ overflow: 'hidden' }}
+                  ></div>
+                </div>
+                
+                <div className="flex items-start gap-2 mt-4">
+                  <svg className="w-5 h-5 text-gray-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                  <p className="text-sm text-gray-600">
+                    Your payment information is secure and encrypted. We never see your full card details.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -706,14 +866,16 @@ export default function CheckoutPage() {
 
               <button
                 type="submit"
-                disabled={isProcessing}
+                disabled={isProcessing || !cardElementLoaded}
                 className="w-full bg-[color:var(--logo-pink)] text-white px-8 py-4 rounded-full font-medium hover:opacity-90 transition-opacity duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isProcessing ? 'Processing...' : `Complete Order - $${total.toFixed(2)}`}
+                {isProcessing ? 'Processing Payment...' : `Complete Order - $${total.toFixed(2)}`}
               </button>
+              {!cardElementLoaded && (
               <p className="text-xs text-gray-500 text-center mt-2">
-                Payment processing will be integrated before launch
+                  Please wait for the payment form to load...
               </p>
+              )}
 
               <Link
                 href="/cart"

@@ -25,6 +25,7 @@ export async function POST(request: Request) {
       tax,
       shippingCost = 0,
       total,
+      paymentId, // Square payment ID
     } = body;
 
     // Validate required fields
@@ -126,7 +127,7 @@ export async function POST(request: Request) {
       .insert({
         user_id: userId || null, // Link to user account if logged in
         order_number: orderNumber,
-        status: 'pending',
+        status: paymentId ? 'paid' : 'pending', // Mark as paid if payment ID exists
         subtotal,
         tax,
         shipping: shippingCost,
@@ -137,6 +138,7 @@ export async function POST(request: Request) {
         customer_first_name: customerFirstName,
         customer_last_name: customerLastName,
         customer_phone: customerPhone,
+        payment_id: paymentId || null, // Store Square payment ID
       })
       .select()
       .single();
