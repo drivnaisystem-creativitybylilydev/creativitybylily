@@ -6,6 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { supabase } from '@/lib/supabase/client';
 import DeleteAccountButton from '@/components/DeleteAccountButton';
+import ReturnTrackingInput from '@/components/ReturnTrackingInput';
 import type { Product } from '@/lib/supabase/types';
 
 type Order = {
@@ -33,14 +34,27 @@ type UserProfile = {
   phone: string | null;
 };
 
+type Return = {
+  id: string;
+  return_number: string;
+  status: string;
+  refund_amount: number;
+  return_tracking_number: string | null;
+  created_at: string;
+  orders: {
+    order_number: string;
+  };
+};
+
 export default function AccountPage() {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
+  const [returns, setReturns] = useState<Return[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'orders' | 'profile'>('orders');
+  const [activeTab, setActiveTab] = useState<'orders' | 'returns' | 'profile'>('orders');
 
   useEffect(() => {
     const loadAccountData = async () => {
@@ -85,6 +99,22 @@ export default function AccountPage() {
 
         if (ordersData) {
           setOrders(ordersData as Order[]);
+        }
+
+        // Get user returns
+        const { data: returnsData } = await supabase
+          .from('returns')
+          .select(`
+            *,
+            orders (
+              order_number
+            )
+          `)
+          .eq('user_id', session.user.id)
+          .order('created_at', { ascending: false });
+
+        if (returnsData) {
+          setReturns(returnsData as Return[]);
         }
 
         // Fetch featured products for carousel
@@ -169,6 +199,16 @@ export default function AccountPage() {
               }`}
             >
               Orders
+            </button>
+            <button
+              onClick={() => setActiveTab('returns')}
+              className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'returns'
+                  ? 'border-[color:var(--logo-pink)] text-[color:var(--logo-pink)]'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              Returns {returns.length > 0 && `(${returns.length})`}
             </button>
             <button
               onClick={() => setActiveTab('profile')}
@@ -298,6 +338,101 @@ export default function AccountPage() {
                     </div>
                   </div>
                 ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Returns Tab */}
+        {activeTab === 'returns' && (
+          <div>
+            {returns.length === 0 ? (
+              <div className="bg-white rounded-2xl shadow-sm p-12 text-center">
+                <p className="text-gray-600 mb-6">You don't have any return requests yet.</p>
+                <Link
+                  href="/returns"
+                  className="inline-flex items-center gap-2 bg-[color:var(--logo-pink)] text-white px-8 py-4 rounded-full font-medium hover:opacity-90 transition-opacity"
+                >
+                  Start a Return
+                </Link>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {returns.map((returnItem) => {
+                  const getStatusColor = (status: string) => {
+                    switch (status) {
+                      case 'pending':
+                        return 'bg-yellow-100 text-yellow-800';
+                      case 'approved':
+                        return 'bg-blue-100 text-blue-800';
+                      case 'shipped':
+                        return 'bg-purple-100 text-purple-800';
+                      case 'received':
+                        return 'bg-indigo-100 text-indigo-800';
+                      case 'processed':
+                        return 'bg-green-100 text-green-800';
+                      case 'refunded':
+                        return 'bg-gray-100 text-gray-800';
+                      case 'rejected':
+                        return 'bg-red-100 text-red-800';
+                      default:
+                        return 'bg-gray-100 text-gray-800';
+                    }
+                  };
+
+                  return (
+                    <div key={returnItem.id} className="bg-white rounded-2xl shadow-sm p-6">
+                      <div className="flex items-start justify-between mb-4">
+                        <div>
+                          <h3 className="font-semibold text-gray-900 mb-1">
+                            Return #{returnItem.return_number}
+                          </h3>
+                          <p className="text-sm text-gray-600">
+                            Order #{returnItem.orders?.order_number || 'N/A'}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            Requested on {new Date(returnItem.created_at).toLocaleDateString('en-US', {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric',
+                            })}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold text-lg text-gray-900">
+                            ${returnItem.refund_amount.toFixed(2)}
+                          </p>
+                          <span
+                            className={`inline-block px-3 py-1 rounded-full text-xs font-medium mt-2 ${getStatusColor(
+                              returnItem.status
+                            )}`}
+                          >
+                            {returnItem.status.charAt(0).toUpperCase() + returnItem.status.slice(1)}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Tracking Input Component */}
+                      <div className="mt-4 pt-4 border-t border-gray-200">
+                        <ReturnTrackingInput
+                          returnId={returnItem.id}
+                          returnNumber={returnItem.return_number}
+                          currentStatus={returnItem.status}
+                          currentTracking={returnItem.return_tracking_number}
+                        />
+                      </div>
+
+                      <div className="mt-4 pt-4 border-t border-gray-200">
+                        <Link
+                          href={`/returns/confirmation?return=${returnItem.return_number}`}
+                          className="text-sm text-[color:var(--logo-pink)] hover:underline"
+                        >
+                          View Return Details →
+                        </Link>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>

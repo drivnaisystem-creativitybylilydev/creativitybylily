@@ -193,3 +193,5 @@ These are **not monthly fees** - you only pay when you make a sale:
 
 **Bottom Line:** You can launch for essentially **$0/month** (just buy a domain for ~$12/year). All other costs are transaction fees that come out of sales, which is standard for e-commerce.
 
+
+

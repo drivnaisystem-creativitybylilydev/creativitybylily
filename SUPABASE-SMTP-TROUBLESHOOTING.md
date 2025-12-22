@@ -155,3 +155,5 @@ If none of this works:
 3. Contact Supabase support with your project details
 4. Or use Supabase's default email service for now and set up SMTP later
 
+
+

@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
 import { sendReturnApprovedEmail, sendRefundProcessedEmail } from '@/lib/email';
+import { Client, Environment } from 'square';
+import type { RefundPaymentRequest, Money } from 'square';
 
 export async function PATCH(
   request: Request,
@@ -33,7 +35,7 @@ export async function PATCH(
       updateData.admin_notes = adminNotes;
     }
 
-    // Get return with order details for email
+    // Get return with order details for email and refund processing
     const { data: returnData, error: fetchError } = await supabase
       .from('returns')
       .select(`
@@ -42,7 +44,9 @@ export async function PATCH(
           customer_email,
           customer_first_name,
           customer_last_name,
-          order_number
+          order_number,
+          payment_id,
+          payment_intent_id
         )
       `)
       .eq('id', id)
@@ -54,6 +58,84 @@ export async function PATCH(
         { error: 'Failed to fetch return', details: fetchError.message },
         { status: 500 }
       );
+    }
+
+    // If status is 'refunded', process refund through Square first
+    let refundTransactionId: string | null = null;
+    if (status === 'refunded') {
+      const order = (returnData as any).orders;
+      // Check both payment_id (Square) and payment_intent_id (legacy/Stripe)
+      const paymentId = order?.payment_id || order?.payment_intent_id;
+
+      if (!paymentId) {
+        return NextResponse.json(
+          { error: 'Cannot process refund: Original payment ID not found for this order' },
+          { status: 400 }
+        );
+      }
+
+      // Initialize Square client
+      if (!process.env.SQUARE_ACCESS_TOKEN) {
+        return NextResponse.json(
+          { error: 'Square credentials not configured' },
+          { status: 500 }
+        );
+      }
+
+      const squareClient = new Client({
+        environment: (process.env.SQUARE_ENVIRONMENT as Environment) || Environment.Production,
+        accessToken: process.env.SQUARE_ACCESS_TOKEN,
+      });
+
+      try {
+        // Convert refund amount to cents (Square expects amount in smallest currency unit)
+        const refundAmountCents = Math.round(returnData.refund_amount * 100);
+        
+        const refundMoney: Money = {
+          amount: refundAmountCents,
+          currency: 'USD',
+        };
+
+        // Create refund request
+        const refundRequest: RefundPaymentRequest = {
+          idempotencyKey: `refund-${returnData.id}-${Date.now()}`, // Unique key to prevent duplicate refunds
+          amountMoney: refundMoney,
+          paymentId: paymentId,
+        };
+
+        // Process refund through Square API
+        const { result, statusCode } = await squareClient.refundsApi.refundPayment(refundRequest);
+
+        if (statusCode !== 200 || !result.refund) {
+          console.error('Square refund failed:', result);
+          return NextResponse.json(
+            {
+              error: result.errors?.[0]?.detail || 'Refund processing failed',
+              details: result.errors,
+            },
+            { status: statusCode || 500 }
+          );
+        }
+
+        // Store refund transaction ID
+        refundTransactionId = result.refund.id;
+        updateData.refund_transaction_id = refundTransactionId;
+
+        console.log('Refund processed successfully:', {
+          refundId: refundTransactionId,
+          amount: returnData.refund_amount,
+          paymentId,
+        });
+      } catch (refundError: any) {
+        console.error('Error processing Square refund:', refundError);
+        return NextResponse.json(
+          {
+            error: 'Failed to process refund through Square',
+            details: process.env.NODE_ENV === 'development' ? refundError?.message : undefined,
+          },
+          { status: 500 }
+        );
+      }
     }
 
     const { data, error } = await supabase
@@ -89,7 +171,7 @@ export async function PATCH(
             customerName: order.customer_first_name || 'Customer',
             customerEmail: order.customer_email,
             refundAmount: returnData.refund_amount,
-            refundTransactionId: returnData.refund_transaction_id || undefined,
+            refundTransactionId: refundTransactionId || returnData.refund_transaction_id || undefined,
           });
         }
       }

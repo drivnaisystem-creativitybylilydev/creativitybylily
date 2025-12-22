@@ -101,3 +101,5 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
 **After adding the Supabase variables and restarting, try signing up again!**
 
+
+
