@@ -2,12 +2,6 @@ import { NextResponse } from 'next/server';
 import { Client, Environment } from 'square';
 import type { CreatePaymentRequest, Money } from 'square';
 
-// Initialize Square client
-const squareClient = new Client({
-  environment: (process.env.SQUARE_ENVIRONMENT as Environment) || Environment.Production,
-  accessToken: process.env.SQUARE_ACCESS_TOKEN || '',
-});
-
 export async function POST(request: Request) {
   try {
     // Verify environment variables are set
@@ -18,6 +12,12 @@ export async function POST(request: Request) {
         { status: 500 }
       );
     }
+
+    // Initialize Square client inside the function to avoid build-time issues
+    const squareClient = new Client({
+      environment: (process.env.SQUARE_ENVIRONMENT as Environment) || Environment.Production,
+      accessToken: process.env.SQUARE_ACCESS_TOKEN,
+    });
 
     const body = await request.json();
     const { sourceId, idempotencyKey, amount, currency = 'USD' } = body;
