@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
-// Email functionality temporarily disabled - will re-enable at launch
-// import { sendOrderConfirmationEmail } from '@/lib/email';
+import { sendOrderConfirmationEmail } from '@/lib/email';
 
 export async function POST(request: Request) {
   try {
@@ -205,8 +204,56 @@ export async function POST(request: Request) {
       }
     }
 
-    // Email functionality temporarily disabled - will re-enable at launch
-    // Order confirmation emails will be added back when ready
+    // Send order confirmation email
+    try {
+      // Fetch order items with product details for email
+      const { data: orderItemsWithProducts } = await supabase
+        .from('order_items')
+        .select(`
+          quantity,
+          price,
+          products (
+            id,
+            title,
+            image_url
+          )
+        `)
+        .eq('order_id', order.id);
+
+      if (orderItemsWithProducts) {
+        const emailItems = orderItemsWithProducts.map((item: any) => ({
+          productId: item.products.id,
+          productTitle: item.products.title,
+          productImage: item.products.image_url,
+          quantity: item.quantity,
+          price: item.price,
+        }));
+
+        await sendOrderConfirmationEmail({
+          orderNumber: order.order_number,
+          customerName: `${customerFirstName} ${customerLastName}`,
+          customerEmail: customerEmail,
+          items: emailItems,
+          subtotal,
+          tax,
+          shipping: shippingCost,
+          total,
+          shippingAddress: {
+            firstName: customerFirstName,
+            lastName: customerLastName,
+            address: shippingAddress.address,
+            address2: shippingAddress.address2,
+            city: shippingAddress.city,
+            state: shippingAddress.state,
+            zip: shippingAddress.zip,
+            country: shippingAddress.country || 'US',
+          },
+        });
+      }
+    } catch (emailError) {
+      // Don't fail the order if email fails, just log it
+      console.error('Error sending order confirmation email:', emailError);
+    }
 
     return NextResponse.json({
       success: true,
