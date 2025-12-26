@@ -759,39 +759,87 @@ export default function CheckoutPage() {
 
               {/* Payment Information */}
               <div className="bg-white rounded-2xl shadow-sm p-8 mt-6">
-                <h2 className="font-serif text-3xl font-light text-gray-900 mb-6">Payment Information</h2>
+                <h2 className="font-serif text-3xl font-light text-gray-900 mb-2">Payment</h2>
+                <p className="text-sm text-gray-600 mb-6">All transactions are secure and encrypted</p>
                 
                 {paymentError && (
-                  <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-                    <p className="text-red-800 text-sm">{paymentError}</p>
+                  <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-red-800 text-sm font-medium">{paymentError}</p>
                   </div>
                 )}
 
                 {!cardElementLoaded && (
-                  <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                    <p className="text-blue-800 text-sm">Loading secure payment form...</p>
+                  <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                      <p className="text-blue-800 text-sm">Loading secure payment form...</p>
+                    </div>
                   </div>
                 )}
 
-                <div>
-                  <label className="block text-sm font-semibold text-gray-900 mb-2">
-                    Card Details *
+                {/* Payment Method Selection */}
+                <div className="mb-6">
+                  <label className="block text-sm font-semibold text-gray-900 mb-3">
+                    Payment Method
                   </label>
-                  <div 
-                    id="sq-card-container" 
-                    ref={cardElementRef} 
-                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg bg-white focus-within:ring-2 focus-within:ring-[color:var(--logo-pink)] focus-within:border-[color:var(--logo-pink)] transition-all"
-                    style={{ overflow: 'hidden' }}
-                  ></div>
+                  <div className="flex gap-3">
+                    <button
+                      type="button"
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-3 border-2 border-[color:var(--logo-pink)] bg-pink-50 rounded-lg cursor-default"
+                    >
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                      </svg>
+                      <span className="font-medium text-gray-900">Credit Card</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Card Details Section */}
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-900 mb-3">
+                      Card Information
+                    </label>
+                    
+                    {/* Card Brand Icons */}
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="flex items-center gap-1">
+                        <div className="w-8 h-5 bg-blue-600 rounded flex items-center justify-center">
+                          <span className="text-white text-xs font-bold">VISA</span>
+                        </div>
+                        <div className="w-8 h-5 bg-red-600 rounded flex items-center justify-center">
+                          <span className="text-white text-xs font-bold">MC</span>
+                        </div>
+                        <div className="w-8 h-5 bg-blue-500 rounded flex items-center justify-center">
+                          <span className="text-white text-xs font-bold">AMEX</span>
+                        </div>
+                        <div className="w-8 h-5 bg-orange-500 rounded flex items-center justify-center">
+                          <span className="text-white text-xs font-bold">DISC</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Square Card Input Container */}
+                    <div 
+                      id="sq-card-container" 
+                      ref={cardElementRef} 
+                      className="w-full min-h-[56px] px-4 py-3 border-2 border-gray-300 rounded-lg bg-white focus-within:ring-2 focus-within:ring-[color:var(--logo-pink)] focus-within:border-[color:var(--logo-pink)] transition-all"
+                      style={{ overflow: 'hidden' }}
+                    ></div>
+                  </div>
                 </div>
                 
-                <div className="flex items-start gap-2 mt-4">
-                  <svg className="w-5 h-5 text-gray-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                  </svg>
-                  <p className="text-sm text-gray-600">
-                    Your payment information is secure and encrypted. We never see your full card details.
-                  </p>
+                {/* Security Badge */}
+                <div className="mt-6 pt-6 border-t border-gray-200">
+                  <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
+                    <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                    <span className="font-medium">Secured by Square</span>
+                    <span className="text-gray-400">•</span>
+                    <span>256-bit SSL encryption</span>
+                  </div>
                 </div>
               </div>
             </div>
