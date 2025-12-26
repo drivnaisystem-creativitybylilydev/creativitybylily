@@ -21,22 +21,35 @@ export default function LoginPage() {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         // Check if user is admin - if so, redirect to admin dashboard
-        const { data: adminCheck } = await supabase
-          .from('admin_users')
-          .select('*')
-          .eq('user_id', session.user.id)
-          .single();
+        // Make this check non-blocking
+        try {
+          const { data: adminCheck, error: adminCheckError } = await supabase
+            .from('admin_users')
+            .select('*')
+            .eq('user_id', session.user.id)
+            .maybeSingle(); // Use maybeSingle() instead of single()
 
-        if (adminCheck) {
-          // Also set session in admin client
-          await adminSupabase.auth.setSession({
-            access_token: session.access_token,
-            refresh_token: session.refresh_token,
-          });
-          router.push('/admin');
-        } else {
-          router.push('/account');
+          if (adminCheck && !adminCheckError) {
+            // Also set session in admin client
+            try {
+              await adminSupabase.auth.setSession({
+                access_token: session.access_token,
+                refresh_token: session.refresh_token,
+              });
+            } catch (sessionError) {
+              // If setting admin session fails, continue anyway
+              console.warn('Could not set admin session:', sessionError);
+            }
+            router.push('/admin');
+            return;
+          }
+        } catch (adminError) {
+          // If admin check fails, treat as regular user
+          console.warn('Admin check failed:', adminError);
         }
+        
+        // Regular user or admin check failed - redirect to account
+        router.push('/account');
       }
     };
     checkSession();
@@ -59,24 +72,40 @@ export default function LoginPage() {
 
       if (data.user) {
         // Check if user is admin - if so, redirect to admin
-        const { data: adminCheck } = await supabase
-          .from('admin_users')
-          .select('*')
-          .eq('user_id', data.user.id)
-          .single();
+        // Make this check non-blocking so login always works
+        try {
+          const { data: adminCheck, error: adminCheckError } = await supabase
+            .from('admin_users')
+            .select('*')
+            .eq('user_id', data.user.id)
+            .maybeSingle(); // Use maybeSingle() instead of single() to avoid errors if not found
 
-        if (adminCheck) {
-          // Admin user: also set session in admin client so they don't need to log in twice
-          if (data.session) {
-            await adminSupabase.auth.setSession({
-              access_token: data.session.access_token,
-              refresh_token: data.session.refresh_token,
-            });
+          if (adminCheck && !adminCheckError) {
+            // Admin user: also set session in admin client so they don't need to log in twice
+            // If this fails, user can still log in via admin login page
+            if (data.session) {
+              try {
+                await adminSupabase.auth.setSession({
+                  access_token: data.session.access_token,
+                  refresh_token: data.session.refresh_token,
+                });
+              } catch (sessionError) {
+                // If setting admin session fails, continue anyway
+                // User can log in via admin login page if needed
+                console.warn('Could not set admin session:', sessionError);
+              }
+            }
+            router.push('/admin');
+            router.refresh();
+            return; // Exit early for admin users
           }
-          router.push('/admin');
-        } else {
-          router.push('/account');
+        } catch (adminError) {
+          // If admin check fails, treat as regular user
+          console.warn('Admin check failed, treating as regular user:', adminError);
         }
+
+        // Regular user or admin check failed - redirect to account
+        router.push('/account');
         router.refresh();
       }
     } catch (err: any) {
