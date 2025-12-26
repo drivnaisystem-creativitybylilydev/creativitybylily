@@ -105,7 +105,7 @@ export default function CartPage() {
                               alert(err.message);
                             }
                           }}
-                          className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors"
+                          className="w-8 h-8 rounded-full border border-gray-800 text-gray-800 flex items-center justify-center hover:bg-gray-100 transition-colors"
                           aria-label="Decrease quantity"
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -122,7 +122,7 @@ export default function CartPage() {
                             }
                           }}
                           disabled={(item.product.inventory_count || 0) <= item.quantity}
-                          className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="w-8 h-8 rounded-full border border-gray-800 text-gray-800 flex items-center justify-center hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                           aria-label="Increase quantity"
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
