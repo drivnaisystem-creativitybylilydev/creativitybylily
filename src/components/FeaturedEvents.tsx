@@ -2,6 +2,10 @@ import { createServerClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import Image from 'next/image';
 
+// Force dynamic rendering to prevent stale cache
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function FeaturedEvents() {
   const supabase = createServerClient();
   const now = new Date().toISOString();
