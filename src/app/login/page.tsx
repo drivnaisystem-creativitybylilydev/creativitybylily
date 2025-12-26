@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase/client';
+import { adminSupabase } from '@/lib/supabase/admin-client';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -19,7 +20,23 @@ export default function LoginPage() {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        router.push('/account');
+        // Check if user is admin - if so, redirect to admin dashboard
+        const { data: adminCheck } = await supabase
+          .from('admin_users')
+          .select('*')
+          .eq('user_id', session.user.id)
+          .single();
+
+        if (adminCheck) {
+          // Also set session in admin client
+          await adminSupabase.auth.setSession({
+            access_token: session.access_token,
+            refresh_token: session.refresh_token,
+          });
+          router.push('/admin');
+        } else {
+          router.push('/account');
+        }
       }
     };
     checkSession();
@@ -49,6 +66,13 @@ export default function LoginPage() {
           .single();
 
         if (adminCheck) {
+          // Admin user: also set session in admin client so they don't need to log in twice
+          if (data.session) {
+            await adminSupabase.auth.setSession({
+              access_token: data.session.access_token,
+              refresh_token: data.session.refresh_token,
+            });
+          }
           router.push('/admin');
         } else {
           router.push('/account');
