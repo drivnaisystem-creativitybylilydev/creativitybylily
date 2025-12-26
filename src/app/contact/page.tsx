@@ -148,7 +148,7 @@ export default function ContactPage() {
                   required
                   value={formData.name}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[color:var(--logo-pink)] focus:border-transparent outline-none transition-colors"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-black focus:ring-2 focus:ring-[color:var(--logo-pink)] focus:border-transparent outline-none transition-colors"
                   placeholder="Your name"
                 />
               </div>
@@ -164,7 +164,7 @@ export default function ContactPage() {
                   required
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[color:var(--logo-pink)] focus:border-transparent outline-none transition-colors"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-black focus:ring-2 focus:ring-[color:var(--logo-pink)] focus:border-transparent outline-none transition-colors"
                   placeholder="your.email@example.com"
                 />
               </div>
@@ -179,7 +179,7 @@ export default function ContactPage() {
                   required
                   value={formData.subject}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[color:var(--logo-pink)] focus:border-transparent outline-none transition-colors"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-black bg-white focus:ring-2 focus:ring-[color:var(--logo-pink)] focus:border-transparent outline-none transition-colors"
                 >
                   <option value="">Select a subject</option>
                   <option value="Order Inquiry">Order Inquiry</option>
@@ -202,7 +202,7 @@ export default function ContactPage() {
                   rows={6}
                   value={formData.message}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[color:var(--logo-pink)] focus:border-transparent outline-none transition-colors resize-none"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-black focus:ring-2 focus:ring-[color:var(--logo-pink)] focus:border-transparent outline-none transition-colors resize-none"
                   placeholder="Tell us how we can help..."
                 />
               </div>
@@ -262,6 +262,7 @@ export default function ContactPage() {
     </div>
   );
 }
+
 
 
 
