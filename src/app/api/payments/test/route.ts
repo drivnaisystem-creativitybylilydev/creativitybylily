@@ -7,10 +7,26 @@ export async function GET() {
     // Try CommonJS require
     const square = require('square');
     console.log('Square SDK loaded via require');
-    console.log('Available exports:', Object.keys(square));
-    console.log('Client type:', typeof square.Client);
-    console.log('Is Client a function?:', typeof square.Client === 'function');
     
+    const exports = Object.keys(square);
+    const clientType = typeof square.Client;
+    const isFunction = typeof square.Client === 'function';
+    
+    console.log('Available exports:', exports);
+    console.log('Client type:', clientType);
+    console.log('Is Client a function?:', isFunction);
+    
+    // Return debug info
+    return NextResponse.json({
+      message: 'Debug info',
+      exports: exports,
+      clientType: clientType,
+      isClientFunction: isFunction,
+      hasClient: !!square.Client,
+      squareKeys: exports.slice(0, 20), // First 20 keys
+    });
+    
+    /*
     const Client = square.Client;
     
     if (!Client || typeof Client !== 'function') {
@@ -22,6 +38,7 @@ export async function GET() {
       environment: 'production',
       accessToken: process.env.SQUARE_ACCESS_TOKEN!,
     });
+    */
     
     return NextResponse.json({
       message: 'Square client initialized successfully',
