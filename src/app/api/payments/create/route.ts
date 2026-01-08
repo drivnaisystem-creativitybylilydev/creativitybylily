@@ -19,9 +19,13 @@ export async function POST(request: Request) {
 
     console.log('Initializing Square client...');
     // Initialize Square client inside the function to avoid build-time issues
-    const { SquareClient } = require('square');
+    const { SquareClient, SquareEnvironment } = require('square');
+    const environment = process.env.SQUARE_ENVIRONMENT === 'sandbox' 
+      ? SquareEnvironment.Sandbox 
+      : SquareEnvironment.Production;
+    
     const squareClient = new SquareClient({
-      environment: (process.env.SQUARE_ENVIRONMENT as 'production' | 'sandbox') || 'production',
+      environment: environment,
       accessToken: process.env.SQUARE_ACCESS_TOKEN,
     });
     console.log('Square client initialized successfully');
