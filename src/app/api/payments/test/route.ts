@@ -4,11 +4,18 @@ export async function GET() {
   console.log('TEST ROUTE CALLED');
   
   try {
-    // Try to dynamically import Square SDK
-    const square = await import('square');
-    console.log('Square SDK imported:', Object.keys(square));
+    // Try CommonJS require
+    const square = require('square');
+    console.log('Square SDK loaded via require');
+    console.log('Available exports:', Object.keys(square));
+    console.log('Client type:', typeof square.Client);
+    console.log('Is Client a function?:', typeof square.Client === 'function');
     
-    const { Client } = square;
+    const Client = square.Client;
+    
+    if (!Client || typeof Client !== 'function') {
+      throw new Error('Client is not available or not a constructor');
+    }
     
     // Try to initialize Square client
     const squareClient = new Client({
