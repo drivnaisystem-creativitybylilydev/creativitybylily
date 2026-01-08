@@ -42,8 +42,9 @@ export async function POST(request: Request) {
 
     console.log('All fields validated, preparing payment...');
     // Convert amount to Money object (Square expects amount in smallest currency unit, e.g., cents)
+    // Square SDK v43+ requires bigint for amount
     const amountMoney: Money = {
-      amount: Math.round(amount * 100), // Convert dollars to cents
+      amount: BigInt(Math.round(amount * 100)), // Convert dollars to cents as bigint
       currency,
     };
 
