@@ -4,41 +4,26 @@ export async function GET() {
   console.log('TEST ROUTE CALLED');
   
   try {
-    // Try CommonJS require
-    const square = require('square');
-    console.log('Square SDK loaded via require');
-    
-    const exports = Object.keys(square);
-    const clientType = typeof square.Client;
-    const isFunction = typeof square.Client === 'function';
-    
-    console.log('Available exports:', exports);
-    console.log('Client type:', clientType);
-    console.log('Is Client a function?:', isFunction);
-    
-    // Return debug info
-    return NextResponse.json({
-      message: 'Debug info',
-      exports: exports,
-      clientType: clientType,
-      isClientFunction: isFunction,
-      hasClient: !!square.Client,
-      squareKeys: exports.slice(0, 20), // First 20 keys
-    });
-    
-    /*
-    const Client = square.Client;
-    
-    if (!Client || typeof Client !== 'function') {
-      throw new Error('Client is not available or not a constructor');
-    }
+    // Use SquareClient instead of Client
+    const { SquareClient } = require('square');
+    console.log('SquareClient loaded via require');
     
     // Try to initialize Square client
-    const squareClient = new Client({
+    const squareClient = new SquareClient({
       environment: 'production',
       accessToken: process.env.SQUARE_ACCESS_TOKEN!,
     });
-    */
+    
+    console.log('SquareClient initialized successfully!');
+    
+    return NextResponse.json({
+      message: 'SquareClient initialized successfully!',
+      env: {
+        hasAccessToken: !!process.env.SQUARE_ACCESS_TOKEN,
+        hasLocationId: !!process.env.SQUARE_LOCATION_ID,
+        environment: process.env.SQUARE_ENVIRONMENT,
+      }
+    });
     
     return NextResponse.json({
       message: 'Square client initialized successfully',

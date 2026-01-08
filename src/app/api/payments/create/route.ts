@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { Client } from 'square';
 import type { CreatePaymentRequest, Money } from 'square';
 
 export async function POST(request: Request) {
@@ -20,7 +19,8 @@ export async function POST(request: Request) {
 
     console.log('Initializing Square client...');
     // Initialize Square client inside the function to avoid build-time issues
-    const squareClient = new Client({
+    const { SquareClient } = require('square');
+    const squareClient = new SquareClient({
       environment: (process.env.SQUARE_ENVIRONMENT as 'production' | 'sandbox') || 'production',
       accessToken: process.env.SQUARE_ACCESS_TOKEN,
     });
