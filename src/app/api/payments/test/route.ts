@@ -1,10 +1,15 @@
 import { NextResponse } from 'next/server';
-import { Client } from 'square';
 
 export async function GET() {
   console.log('TEST ROUTE CALLED');
   
   try {
+    // Try to dynamically import Square SDK
+    const square = await import('square');
+    console.log('Square SDK imported:', Object.keys(square));
+    
+    const { Client } = square;
+    
     // Try to initialize Square client
     const squareClient = new Client({
       environment: 'production',
