@@ -16,9 +16,10 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     optimizePackageImports: ['@/data/gallery'],
+    serverComponentsExternalPackages: ['square'], // Don't bundle Square SDK
   },
   compiler: {
-    removeConsole: process.env.NODE_ENV === 'production',
+    removeConsole: false, // Keep console logs for debugging
   },
 };
 
