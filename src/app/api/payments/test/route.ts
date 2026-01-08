@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { Client, Environment } from 'square';
+import { Client } from 'square';
 
 export async function GET() {
   console.log('TEST ROUTE CALLED');
@@ -7,7 +7,7 @@ export async function GET() {
   try {
     // Try to initialize Square client
     const squareClient = new Client({
-      environment: Environment.Production,
+      environment: 'production',
       accessToken: process.env.SQUARE_ACCESS_TOKEN!,
     });
     
