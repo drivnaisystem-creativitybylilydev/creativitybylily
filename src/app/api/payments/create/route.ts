@@ -56,18 +56,20 @@ export async function POST(request: Request) {
     };
 
     console.log('Calling Square API...');
-    // Create payment using Square API
-    const { result, statusCode } = await squareClient.paymentsApi.createPayment(paymentRequest);
-    console.log('Square API responded with status:', statusCode);
+    // Create payment using Square API (use .payments not .paymentsApi)
+    const response = await squareClient.payments.create(paymentRequest);
+    console.log('Square API responded:', response);
+    
+    const { result } = response;
 
-    if (statusCode !== 200 || !result.payment) {
+    if (!result || !result.payment) {
       console.error('Square payment failed:', result);
       return NextResponse.json(
         { 
-          error: result.errors?.[0]?.detail || 'Payment processing failed',
-          details: result.errors,
+          error: result?.errors?.[0]?.detail || 'Payment processing failed',
+          details: result?.errors,
         },
-        { status: statusCode || 500 }
+        { status: 500 }
       );
     }
 
