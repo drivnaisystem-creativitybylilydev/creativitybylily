@@ -4,6 +4,11 @@ import type { CreatePaymentRequest, Money } from 'square';
 
 export async function POST(request: Request) {
   try {
+    console.log('=== Payment API Called ===');
+    console.log('SQUARE_ACCESS_TOKEN exists:', !!process.env.SQUARE_ACCESS_TOKEN);
+    console.log('SQUARE_LOCATION_ID exists:', !!process.env.SQUARE_LOCATION_ID);
+    console.log('SQUARE_ENVIRONMENT:', process.env.SQUARE_ENVIRONMENT);
+    
     // Verify environment variables are set
     if (!process.env.SQUARE_ACCESS_TOKEN || !process.env.SQUARE_LOCATION_ID) {
       console.error('Square credentials not configured');
@@ -13,23 +18,29 @@ export async function POST(request: Request) {
       );
     }
 
+    console.log('Initializing Square client...');
     // Initialize Square client inside the function to avoid build-time issues
     const squareClient = new Client({
       environment: (process.env.SQUARE_ENVIRONMENT as Environment) || Environment.Production,
       accessToken: process.env.SQUARE_ACCESS_TOKEN,
     });
+    console.log('Square client initialized successfully');
 
+    console.log('Parsing request body...');
     const body = await request.json();
+    console.log('Request body:', { ...body, sourceId: body.sourceId ? 'EXISTS' : 'MISSING' });
     const { sourceId, idempotencyKey, amount, currency = 'USD' } = body;
 
     // Validate required fields
     if (!sourceId || !idempotencyKey || !amount) {
+      console.error('Missing required fields:', { sourceId: !!sourceId, idempotencyKey: !!idempotencyKey, amount: !!amount });
       return NextResponse.json(
         { error: 'Missing required payment information' },
         { status: 400 }
       );
     }
 
+    console.log('All fields validated, preparing payment...');
     // Convert amount to Money object (Square expects amount in smallest currency unit, e.g., cents)
     const amountMoney: Money = {
       amount: Math.round(amount * 100), // Convert dollars to cents
@@ -44,8 +55,10 @@ export async function POST(request: Request) {
       locationId: process.env.SQUARE_LOCATION_ID,
     };
 
+    console.log('Calling Square API...');
     // Create payment using Square API
     const { result, statusCode } = await squareClient.paymentsApi.createPayment(paymentRequest);
+    console.log('Square API responded with status:', statusCode);
 
     if (statusCode !== 200 || !result.payment) {
       console.error('Square payment failed:', result);
