@@ -15,9 +15,15 @@ export async function GET() {
     });
     
     console.log('SquareClient initialized successfully!');
+    console.log('Available client methods:', Object.keys(squareClient));
+    console.log('Payments API available:', !!squareClient.payments);
+    console.log('PaymentsApi available:', !!squareClient.paymentsApi);
     
     return NextResponse.json({
       message: 'SquareClient initialized successfully!',
+      clientMethods: Object.keys(squareClient),
+      hasPayments: !!squareClient.payments,
+      hasPaymentsApi: !!squareClient.paymentsApi,
       env: {
         hasAccessToken: !!process.env.SQUARE_ACCESS_TOKEN,
         hasLocationId: !!process.env.SQUARE_LOCATION_ID,
