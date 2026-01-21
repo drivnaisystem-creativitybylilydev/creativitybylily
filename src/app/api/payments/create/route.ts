@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { Client } from 'square';
 
 export async function POST(request: Request) {
   try {
@@ -23,7 +22,11 @@ export async function POST(request: Request) {
     console.log('  Access Token present:', !!process.env.SQUARE_ACCESS_TOKEN);
     console.log('  Access Token prefix:', process.env.SQUARE_ACCESS_TOKEN?.substring(0, 8) + '...');
 
-    // Initialize Square client inside the function to avoid build-time issues
+    // Dynamically import Square SDK (fixes bundling issues)
+    console.log('Dynamically importing Square SDK...');
+    const { Client } = await import('square');
+    
+    // Initialize Square client
     console.log('Initializing Square client...');
     const client = new Client({
       bearerAuthCredentials: {
@@ -80,10 +83,10 @@ export async function POST(request: Request) {
     // Create payment using Square API
     console.log('⏳ Calling Square paymentsApi.createPayment...');
     const { result, statusCode } = await client.paymentsApi.createPayment({
-      sourceId, // The card token from Square Web Payments SDK
-      idempotencyKey, // Unique key to prevent duplicate payments
+      sourceId,
+      idempotencyKey,
       amountMoney: {
-        amount: BigInt(amountInCents), // Convert dollars to cents as bigint (required by Square SDK)
+        amount: BigInt(amountInCents),
         currency,
       },
       locationId: process.env.SQUARE_LOCATION_ID,
