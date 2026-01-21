@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { Client, Environment } from 'square';
+import { Client } from 'square';
 
 export async function POST(request: Request) {
   try {
@@ -29,7 +29,7 @@ export async function POST(request: Request) {
       bearerAuthCredentials: {
         accessToken: process.env.SQUARE_ACCESS_TOKEN,
       },
-      environment: process.env.SQUARE_ENV === 'sandbox' ? Environment.Sandbox : Environment.Production,
+      environment: process.env.SQUARE_ENV === 'sandbox' ? 'sandbox' : 'production',
     });
     console.log('Square client initialized successfully');
 
