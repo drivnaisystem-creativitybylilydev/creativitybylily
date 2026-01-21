@@ -23,8 +23,8 @@
 You need to add **ONE MORE** environment variable for the client-side Square integration:
 
 ```bash
-NEXT_PUBLIC_SQUARE_APPLICATION_ID=sq0idp-VzZqvxxD4PXPfmHZ1Z59Ew
-NEXT_PUBLIC_SQUARE_ENVIRONMENT=production
+NEXT_PUBLIC_SQUARE_APPLICATION_ID=sq0idp-your-production-app-id
+NEXT_PUBLIC_SQUARE_ENV=production
 ```
 
 **Add these to your `.env.local` file** (the Application ID needs to be public because it's used in the browser).
@@ -32,13 +32,15 @@ NEXT_PUBLIC_SQUARE_ENVIRONMENT=production
 Your complete Square section in `.env.local` should look like:
 
 ```bash
-# Square Payment Processing
-SQUARE_APPLICATION_ID=sq0idp-VzZqvxxD4PXPfmHZ1Z59Ew
-NEXT_PUBLIC_SQUARE_APPLICATION_ID=sq0idp-VzZqvxxD4PXPfmHZ1Z59Ew
-SQUARE_ACCESS_TOKEN=EAAAI_kqQvFRH7gwTo_QSRWYgtMKp2uqFltbM_7DTLWgHHnrZIQmCUcFux4IFKF6
-SQUARE_LOCATION_ID=LMSB4CZ8GM32M
-SQUARE_ENVIRONMENT=production
-NEXT_PUBLIC_SQUARE_ENVIRONMENT=production
+# Square Payment Processing (Production)
+# Frontend (public) - Application ID starts with sq0idp-...
+NEXT_PUBLIC_SQUARE_APPLICATION_ID=sq0idp-your-production-app-id
+NEXT_PUBLIC_SQUARE_ENV=production
+
+# Backend (server-only) - Access Token starts with sq0atp-...
+SQUARE_ACCESS_TOKEN=sq0atp-your-production-oauth-token
+SQUARE_LOCATION_ID=your-location-id
+SQUARE_ENV=production
 ```
 
 ---
@@ -103,7 +105,9 @@ npm install square
 
 ### Payment fails:
 - ✅ Verify all Square credentials are correct
-- ✅ Check that `SQUARE_ENVIRONMENT` matches your credentials (production vs sandbox)
+- ✅ Check that `SQUARE_ENV` matches your credentials (production vs sandbox)
+- ✅ Verify `SQUARE_ACCESS_TOKEN` starts with `sq0atp-` (OAuth token, NOT legacy PAT)
+- ✅ Verify `NEXT_PUBLIC_SQUARE_APPLICATION_ID` starts with `sq0idp-` (NOT an access token)
 - ✅ Check server logs for error details
 
 ### "Payment form not loaded" error:
@@ -131,6 +135,11 @@ The orders table should have a `payment_id` field to store Square payment IDs. I
 ---
 
 **You're almost ready to launch! 🎉**
+
+
+
+
+
 
 
 

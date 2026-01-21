@@ -83,7 +83,7 @@ export async function PATCH(
       }
 
       const squareClient = new Client({
-        environment: (process.env.SQUARE_ENVIRONMENT as Environment) || Environment.Production,
+        environment: (process.env.SQUARE_ENV as Environment) || Environment.Production,
         accessToken: process.env.SQUARE_ACCESS_TOKEN,
       });
 

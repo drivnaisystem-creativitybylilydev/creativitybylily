@@ -61,10 +61,14 @@ During the call, collect these credentials:
 After the call, add these to your `.env.local` file:
 
 ```bash
-SQUARE_APPLICATION_ID=sq0idp-XXXXXXXXXXXXXXXXXXXX
-SQUARE_ACCESS_TOKEN=EAAAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+# Application ID (starts with sq0idp-...) - public
+NEXT_PUBLIC_SQUARE_APPLICATION_ID=sq0idp-XXXXXXXXXXXXXXXXXXXX
+NEXT_PUBLIC_SQUARE_ENV=production
+
+# Access Token (starts with sq0atp-...) - server-only
+SQUARE_ACCESS_TOKEN=sq0atp-XXXXXXXXXXXXXXXXXXXX
 SQUARE_LOCATION_ID=LXXXXXXXXXXXXXXXXX
-SQUARE_ENVIRONMENT=production
+SQUARE_ENV=production
 ```
 
 **Then:**
@@ -128,6 +132,11 @@ Before ending the call, confirm:
 ---
 
 **Good luck with the meeting!** 🎉
+
+
+
+
+
 
 
 

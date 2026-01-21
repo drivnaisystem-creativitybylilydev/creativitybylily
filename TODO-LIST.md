@@ -17,7 +17,7 @@
      - `src/app/api/payments/create/route.ts`
      - `src/app/api/webhooks/square/route.ts`
      - `src/app/checkout/page.tsx` (add Square Web Payments)
-     - `.env.local` (add `SQUARE_APPLICATION_ID`, `SQUARE_ACCESS_TOKEN`, `SQUARE_LOCATION_ID`)
+     - `.env.local` (add `NEXT_PUBLIC_SQUARE_APPLICATION_ID`, `SQUARE_ACCESS_TOKEN`, `SQUARE_LOCATION_ID`, `SQUARE_ENV`, `NEXT_PUBLIC_SQUARE_ENV`)
 
 ### 2. **Email Automation (Re-enable at Launch)**
    - **Status**: ⏸️ Temporarily Disabled

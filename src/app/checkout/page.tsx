@@ -111,7 +111,7 @@ export default function CheckoutPage() {
 
     // Load Square Web Payments SDK script (use sandbox for testing, production for live)
     const script = document.createElement('script');
-    const isSandbox = process.env.NEXT_PUBLIC_SQUARE_ENVIRONMENT === 'sandbox';
+    const isSandbox = process.env.NEXT_PUBLIC_SQUARE_ENV === 'sandbox';
     script.src = isSandbox 
       ? 'https://sandbox.web.squarecdn.com/v1/square.js'
       : 'https://web.squarecdn.com/v1/square.js';
@@ -141,7 +141,7 @@ export default function CheckoutPage() {
         throw new Error('Square SDK not loaded');
       }
       
-      const environment = process.env.NEXT_PUBLIC_SQUARE_ENVIRONMENT === 'sandbox' ? 'sandbox' : 'production';
+      const environment = process.env.NEXT_PUBLIC_SQUARE_ENV === 'sandbox' ? 'sandbox' : 'production';
       const payments = Square.payments(squareApplicationId, environment);
       
       // Create card payment method - check if it returns a promise

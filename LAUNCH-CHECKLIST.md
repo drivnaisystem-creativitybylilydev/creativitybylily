@@ -26,8 +26,8 @@
 - [ ] Client already has Square account ✓ (used for in-person sales)
 - [ ] Enable online payments in Square Dashboard
 - [ ] Get Square API credentials:
-  - `SQUARE_APPLICATION_ID` (client-side)
-  - `SQUARE_ACCESS_TOKEN` (server-side)
+  - `NEXT_PUBLIC_SQUARE_APPLICATION_ID` (starts with `sq0idp-...`) - client-side
+  - `SQUARE_ACCESS_TOKEN` (starts with `sq0atp-...`) - server-side OAuth token
   - `SQUARE_LOCATION_ID` (identifies payment location)
 - [ ] Install Square SDK: `npm install square`
 - [ ] Create payment API route (`src/app/api/payments/create/route.ts`)
@@ -87,9 +87,11 @@
 - [ ] `SHIPPO_USE_TEST_ADDRESS` (set to `false` for production)
 - [ ] `RESEND_API_KEY` (after email setup)
 - [ ] `RESEND_FROM_EMAIL` (after email setup)
-- [ ] `SQUARE_APPLICATION_ID` (after Square setup)
-- [ ] `SQUARE_ACCESS_TOKEN` (after Square setup)
+- [ ] `NEXT_PUBLIC_SQUARE_APPLICATION_ID` (after Square setup - starts with sq0idp-...)
+- [ ] `NEXT_PUBLIC_SQUARE_ENV` (production or sandbox)
+- [ ] `SQUARE_ACCESS_TOKEN` (after Square setup - starts with sq0atp-...)
 - [ ] `SQUARE_LOCATION_ID` (after Square setup)
+- [ ] `SQUARE_ENV` (production or sandbox)
 
 **Estimated time**: 10 minutes
 

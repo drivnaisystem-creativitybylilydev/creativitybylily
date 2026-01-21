@@ -158,10 +158,14 @@ RESEND_FROM_EMAIL=orders@creativitybylily.com
 
 #### **Square Variables (after Square setup):**
 ```
-SQUARE_APPLICATION_ID=your-square-app-id
-SQUARE_ACCESS_TOKEN=your-square-access-token
-SQUARE_LOCATION_ID=your-square-location-id
-SQUARE_ENVIRONMENT=production
+# Application ID (starts with sq0idp-...) - public
+NEXT_PUBLIC_SQUARE_APPLICATION_ID=sq0idp-your-production-app-id
+NEXT_PUBLIC_SQUARE_ENV=production
+
+# Access Token (starts with sq0atp-...) - server-only
+SQUARE_ACCESS_TOKEN=sq0atp-your-production-oauth-token
+SQUARE_LOCATION_ID=your-location-id
+SQUARE_ENV=production
 ```
 
 **Important:**
@@ -457,6 +461,11 @@ git push
 
 **Last Updated**: Based on current codebase  
 **Next Step**: Set up Vercel account and deploy!
+
+
+
+
+
 
 
 

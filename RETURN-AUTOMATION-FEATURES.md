@@ -185,7 +185,7 @@ This document describes the automation features added to streamline the return w
 - Admin must process refund manually if payment ID is not available
 
 ### Square Environment
-- Uses `SQUARE_ENVIRONMENT` environment variable (Production/Sandbox)
+- Uses `SQUARE_ENV` environment variable (production/sandbox)
 - Uses `SQUARE_ACCESS_TOKEN` for authentication
 - Refunds are processed in real-time
 
@@ -225,5 +225,10 @@ Potential improvements that could be added:
 ---
 
 **Last Updated**: January 2025
+
+
+
+
+
 
 

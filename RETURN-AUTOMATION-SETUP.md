@@ -32,8 +32,8 @@ CREATE INDEX IF NOT EXISTS idx_orders_payment_id ON orders(payment_id);
 
 The automation uses the same Square credentials you already have set up:
 
-- ✅ `SQUARE_ACCESS_TOKEN` - Already set
-- ✅ `SQUARE_ENVIRONMENT` - Already set  
+- ✅ `SQUARE_ACCESS_TOKEN` - Already set (must start with `sq0atp-...`)
+- ✅ `SQUARE_ENV` - Already set (production/sandbox)  
 - ✅ `SQUARE_LOCATION_ID` - Already set (not used for refunds, but good to have)
 
 **No additional environment variables needed!**
@@ -91,5 +91,10 @@ After running the SQL migration, test the automation:
 ---
 
 **Questions?** Check the error messages - they'll tell you exactly what's missing if something isn't configured correctly.
+
+
+
+
+
 
 

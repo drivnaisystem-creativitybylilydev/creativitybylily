@@ -126,13 +126,14 @@ ON CONFLICT (user_id) DO NOTHING;
 
 ```bash
 # Change from sandbox to production
-SQUARE_ENVIRONMENT=production
-NEXT_PUBLIC_SQUARE_ENVIRONMENT=production
+SQUARE_ENV=production
+NEXT_PUBLIC_SQUARE_ENV=production
 
 # Update with client's PRODUCTION credentials (not sandbox)
-SQUARE_ACCESS_TOKEN=client_production_access_token
-SQUARE_APPLICATION_ID=client_production_application_id
-NEXT_PUBLIC_SQUARE_APPLICATION_ID=client_production_application_id
+# Access Token must start with sq0atp-... (OAuth token)
+SQUARE_ACCESS_TOKEN=sq0atp-client-production-oauth-token
+# Application ID must start with sq0idp-...
+NEXT_PUBLIC_SQUARE_APPLICATION_ID=sq0idp-client-production-app-id
 SQUARE_LOCATION_ID=client_production_location_id
 ```
 
@@ -141,13 +142,15 @@ SQUARE_LOCATION_ID=client_production_location_id
 2. Select their application
 3. Go to **Credentials** tab
 4. Under **Production** section:
-   - Copy **Access Token** → `SQUARE_ACCESS_TOKEN`
-   - Copy **Application ID** → `SQUARE_APPLICATION_ID` and `NEXT_PUBLIC_SQUARE_APPLICATION_ID`
+   - Copy **Production Access Token** (starts with `sq0atp-...`) → `SQUARE_ACCESS_TOKEN`
+   - Copy **Production Application ID** (starts with `sq0idp-...`) → `NEXT_PUBLIC_SQUARE_APPLICATION_ID`
 5. Go to **Locations** tab → Copy **Location ID** → `SQUARE_LOCATION_ID`
 
 **⚠️ CRITICAL:** 
-- Make sure you're using **Production** credentials, NOT Sandbox
-- `SQUARE_ENVIRONMENT` must be `production` (not `sandbox`)
+- Make sure you're using **Production OAuth** credentials, NOT Sandbox
+- Access Token MUST start with `sq0atp-` (NOT legacy `EAAA...` tokens)
+- Application ID MUST start with `sq0idp-` (NOT an access token)
+- `SQUARE_ENV` must be `production` (not `sandbox`)
 - After updating, **redeploy** the site
 
 **Files affected:**
@@ -225,12 +228,14 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 
 # Square (UPDATE TO PRODUCTION)
-SQUARE_APPLICATION_ID=client_production_app_id
-NEXT_PUBLIC_SQUARE_APPLICATION_ID=client_production_app_id
-SQUARE_ACCESS_TOKEN=client_production_access_token
-SQUARE_LOCATION_ID=client_production_location_id
-SQUARE_ENVIRONMENT=production
-NEXT_PUBLIC_SQUARE_ENVIRONMENT=production
+# Application ID (starts with sq0idp-...) - public, used in browser
+NEXT_PUBLIC_SQUARE_APPLICATION_ID=sq0idp-client-production-app-id
+NEXT_PUBLIC_SQUARE_ENV=production
+
+# Access Token (starts with sq0atp-...) - server-only, NEVER expose to browser
+SQUARE_ACCESS_TOKEN=sq0atp-client-production-oauth-token
+SQUARE_LOCATION_ID=client-production-location-id
+SQUARE_ENV=production
 
 # Shippo (UPDATE TO LIVE + CLIENT'S ADDRESS)
 SHIPPO_API_KEY=shippo_live_xxxxxxxxxxxxx
@@ -266,7 +271,7 @@ NEXT_PUBLIC_SITE_URL=https://creativitybylily.com
 ### Before Going Live:
 
 - [ ] **Square:** All credentials are PRODUCTION (not sandbox)
-- [ ] **Square:** `SQUARE_ENVIRONMENT=production`
+- [ ] **Square:** `SQUARE_ENV=production` and `NEXT_PUBLIC_SQUARE_ENV=production`
 - [ ] **Shippo:** API key is LIVE (not test)
 - [ ] **Shippo:** `SHIPPO_USE_TEST_ADDRESS=false`
 - [ ] **Shippo:** Business address is correct
@@ -294,7 +299,7 @@ NEXT_PUBLIC_SITE_URL=https://creativitybylily.com
 
 ### Issue: "Square payment failed"
 **Solution:** 
-- Check `SQUARE_ENVIRONMENT=production` (not sandbox)
+- Check `SQUARE_ENV=production` (not sandbox)
 - Verify using PRODUCTION access token (not sandbox)
 - Check Square dashboard for API errors
 
@@ -376,5 +381,10 @@ If something breaks:
 **Last Updated:** January 2025
 
 **Remember:** Always test in production mode before announcing launch!
+
+
+
+
+
 
 

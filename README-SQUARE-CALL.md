@@ -74,11 +74,12 @@ Once in the application settings, collect these three items:
    - Looks like: `sq0idp-XXXXXXXXXXXXXXXXXXXX`
    - This is safe to use in client-side code.
 
-2. **Access Token** (Production)
+2. **Access Token** (Production OAuth)
    - Go to the **Credentials** tab.
-   - Under **Production**, find or generate the **Access Token**.
-   - Looks like: `EAAAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
+   - Under **Production**, find or generate the **Production Access Token** (OAuth).
+   - MUST start with: `sq0atp-XXXXXXXXXXXXXXXXXXXX` (NOT legacy `EAAA...` tokens)
    - ⚠️ **Treat this like a password** – never share over email or plain chat.
+   - ⚠️ **This is server-only** – NEVER put in any `NEXT_PUBLIC_` variable.
 
 3. **Location ID**
    - Go to the **Locations** tab in the Developer Dashboard.
@@ -101,10 +102,14 @@ After the call, you will:
 2. Add:
 
 ```bash
-SQUARE_APPLICATION_ID=sq0idp-XXXXXXXXXXXXXXXXXXXX
-SQUARE_ACCESS_TOKEN=EAAAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+# Application ID (starts with sq0idp-...) - public
+NEXT_PUBLIC_SQUARE_APPLICATION_ID=sq0idp-XXXXXXXXXXXXXXXXXXXX
+NEXT_PUBLIC_SQUARE_ENV=production
+
+# Access Token (starts with sq0atp-...) - server-only, NEVER expose
+SQUARE_ACCESS_TOKEN=sq0atp-XXXXXXXXXXXXXXXXXXXX
 SQUARE_LOCATION_ID=LXXXXXXXXXXXXXXXXX
-SQUARE_ENVIRONMENT=production   # or 'sandbox' for testing
+SQUARE_ENV=production   # or 'sandbox' for testing
 ```
 
 3. Save the file and restart the dev server.
@@ -197,6 +202,11 @@ The integration is similar in concept – both use tokenization and server-side 
 - [Square Web Payments SDK Docs](https://developer.squareup.com/docs/web-payments/overview)
 - [Square API Reference](https://developer.squareup.com/reference/square)
 - [Square Sandbox Testing](https://developer.squareup.com/docs/devtools/sandbox/overview)
+
+
+
+
+
 
 
 

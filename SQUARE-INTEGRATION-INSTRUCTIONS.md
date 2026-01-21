@@ -11,10 +11,14 @@ npm install square
 
 Your `.env.local` should have:
 ```bash
-SQUARE_APPLICATION_ID=sq0idp-VzZqvxxD4PXPfmHZ1Z59Ew
-SQUARE_ACCESS_TOKEN=EAAAI_kqQvFRH7gwTo_QSRWYgtMKp2uqFltbM_7DTLWgHHnrZIQmCUcFux4IFKF6
-SQUARE_LOCATION_ID=LMSB4CZ8GM32M
-SQUARE_ENVIRONMENT=production
+# Application ID (starts with sq0idp-...) - public
+NEXT_PUBLIC_SQUARE_APPLICATION_ID=sq0idp-your-production-app-id
+NEXT_PUBLIC_SQUARE_ENV=production
+
+# Access Token (starts with sq0atp-...) - server-only
+SQUARE_ACCESS_TOKEN=sq0atp-your-production-oauth-token
+SQUARE_LOCATION_ID=your-location-id
+SQUARE_ENV=production
 ```
 
 ## ✅ Step 3: Files Created
@@ -32,6 +36,11 @@ The checkout page needs to be updated to:
 5. Remove demo banner
 
 Let me update the checkout page now...
+
+
+
+
+
 
 
 
