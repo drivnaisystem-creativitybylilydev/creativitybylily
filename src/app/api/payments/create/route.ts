@@ -4,6 +4,8 @@ import type { CreatePaymentRequest, Money } from 'square';
 
 export async function POST(request: Request) {
   try {
+    console.log('=== Payment API Called ===');
+    
     // Verify environment variables are set
     if (!process.env.SQUARE_ACCESS_TOKEN || !process.env.SQUARE_LOCATION_ID) {
       console.error('❌ Square credentials not configured');
@@ -23,11 +25,14 @@ export async function POST(request: Request) {
     console.log('  Access Token prefix:', process.env.SQUARE_ACCESS_TOKEN?.substring(0, 8) + '...');
 
     // Initialize Square client inside the function to avoid build-time issues
+    console.log('Initializing Square client...');
     const squareClient = new Client({
       environment: (process.env.SQUARE_ENV as Environment) || Environment.Production,
       accessToken: process.env.SQUARE_ACCESS_TOKEN,
     });
+    console.log('Square client initialized successfully');
 
+    console.log('Parsing request body...');
     const body = await request.json();
     const { sourceId, idempotencyKey, amount, currency = 'USD' } = body;
 
@@ -60,10 +65,11 @@ export async function POST(request: Request) {
       );
     }
 
+    console.log('All fields validated, preparing payment...');
     // Convert amount to Money object (Square expects amount in smallest currency unit, e.g., cents)
     const amountInCents = Math.round(amount * 100);
     const amountMoney: Money = {
-      amount: amountInCents, // Convert dollars to cents (must be integer)
+      amount: BigInt(amountInCents), // Convert dollars to cents as bigint (required by Square SDK)
       currency,
     };
 
@@ -122,6 +128,7 @@ export async function POST(request: Request) {
     console.error('❌ Payment processing exception caught:');
     console.error('Error type:', error?.constructor?.name);
     console.error('Error message:', error?.message);
+    console.error('Full error:', error);
     
     // Square SDK errors have a specific structure
     if (error?.result) {
@@ -163,4 +170,3 @@ export async function POST(request: Request) {
     );
   }
 }
-
