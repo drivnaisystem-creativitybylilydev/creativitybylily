@@ -126,7 +126,7 @@ export async function POST(request: Request) {
       .insert({
         user_id: userId || null, // Link to user account if logged in
         order_number: orderNumber,
-        status: paymentId ? 'paid' : 'pending', // Mark as paid if payment ID exists
+        status: paymentId ? 'processing' : 'pending', // Mark as processing if payment succeeded
         subtotal,
         tax,
         shipping: shippingCost,
