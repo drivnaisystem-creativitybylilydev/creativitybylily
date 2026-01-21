@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { Client, Environment } from 'square';
-import type { CreatePaymentRequest, Money } from 'square';
 
 export async function POST(request: Request) {
   try {
@@ -26,9 +25,11 @@ export async function POST(request: Request) {
 
     // Initialize Square client inside the function to avoid build-time issues
     console.log('Initializing Square client...');
-    const squareClient = new Client({
-      environment: (process.env.SQUARE_ENV as Environment) || Environment.Production,
-      accessToken: process.env.SQUARE_ACCESS_TOKEN,
+    const client = new Client({
+      bearerAuthCredentials: {
+        accessToken: process.env.SQUARE_ACCESS_TOKEN,
+      },
+      environment: process.env.SQUARE_ENV === 'sandbox' ? Environment.Sandbox : Environment.Production,
     });
     console.log('Square client initialized successfully');
 
@@ -68,18 +69,6 @@ export async function POST(request: Request) {
     console.log('All fields validated, preparing payment...');
     // Convert amount to Money object (Square expects amount in smallest currency unit, e.g., cents)
     const amountInCents = Math.round(amount * 100);
-    const amountMoney: Money = {
-      amount: BigInt(amountInCents), // Convert dollars to cents as bigint (required by Square SDK)
-      currency,
-    };
-
-    // Create payment request
-    const paymentRequest: CreatePaymentRequest = {
-      sourceId, // The card token from Square Web Payments SDK
-      idempotencyKey, // Unique key to prevent duplicate payments
-      amountMoney,
-      locationId: process.env.SQUARE_LOCATION_ID,
-    };
 
     // Log payment request details (safe - no secrets)
     console.log('📤 Sending to Square API:');
@@ -90,7 +79,15 @@ export async function POST(request: Request) {
 
     // Create payment using Square API
     console.log('⏳ Calling Square paymentsApi.createPayment...');
-    const { result, statusCode } = await squareClient.paymentsApi.createPayment(paymentRequest);
+    const { result, statusCode } = await client.paymentsApi.createPayment({
+      sourceId, // The card token from Square Web Payments SDK
+      idempotencyKey, // Unique key to prevent duplicate payments
+      amountMoney: {
+        amount: BigInt(amountInCents), // Convert dollars to cents as bigint (required by Square SDK)
+        currency,
+      },
+      locationId: process.env.SQUARE_LOCATION_ID,
+    });
     console.log('✅ Square API Response Status:', statusCode);
 
     if (statusCode !== 200 || !result.payment) {
