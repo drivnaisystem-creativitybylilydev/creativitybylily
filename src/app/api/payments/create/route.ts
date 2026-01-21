@@ -22,20 +22,6 @@ export async function POST(request: Request) {
     console.log('  Access Token present:', !!process.env.SQUARE_ACCESS_TOKEN);
     console.log('  Access Token prefix:', process.env.SQUARE_ACCESS_TOKEN?.substring(0, 8) + '...');
 
-    // Dynamically import Square SDK (fixes bundling issues)
-    console.log('Dynamically importing Square SDK...');
-    const { Client } = await import('square');
-    
-    // Initialize Square client
-    console.log('Initializing Square client...');
-    const client = new Client({
-      bearerAuthCredentials: {
-        accessToken: process.env.SQUARE_ACCESS_TOKEN,
-      },
-      environment: process.env.SQUARE_ENV === 'sandbox' ? 'sandbox' : 'production',
-    });
-    console.log('Square client initialized successfully');
-
     console.log('Parsing request body...');
     const body = await request.json();
     const { sourceId, idempotencyKey, amount, currency = 'USD' } = body;
@@ -70,28 +56,46 @@ export async function POST(request: Request) {
     }
 
     console.log('All fields validated, preparing payment...');
-    // Convert amount to Money object (Square expects amount in smallest currency unit, e.g., cents)
+    // Convert amount to cents
     const amountInCents = Math.round(amount * 100);
 
     // Log payment request details (safe - no secrets)
-    console.log('📤 Sending to Square API:');
+    console.log('📤 Preparing Square API request:');
     console.log('  Amount in cents:', amountInCents);
     console.log('  Currency:', currency);
     console.log('  Location ID:', process.env.SQUARE_LOCATION_ID);
-    console.log('  Source ID (first 20 chars):', sourceId.substring(0, 20) + '...');
 
-    // Create payment using Square API
-    console.log('⏳ Calling Square paymentsApi.createPayment...');
-    const { result, statusCode } = await client.paymentsApi.createPayment({
-      sourceId,
-      idempotencyKey,
-      amountMoney: {
-        amount: BigInt(amountInCents),
-        currency,
+    // Use fetch directly to call Square API (bypassing SDK issues)
+    const squareApiUrl = process.env.SQUARE_ENV === 'sandbox' 
+      ? 'https://connect.squareupsandbox.com/v2/payments'
+      : 'https://connect.squareup.com/v2/payments';
+
+    console.log('⏳ Calling Square API directly via fetch...');
+    console.log('  URL:', squareApiUrl);
+
+    const squareResponse = await fetch(squareApiUrl, {
+      method: 'POST',
+      headers: {
+        'Square-Version': '2024-12-18',
+        'Authorization': `Bearer ${process.env.SQUARE_ACCESS_TOKEN}`,
+        'Content-Type': 'application/json',
       },
-      locationId: process.env.SQUARE_LOCATION_ID,
+      body: JSON.stringify({
+        source_id: sourceId,
+        idempotency_key: idempotencyKey,
+        amount_money: {
+          amount: amountInCents,
+          currency: currency,
+        },
+        location_id: process.env.SQUARE_LOCATION_ID,
+      }),
     });
+
+    const statusCode = squareResponse.status;
     console.log('✅ Square API Response Status:', statusCode);
+
+    const result = await squareResponse.json();
+    console.log('Square API Result:', JSON.stringify(result, null, 2));
 
     if (statusCode !== 200 || !result.payment) {
       console.error('❌ Square payment failed!');
@@ -113,48 +117,27 @@ export async function POST(request: Request) {
     console.log('✅ Payment successful!');
     console.log('  Payment ID:', result.payment.id);
     console.log('  Status:', result.payment.status);
-    console.log('  Amount:', result.payment.totalMoney);
+    console.log('  Amount:', result.payment.total_money);
     
     return NextResponse.json({
       success: true,
       payment: {
         id: result.payment.id,
         status: result.payment.status,
-        amount: result.payment.totalMoney,
+        amount: result.payment.total_money,
       },
     });
   } catch (error: any) {
-    // Enhanced error logging for Square API errors
+    // Enhanced error logging
     console.error('❌ Payment processing exception caught:');
     console.error('Error type:', error?.constructor?.name);
     console.error('Error message:', error?.message);
     console.error('Full error:', error);
     
-    // Square SDK errors have a specific structure
-    if (error?.result) {
-      console.error('Square API Response:');
-      console.error('  Status Code:', error.statusCode);
-      console.error('  Errors:', JSON.stringify(error.result.errors, null, 2));
-    } else if (error?.errors) {
-      console.error('Square Errors Array:', JSON.stringify(error.errors, null, 2));
-    } else {
-      console.error('Full error object:', JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
-    }
-    
-    // Extract Square's actual error message if available
+    // Extract error message
     let errorMessage = 'Payment processing failed';
-    let errorDetails = null;
     
-    if (error?.result?.errors && error.result.errors.length > 0) {
-      // Square API returned structured errors
-      errorMessage = error.result.errors[0].detail || errorMessage;
-      errorDetails = error.result.errors;
-    } else if (error?.errors && error.errors.length > 0) {
-      // Alternative Square error format
-      errorMessage = error.errors[0].detail || error.errors[0].message || errorMessage;
-      errorDetails = error.errors;
-    } else if (error?.message) {
-      // Generic error message
+    if (error?.message) {
       errorMessage = error.message;
     }
     
@@ -162,11 +145,10 @@ export async function POST(request: Request) {
     return NextResponse.json(
       { 
         error: errorMessage,
-        details: process.env.NODE_ENV === 'development' ? errorDetails : undefined,
-        category: error?.result?.errors?.[0]?.category || 'PAYMENT_ERROR',
-        code: error?.result?.errors?.[0]?.code || 'UNKNOWN',
+        category: 'PAYMENT_ERROR',
+        code: 'UNKNOWN',
       },
-      { status: error?.statusCode || 500 }
+      { status: 500 }
     );
   }
 }
