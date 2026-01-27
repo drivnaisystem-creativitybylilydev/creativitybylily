@@ -100,6 +100,8 @@ export default function NewProductPage() {
         throw new Error(data.error || 'Failed to create product');
       }
 
+      // Refresh the router cache to show new product immediately
+      router.refresh();
       router.push('/admin/products');
     } catch (error: any) {
       console.error('Error creating product:', error);

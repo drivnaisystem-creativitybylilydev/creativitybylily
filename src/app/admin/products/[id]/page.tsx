@@ -137,6 +137,8 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
         throw new Error(data.error || 'Failed to update product');
       }
 
+      // Refresh the router cache to show updated data immediately
+      router.refresh();
       router.push('/admin/products');
     } catch (error: any) {
       console.error('Error updating product:', error);

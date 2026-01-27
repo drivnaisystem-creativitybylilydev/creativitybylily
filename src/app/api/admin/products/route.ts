@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { createAdminClient } from '@/lib/supabase/server';
 
 export async function POST(request: Request) {
@@ -75,6 +76,10 @@ export async function POST(request: Request) {
         { status: 500 }
       );
     }
+
+    // Revalidate the admin products page cache so new product appears immediately
+    revalidatePath('/admin/products');
+    revalidatePath('/products'); // Also revalidate customer-facing products page
 
     return NextResponse.json({ success: true, product });
   } catch (error) {

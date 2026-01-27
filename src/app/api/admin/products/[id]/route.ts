@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { createAdminClient } from '@/lib/supabase/server';
 
 export async function GET(
@@ -101,6 +102,10 @@ export async function PATCH(
       );
     }
 
+    // Revalidate the admin products page cache so changes appear immediately
+    revalidatePath('/admin/products');
+    revalidatePath('/products'); // Also revalidate customer-facing products page
+
     return NextResponse.json({ success: true, product });
   } catch (error) {
     console.error('Error in product update:', error);
@@ -132,6 +137,10 @@ export async function DELETE(
         { status: 500 }
       );
     }
+
+    // Revalidate the admin products page cache so deactivated product updates immediately
+    revalidatePath('/admin/products');
+    revalidatePath('/products'); // Also revalidate customer-facing products page
 
     return NextResponse.json({ success: true });
   } catch (error) {
