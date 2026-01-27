@@ -183,6 +183,28 @@ export type Database = {
         Insert: Omit<Database['public']['Tables']['returns']['Row'], 'id' | 'return_number' | 'created_at' | 'updated_at'>;
         Update: Partial<Database['public']['Tables']['returns']['Update']>;
       };
+      reviews: {
+        Row: {
+          id: string;
+          product_id: string;
+          order_id: string | null;
+          reviewer_name: string;
+          reviewer_email: string;
+          rating: number; // 1-5
+          title: string | null;
+          comment: string;
+          images: string[];
+          is_approved: boolean;
+          is_featured: boolean;
+          admin_response: string | null;
+          verified_purchase: boolean;
+          helpful_count: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Omit<Database['public']['Tables']['reviews']['Row'], 'id' | 'created_at' | 'updated_at' | 'helpful_count'>;
+        Update: Partial<Database['public']['Tables']['reviews']['Insert']>;
+      };
     };
   };
 };
@@ -215,4 +237,5 @@ export type CartItem = Database['public']['Tables']['cart_items']['Row'];
 export type Shipment = Database['public']['Tables']['shipments']['Row'];
 export type Event = Database['public']['Tables']['events']['Row'];
 export type Return = Database['public']['Tables']['returns']['Row'];
+export type Review = Database['public']['Tables']['reviews']['Row'];
 

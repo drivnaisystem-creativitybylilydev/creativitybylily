@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import type { Product } from "@/lib/supabase/types";
 import { useCart } from "@/contexts/CartContext";
+import ProductRatingBadge from "@/components/ProductRatingBadge";
 
 export default function ProductsPage() {
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -124,8 +125,11 @@ export default function ProductsPage() {
                     <h2 className="font-serif text-lg text-gray-800 mb-2 line-clamp-2 hover:text-[color:var(--logo-pink)] transition-colors">
                       {product.title}
                     </h2>
-                    <p className="text-sm text-gray-500 mb-4">Handcrafted on Cape Cod</p>
+                    <p className="text-sm text-gray-500 mb-2">Handcrafted on Cape Cod</p>
                   </Link>
+                  <div className="mb-4">
+                    <ProductRatingBadge productId={product.id} compact />
+                  </div>
                   <div className="flex items-center justify-between mb-4">
                     <span className="text-xl font-semibold text-[color:var(--logo-pink)]">${product.price}</span>
                   </div>

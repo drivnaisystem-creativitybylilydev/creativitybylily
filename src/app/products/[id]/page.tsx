@@ -5,6 +5,7 @@ import { getProductBySlug, getRelatedProducts, getProducts } from "@/lib/supabas
 import type { Metadata } from "next";
 import AddToCartButton from "@/components/AddToCartButton";
 import ProductImageGallery from "@/components/ProductImageGallery";
+import ProductReviewsSection from "@/components/ProductReviewsSection";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -94,6 +95,9 @@ export default async function ProductDetailPage(props: PageProps) {
             </div>
           </div>
         </div>
+
+        {/* Reviews Section */}
+        <ProductReviewsSection productId={product.id} />
 
         {/* Product Recommendations Section */}
         <div className="mt-20">
