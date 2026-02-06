@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import { products, galleryItems } from "@/data/gallery";
 import { Suspense } from "react";
 import ProductCarousel from "@/components/ProductCarousel";
 import ProductSpotlight from "@/components/ProductSpotlight";
@@ -16,11 +15,33 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-br from-pink-50 to-amber-50">
           <div className="absolute inset-0 grid grid-cols-4 md:grid-cols-6 gap-2 p-4 opacity-20">
             {(() => {
-              // Shuffle gallery items for randomization on each load
-              const shuffled = [...galleryItems].sort(() => Math.random() - 0.5);
-              return shuffled.slice(0, 12).map((item, index) => (
+              // Hero section images
+              const heroImages = [
+                '/hero-section-images/IMG_5220.PNG',
+                '/hero-section-images/IMG_5221.jpg',
+                '/hero-section-images/IMG_5222.jpg',
+                '/hero-section-images/IMG_5223.jpg',
+                '/hero-section-images/IMG_5224.jpg',
+                '/hero-section-images/IMG_5225.jpg',
+                '/hero-section-images/IMG_5226.jpg',
+                '/hero-section-images/IMG_5227.jpg',
+                '/hero-section-images/IMG_5228.jpg',
+                '/hero-section-images/IMG_5229.jpg',
+                '/hero-section-images/IMG_5230.jpg',
+                '/hero-section-images/IMG_5231.jpg',
+                '/hero-section-images/IMG_5232.jpg',
+                '/hero-section-images/IMG_5233.jpg',
+                '/hero-section-images/IMG_5234.jpg',
+                '/hero-section-images/IMG_5235.jpg',
+                '/hero-section-images/IMG_5236.jpg',
+                '/hero-section-images/IMG_5237.jpg',
+              ];
+              
+              // Shuffle images for randomization on each load
+              const shuffled = [...heroImages].sort(() => Math.random() - 0.5);
+              return shuffled.slice(0, 12).map((src, index) => (
                 <div 
-                  key={`${item.src}-${index}`} 
+                  key={`${src}-${index}`} 
                   className={`relative aspect-square rounded-lg overflow-hidden ${
                     index % 3 === 0 ? 'rotate-3' : 
                     index % 3 === 1 ? '-rotate-2' : 'rotate-1'
@@ -31,8 +52,8 @@ export default function Home() {
                   }}
                 >
                   <Image 
-                    src={item.src} 
-                    alt={item.title}
+                    src={src} 
+                    alt="Creativity by Lily jewelry"
                     fill
                     className="object-cover"
                     sizes="(max-width: 768px) 25vw, 16vw"
