@@ -1,123 +1,15 @@
-import Image from "next/image";
-import Link from "next/link";
+import dynamic from "next/dynamic";
 import { Suspense } from "react";
-import ProductCarousel from "@/components/ProductCarousel";
-import ProductSpotlight from "@/components/ProductSpotlight";
-import CustomerFavorites from "@/components/CustomerFavorites";
-import FeaturedEvents from "@/components/FeaturedEvents";
+import HeroSection from "@/components/HeroSection";
+
+const DynamicProductCarousel = dynamic(() => import("@/components/ProductCarousel"), { ssr: true });
+const DynamicCustomerFavorites = dynamic(() => import("@/components/CustomerFavorites"), { ssr: true });
+const DynamicFeaturedEvents = dynamic(() => import("@/components/FeaturedEvents"), { ssr: true });
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-[#faf8f5]">
-      {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Product Image Collage Background - Optimized */}
-        <div className="absolute inset-0 bg-gradient-to-br from-pink-50 to-amber-50">
-          <div className="absolute inset-0 grid grid-cols-4 md:grid-cols-6 gap-2 p-4 opacity-20">
-            {(() => {
-              // Hero section images
-              const heroImages = [
-                '/hero-section-images/IMG_5220.PNG',
-                '/hero-section-images/IMG_5221.jpg',
-                '/hero-section-images/IMG_5222.jpg',
-                '/hero-section-images/IMG_5223.jpg',
-                '/hero-section-images/IMG_5224.jpg',
-                '/hero-section-images/IMG_5225.jpg',
-                '/hero-section-images/IMG_5226.jpg',
-                '/hero-section-images/IMG_5227.jpg',
-                '/hero-section-images/IMG_5228.jpg',
-                '/hero-section-images/IMG_5229.jpg',
-                '/hero-section-images/IMG_5230.jpg',
-                '/hero-section-images/IMG_5231.jpg',
-                '/hero-section-images/IMG_5232.jpg',
-                '/hero-section-images/IMG_5233.jpg',
-                '/hero-section-images/IMG_5234.jpg',
-                '/hero-section-images/IMG_5235.jpg',
-                '/hero-section-images/IMG_5236.jpg',
-                '/hero-section-images/IMG_5237.jpg',
-              ];
-              
-              // Shuffle images for randomization on each load
-              const shuffled = [...heroImages].sort(() => Math.random() - 0.5);
-              return shuffled.slice(0, 12).map((src, index) => (
-                <div 
-                  key={`${src}-${index}`} 
-                  className={`relative aspect-square rounded-lg overflow-hidden ${
-                    index % 3 === 0 ? 'rotate-3' : 
-                    index % 3 === 1 ? '-rotate-2' : 'rotate-1'
-                  }`}
-                  style={{
-                    gridColumn: index % 4 === 0 ? 'span 2' : 'span 1',
-                    gridRow: index % 4 === 0 ? 'span 2' : 'span 1',
-                  }}
-                >
-                  <Image 
-                    src={src} 
-                    alt="Creativity by Lily jewelry"
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 25vw, 16vw"
-                    loading="lazy"
-                    quality={50}
-                  />
-                </div>
-              ));
-            })()}
-          </div>
-        </div>
-        
-        <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
-                  <h1 className="text-6xl md:text-8xl font-light leading-tight mb-8" style={{ fontFamily: 'var(--font-script)' }}>
-                    <span className="block text-gray-800 drop-shadow-sm" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-            Handcrafted
-                    </span>
-                    <span className="block text-[color:var(--logo-pink)] font-normal -mt-10" style={{ 
-                      textShadow: '0 2px 8px rgba(236, 72, 153, 0.3)',
-                      background: 'linear-gradient(135deg, var(--logo-pink) 0%, #ec4899 100%)',
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent',
-                      backgroundClip: 'text'
-                    }}>
-                      Jewelry
-                    </span>
-                    <span className="block text-2xl md:text-3xl font-normal text-gray-700 -mt-2" style={{ 
-                      textShadow: '0 1px 3px rgba(0,0,0,0.1)',
-                      letterSpacing: '0.02em'
-                    }}>
-                      from Cape Cod
-                    </span>
-          </h1>
-                  <p className="text-xl text-gray-700 mb-10 max-w-3xl mx-auto leading-relaxed font-light" style={{ 
-                    textShadow: '0 1px 2px rgba(0,0,0,0.1)',
-                    letterSpacing: '0.02em'
-                  }}>
-            Each piece is thoughtfully designed and handcrafted with love, 
-            bringing you waterproof and hypoallergenic jewelry that celebrates 
-            the beauty of coastal living.
-          </p>
-                  <div className="flex flex-col sm:flex-row gap-6 justify-center">
-            <Link 
-              href="/products"
-                      className="bg-[color:var(--logo-pink)] text-white px-10 py-5 rounded-full font-medium hover:opacity-90 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-                      style={{
-                        background: 'linear-gradient(135deg, var(--logo-pink) 0%, #ec4899 100%)',
-                        boxShadow: '0 8px 25px rgba(236, 72, 153, 0.3)'
-                      }}
-            >
-              Shop Collection
-            </Link>
-            <Link 
-              href="#about"
-                      className="border-2 border-[color:var(--logo-pink)] text-[color:var(--logo-pink)] px-10 py-5 rounded-full font-medium hover:bg-[color:var(--logo-pink)] hover:text-white transition-all duration-300 transform hover:-translate-y-1"
-                      style={{
-                        boxShadow: '0 4px 15px rgba(236, 72, 153, 0.2)'
-                      }}
-            >
-              Our Story
-            </Link>
-          </div>
-        </div>
-      </section>
+      <HeroSection />
 
       {/* About Section */}
       <section id="about" className="py-20 bg-white">
@@ -163,19 +55,21 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Customer Favorites Section */}
+      {/* Customer Favorites Section - lazy loaded */}
       <section className="py-20 bg-[#faf8f5]">
-        <CustomerFavorites />
+        <Suspense fallback={null}>
+          <DynamicCustomerFavorites />
+        </Suspense>
       </section>
 
-      {/* Featured Events Section - Moved Higher */}
+      {/* Featured Events Section - lazy loaded */}
       <Suspense fallback={null}>
-        <FeaturedEvents />
+        <DynamicFeaturedEvents />
       </Suspense>
 
-      {/* Product Carousel Section */}
+      {/* Product Carousel Section - lazy loaded */}
       <section className="py-20" style={{ backgroundColor: 'var(--soft-pink)' }}>
-        <ProductCarousel />
+        <DynamicProductCarousel />
       </section>
 
       {/* Contact anchor - Footer is handled by layout */}

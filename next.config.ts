@@ -1,25 +1,21 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  eslint: {
-    ignoreDuringBuilds: true, // Temporarily disable ESLint during builds
-  },
   typescript: {
     ignoreBuildErrors: true, // Temporarily disable TypeScript errors during builds
   },
   images: {
-    formats: ['image/webp'],
+    formats: ["image/webp"],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
     imageSizes: [16, 32, 48, 64, 96, 128],
     qualities: [40, 50, 60, 70, 75, 80, 90, 100],
   },
+  serverExternalPackages: ["square"],
   experimental: {
-    optimizePackageImports: ['@/data/gallery'],
-    serverComponentsExternalPackages: ['square'], // Don't bundle Square SDK
+    optimizePackageImports: ["@/data/gallery"],
   },
   compiler: {
-    removeConsole: false, // Keep console logs for debugging
+    removeConsole: process.env.NODE_ENV === "production",
   },
 };
 
