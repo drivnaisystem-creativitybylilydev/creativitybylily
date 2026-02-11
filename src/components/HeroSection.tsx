@@ -27,6 +27,7 @@ const HERO_IMAGES = [
 
 const SLOT_COUNT = 5;
 const ROTATE_INTERVAL_MS = 90 * 1000;
+const MOBILE_ROTATE_INTERVAL_MS = 5 * 1000;
 
 /** Fixed initial order so server and client render the same (avoids hydration mismatch). */
 const INITIAL_SLOTS = HERO_IMAGES.slice(0, SLOT_COUNT);
@@ -38,6 +39,7 @@ function pickRandomSlots(): string[] {
 
 export default function HeroSection() {
   const [slotImages, setSlotImages] = useState<string[]>(INITIAL_SLOTS);
+  const [mobileImageIndex, setMobileImageIndex] = useState(0);
   const [mounted, setMounted] = useState(false);
 
   const rotate = useCallback(() => setSlotImages(pickRandomSlots()), []);
@@ -53,19 +55,41 @@ export default function HeroSection() {
     return () => clearInterval(t);
   }, [mounted, rotate]);
 
+  useEffect(() => {
+    if (!mounted) return;
+    const t = setInterval(() => {
+      setMobileImageIndex((i) => (i + 1) % HERO_IMAGES.length);
+    }, MOBILE_ROTATE_INTERVAL_MS);
+    return () => clearInterval(t);
+  }, [mounted]);
+
   const [topLeft, topRight, bottomLeft, bottomCenter, bottomRight] = slotImages;
 
   return (
     <section className="relative overflow-hidden bg-[#fef5f8] min-h-[70svh] md:min-h-[85vh] flex flex-col">
-      {/* IMAGE LAYER: one row on mobile, two rows on desktop – text overlay sits on top */}
+      {/* IMAGE LAYER: one full-width rotating image on mobile; two rows on desktop */}
       <div className="relative flex flex-col gap-0 flex-1 min-h-0">
-        {/* Top row: two images + vertical pink blur (only row visible on mobile) */}
-        <div className="relative flex w-full aspect-[16/6] min-h-[220px] max-h-[280px] md:aspect-[16/5] md:min-h-[200px] md:max-h-[360px]">
+        {/* Mobile only: single image slot rotating through all 18 images */}
+        <div className="hero-image-container relative w-full flex-1 min-h-[50vh] flex md:hidden">
+          <Image
+            key={mobileImageIndex}
+            src={HERO_IMAGES[mobileImageIndex]}
+            alt="Creativity by Lily"
+            fill
+            className="object-cover transition-opacity duration-700"
+            sizes="100vw"
+            priority
+            quality={85}
+          />
+        </div>
+
+        {/* Desktop only: top row */}
+        <div className="hidden md:flex relative w-full aspect-[16/5] min-h-[200px] max-h-[360px]">
           <div className="hero-image-container relative flex-1 min-w-0 h-full">
             <Image src={topLeft} alt="Creativity by Lily" fill className="object-cover transition-opacity duration-700" sizes="50vw" priority quality={82} />
           </div>
           <div
-            className="flex-shrink-0 w-6 md:w-12 h-full"
+            className="flex-shrink-0 w-12 h-full"
             style={{
               background: "linear-gradient(90deg, transparent, rgba(255,105,180,0.4) 20%, rgba(255,105,180,0.35) 50%, rgba(255,105,180,0.4) 80%, transparent)",
               filter: "blur(8px)",
@@ -76,7 +100,7 @@ export default function HeroSection() {
           </div>
         </div>
 
-        {/* Bottom row: three images (hidden on mobile for cleaner hero) */}
+        {/* Desktop only: bottom row */}
         <div className="hidden md:flex relative w-full aspect-[16/5] min-h-[160px] max-h-[300px]">
           <div className="hero-image-container relative flex-1 min-w-0 h-full">
             <Image src={bottomLeft} alt="Creativity by Lily jewelry" fill className="object-cover transition-opacity duration-700" sizes="33vw" loading="lazy" quality={80} />
