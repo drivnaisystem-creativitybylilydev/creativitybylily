@@ -72,8 +72,8 @@ export const metadata: Metadata = {
     creator: "@creativitybylily",
   },
   icons: {
-    icon: "/favicon.ico",
-    apple: "/apple-touch-icon.png",
+    icon: [{ url: "/brand_logo.webp", type: "image/webp", sizes: "any" }],
+    apple: [{ url: "/brand_logo.webp", type: "image/webp", sizes: "180x180" }],
   },
   manifest: "/site.webmanifest",
 };
