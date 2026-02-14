@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   // Protect admin routes
   if (request.nextUrl.pathname.startsWith('/admin')) {
     // For now, we'll handle auth in the page components
@@ -15,11 +15,3 @@ export function middleware(request: NextRequest) {
 export const config = {
   matcher: '/admin/:path*',
 };
-
-
-
-
-
-
-
-
