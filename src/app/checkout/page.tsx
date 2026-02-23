@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useCart } from '@/contexts/CartContext';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase/client';
+import CardBrandLogos from '@/components/checkout/CardBrandLogos';
 
 type ShippingFormData = {
   email: string;
@@ -393,15 +394,10 @@ export default function CheckoutPage() {
         throw new Error(tokenResult.errors?.[0]?.detail || 'Failed to process payment information');
       }
 
-      // Generate idempotency key (prevents duplicate charges)
       const idempotencyKey = `${Date.now()}-${Math.random().toString(36).substring(7)}`;
-
-      // Create payment
       const paymentResponse = await fetch('/api/payments/create', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           sourceId: tokenResult.token,
           idempotencyKey,
@@ -409,21 +405,15 @@ export default function CheckoutPage() {
           currency: 'USD',
         }),
       });
-
       const paymentData = await paymentResponse.json();
-
       if (!paymentResponse.ok) {
         throw new Error(paymentData.error || 'Payment processing failed');
       }
-
-      // Step 2: Create order in database (only after successful payment)
       const response = await fetch('/api/orders/create', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userId: userId || null, // Include user ID if logged in
+          userId: userId || null,
           items: items.map(item => ({
             productId: item.product.id,
             variantId: item.variantId,
@@ -467,45 +457,30 @@ export default function CheckoutPage() {
           },
           subtotal,
           tax,
-          shippingCost: shipping,  // Calculated shipping or 0 for free shipping
+          shippingCost: shipping,
           total,
-          paymentId: paymentData.payment?.id, // Store Square payment ID
+          paymentId: paymentData.payment?.id,
         }),
       });
-
-      // Check if response is JSON
       const contentType = response.headers.get('content-type');
       if (!contentType || !contentType.includes('application/json')) {
         const text = await response.text();
         console.error('Non-JSON response:', text);
         throw new Error('Server returned an error. Please check the browser console and server logs for details.');
       }
-
       const data = await response.json();
-
       if (!response.ok) {
-        // Handle inventory errors specifically
         if (data.error === 'Insufficient inventory' && data.details) {
-          const inventoryErrors = Array.isArray(data.details) 
-            ? data.details.join('\n')
-            : data.details;
-          alert(
-            `${data.message || 'Some items are no longer available:'}\n\n${inventoryErrors}\n\nPlease update your cart and try again.`
-          );
-          // Refresh the page to update cart with current inventory
+          const inventoryErrors = Array.isArray(data.details) ? data.details.join('\n') : data.details;
+          alert(`${data.message || 'Some items are no longer available:'}\n\n${inventoryErrors}\n\nPlease update your cart and try again.`);
           window.location.reload();
           return;
         }
-        
         const errorMsg = data.error || 'Failed to create order';
         const details = data.details ? ` (${data.details})` : '';
         throw new Error(errorMsg + details);
       }
-
-      // Clear cart
       clearCart();
-
-      // Redirect to order confirmation
       router.push(`/checkout/confirmation?order=${data.orderNumber}`);
     } catch (error) {
       console.error('Checkout error:', error);
@@ -802,22 +777,9 @@ export default function CheckoutPage() {
                       Card Information
                     </label>
                     
-                    {/* Card Brand Icons */}
-                    <div className="flex items-center gap-2 mb-3">
-                      <div className="flex items-center gap-1">
-                        <div className="w-8 h-5 bg-blue-600 rounded flex items-center justify-center">
-                          <span className="text-white text-xs font-bold">VISA</span>
-                        </div>
-                        <div className="w-8 h-5 bg-red-600 rounded flex items-center justify-center">
-                          <span className="text-white text-xs font-bold">MC</span>
-                        </div>
-                        <div className="w-8 h-5 bg-blue-500 rounded flex items-center justify-center">
-                          <span className="text-white text-xs font-bold">AMEX</span>
-                        </div>
-                        <div className="w-8 h-5 bg-orange-500 rounded flex items-center justify-center">
-                          <span className="text-white text-xs font-bold">DISC</span>
-                        </div>
-                      </div>
+                    {/* Card brand logos (Visa, Mastercard, Amex, Discover) */}
+                    <div className="mb-3">
+                      <CardBrandLogos />
                     </div>
 
                     {/* Square Card Input Container */}
