@@ -89,7 +89,7 @@ export async function sendOrderConfirmationEmail({
 
   try {
     // Render email template (render is synchronous)
-    const emailHtml = render(
+    const emailHtml = await render(
       OrderConfirmationEmail({
         orderNumber,
         customerName: `${shippingAddress.firstName} ${shippingAddress.lastName}`,
@@ -100,7 +100,7 @@ export async function sendOrderConfirmationEmail({
         shipping,
         total,
         shippingAddress,
-        siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://creativitybylily.com',
+        siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://creativitybylilyco.com',
       })
     );
 
@@ -154,7 +154,7 @@ export async function sendReturnRequestReceivedEmail({
   }
 
   try {
-    const emailHtml = render(
+    const emailHtml = await render(
       ReturnRequestReceivedEmail({
         returnNumber,
         customerName,
@@ -162,7 +162,7 @@ export async function sendReturnRequestReceivedEmail({
         orderNumber,
         refundAmount,
         items,
-        siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://creativitybylily.com',
+        siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://creativitybylilyco.com',
       })
     );
 
@@ -218,13 +218,13 @@ export async function sendReturnApprovedEmail({
   }
 
   try {
-    const emailHtml = render(
+    const emailHtml = await render(
       ReturnApprovedEmail({
         returnNumber,
         customerName,
         returnAddress,
         refundAmount,
-        siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://creativitybylily.com',
+        siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://creativitybylilyco.com',
       })
     );
 
@@ -273,13 +273,13 @@ export async function sendRefundProcessedEmail({
   }
 
   try {
-    const emailHtml = render(
+    const emailHtml = await render(
       RefundProcessedEmail({
         returnNumber,
         customerName,
         refundAmount,
         refundTransactionId,
-        siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://creativitybylily.com',
+        siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://creativitybylilyco.com',
       })
     );
 
@@ -335,7 +335,7 @@ export async function sendShippingConfirmationEmail({
   }
 
   try {
-    const emailHtml = render(
+    const emailHtml = await render(
       ShippingConfirmationEmail({
         orderNumber,
         customerName,
@@ -343,7 +343,7 @@ export async function sendShippingConfirmationEmail({
         carrier,
         estimatedDelivery,
         items,
-        siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://creativitybylily.com',
+        siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://creativitybylilyco.com',
       })
     );
 

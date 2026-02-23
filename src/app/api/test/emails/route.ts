@@ -75,7 +75,7 @@ export async function GET(request: Request) {
   try {
     switch (emailType) {
       case 'order':
-        emailHtml = render(
+        emailHtml = await render(
           OrderConfirmationEmail({
             orderNumber: sampleData.orderNumber,
             customerName: sampleData.customerName,
@@ -92,7 +92,7 @@ export async function GET(request: Request) {
         break;
 
       case 'shipping':
-        emailHtml = render(
+        emailHtml = await render(
           ShippingConfirmationEmail({
             orderNumber: sampleData.orderNumber,
             customerName: sampleData.customerName,
@@ -109,7 +109,7 @@ export async function GET(request: Request) {
         break;
 
       case 'return-request':
-        emailHtml = render(
+        emailHtml = await render(
           ReturnRequestReceivedEmail({
             returnNumber: sampleData.returnNumber,
             customerName: sampleData.customerName,
@@ -127,7 +127,7 @@ export async function GET(request: Request) {
         break;
 
       case 'return-approved':
-        emailHtml = render(
+        emailHtml = await render(
           ReturnApprovedEmail({
             returnNumber: sampleData.returnNumber,
             customerName: sampleData.customerName,
@@ -139,7 +139,7 @@ export async function GET(request: Request) {
         break;
 
       case 'refund':
-        emailHtml = render(
+        emailHtml = await render(
           RefundProcessedEmail({
             returnNumber: sampleData.returnNumber,
             customerName: sampleData.customerName,
@@ -268,7 +268,7 @@ export async function POST(request: Request) {
   try {
     switch (emailType) {
       case 'order':
-        emailHtml = render(
+        emailHtml = await render(
           OrderConfirmationEmail({
             orderNumber: sampleData.orderNumber,
             customerName: sampleData.customerName,
@@ -284,7 +284,7 @@ export async function POST(request: Request) {
         );
         break;
       case 'shipping':
-        emailHtml = render(
+        emailHtml = await render(
           ShippingConfirmationEmail({
             orderNumber: sampleData.orderNumber,
             customerName: sampleData.customerName,
@@ -297,7 +297,7 @@ export async function POST(request: Request) {
         );
         break;
       case 'return-request':
-        emailHtml = render(
+        emailHtml = await render(
           ReturnRequestReceivedEmail({
             returnNumber: sampleData.returnNumber,
             customerName: sampleData.customerName,
@@ -310,7 +310,7 @@ export async function POST(request: Request) {
         );
         break;
       case 'return-approved':
-        emailHtml = render(
+        emailHtml = await render(
           ReturnApprovedEmail({
             returnNumber: sampleData.returnNumber,
             customerName: sampleData.customerName,
@@ -321,7 +321,7 @@ export async function POST(request: Request) {
         );
         break;
       case 'refund':
-        emailHtml = render(
+        emailHtml = await render(
           RefundProcessedEmail({
             returnNumber: sampleData.returnNumber,
             customerName: sampleData.customerName,
