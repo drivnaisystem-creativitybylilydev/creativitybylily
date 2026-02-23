@@ -5,6 +5,10 @@ import Link from 'next/link';
 
 export default function TestEmailsPage() {
   const [selectedEmail, setSelectedEmail] = useState('order');
+  const [sendTo, setSendTo] = useState('');
+  const [sendType, setSendType] = useState('order');
+  const [sending, setSending] = useState(false);
+  const [sendResult, setSendResult] = useState<{ ok: boolean; message: string } | null>(null);
 
   const emailTypes = [
     { value: 'order', label: 'Order Confirmation', description: 'Sent when customer places an order' },
@@ -48,26 +52,83 @@ export default function TestEmailsPage() {
           </div>
         </div>
 
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <h3 className="font-semibold text-yellow-900 mb-2">📧 Testing Real Emails</h3>
-          <p className="text-sm text-yellow-800 mb-2">
-            To test sending actual emails (not just preview):
+        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+          <h2 className="text-xl font-semibold mb-4">📧 Send test email (no real order)</h2>
+          <p className="text-sm text-gray-600 mb-4">
+            Sends one real email to your inbox using sample data. Only works in development (not on production).
           </p>
-          <ol className="text-sm text-yellow-800 list-decimal list-inside space-y-1 ml-4">
-            <li>Make sure <code className="bg-yellow-100 px-1 rounded">RESEND_API_KEY</code> is in <code className="bg-yellow-100 px-1 rounded">.env.local</code></li>
-            <li>Set <code className="bg-yellow-100 px-1 rounded">RESEND_FROM_EMAIL</code> to your email address</li>
-            <li>Restart your dev server</li>
-            <li>
-              <strong>Test Return Emails:</strong> Submit a return request at{' '}
-              <Link href="/returns/start" className="text-pink-600 underline">
-                /returns/start
-              </Link>
-            </li>
-            <li>
-              <strong>Test Order Email:</strong> Currently disabled. Enable it in{' '}
-              <code className="bg-yellow-100 px-1 rounded">src/app/api/orders/create/route.ts</code>
-            </li>
-          </ol>
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault();
+              if (!sendTo.trim()) return;
+              setSending(true);
+              setSendResult(null);
+              try {
+                const res = await fetch('/api/test/emails', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ to: sendTo.trim(), type: sendType }),
+                });
+                const data = await res.json();
+                if (res.ok) {
+                  setSendResult({ ok: true, message: `Sent! Check ${sendTo} (and spam folder).` });
+                } else {
+                  setSendResult({ ok: false, message: data.error || data.details?.message || 'Failed to send' });
+                }
+              } catch (err: any) {
+                setSendResult({ ok: false, message: err.message || 'Request failed' });
+              } finally {
+                setSending(false);
+              }
+            }}
+            className="flex flex-wrap items-end gap-3"
+          >
+            <label className="flex flex-col gap-1">
+              <span className="text-sm font-medium text-gray-700">Send to</span>
+              <input
+                type="email"
+                value={sendTo}
+                onChange={(e) => setSendTo(e.target.value)}
+                placeholder="you@example.com"
+                className="border border-gray-300 rounded-lg px-3 py-2 w-64"
+                required
+              />
+            </label>
+            <label className="flex flex-col gap-1">
+              <span className="text-sm font-medium text-gray-700">Template</span>
+              <select
+                value={sendType}
+                onChange={(e) => setSendType(e.target.value)}
+                className="border border-gray-300 rounded-lg px-3 py-2"
+              >
+                {emailTypes.map((e) => (
+                  <option key={e.value} value={e.value}>{e.label}</option>
+                ))}
+              </select>
+            </label>
+            <button
+              type="submit"
+              disabled={sending}
+              className="bg-pink-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-pink-700 disabled:opacity-50"
+            >
+              {sending ? 'Sending…' : 'Send test email'}
+            </button>
+          </form>
+          {sendResult && (
+            <p className={`mt-3 text-sm ${sendResult.ok ? 'text-green-700' : 'text-red-700'}`}>
+              {sendResult.message}
+            </p>
+          )}
+        </div>
+
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <h3 className="font-semibold text-yellow-900 mb-2">Preview only</h3>
+          <p className="text-sm text-yellow-800 mb-2">
+            The links above open the template as HTML in the browser (no email is sent). Use the form above to send a real test to your inbox.
+          </p>
+          <p className="text-sm text-yellow-800">
+            Ensure <code className="bg-yellow-100 px-1 rounded">RESEND_API_KEY</code> and <code className="bg-yellow-100 px-1 rounded">RESEND_FROM_EMAIL</code> are in <code className="bg-yellow-100 px-1 rounded">.env.local</code> and restart the dev server.
+          </p>
         </div>
       </div>
     </div>
