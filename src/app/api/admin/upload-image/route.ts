@@ -16,10 +16,15 @@ export async function POST(request: Request) {
       );
     }
 
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
+    // Allowed image extensions (covers JPEG, PNG, HEIC, WebP, GIF, etc.)
+    const allowedExtensions = ['jpg', 'jpeg', 'png', 'heic', 'heif', 'webp', 'gif', 'bmp', 'tiff', 'tif', 'avif'];
+    const extension = (file.name.split('.').pop() || '').toLowerCase();
+    const isAllowedMime = file.type.startsWith('image/');
+    const isAllowedExtension = allowedExtensions.includes(extension);
+
+    if (!isAllowedMime && !isAllowedExtension) {
       return NextResponse.json(
-        { error: 'File must be an image' },
+        { error: 'File must be an image (e.g. JPEG, PNG, HEIC, WebP)' },
         { status: 400 }
       );
     }
@@ -32,11 +37,11 @@ export async function POST(request: Request) {
       );
     }
 
-    // Generate unique filename
+    // Generate unique filename (use extension from above)
     const timestamp = Date.now();
     const randomString = Math.random().toString(36).substring(2, 15);
-    const extension = file.name.split('.').pop() || 'jpg';
-    const filename = `${timestamp}-${randomString}.${extension}`;
+    const ext = extension || 'jpg';
+    const filename = `${timestamp}-${randomString}.${ext}`;
 
     // Create directory path
     const uploadDir = join(process.cwd(), 'public', folder);

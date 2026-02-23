@@ -29,10 +29,13 @@ export default function ImageUpload({ images, onImagesChange, maxImages = 10 }: 
     setIsUploading(true);
 
     try {
+      const allowedExtensions = ['jpg', 'jpeg', 'png', 'heic', 'heif', 'webp', 'gif', 'bmp', 'tiff', 'tif', 'avif'];
       const uploadPromises = filesToUpload.map(async (file) => {
-        // Validate file type
-        if (!file.type.startsWith('image/')) {
-          throw new Error(`${file.name} is not an image file`);
+        const ext = (file.name.split('.').pop() || '').toLowerCase();
+        const isImageMime = file.type.startsWith('image/');
+        const isImageExtension = allowedExtensions.includes(ext);
+        if (!isImageMime && !isImageExtension) {
+          throw new Error(`${file.name} is not a supported image (use JPEG, PNG, HEIC, WebP, etc.)`);
         }
 
         // Validate file size (max 5MB)
@@ -107,7 +110,7 @@ export default function ImageUpload({ images, onImagesChange, maxImages = 10 }: 
           ref={fileInputRef}
           type="file"
           multiple
-          accept="image/*"
+          accept="image/jpeg,image/jpg,image/png,image/heic,image/heif,image/webp,image/gif,image/bmp,image/tiff,image/avif,image/*"
           onChange={(e) => handleFileSelect(e.target.files)}
           className="hidden"
         />
@@ -143,7 +146,7 @@ export default function ImageUpload({ images, onImagesChange, maxImages = 10 }: 
               <span className="text-gray-600"> or drag and drop</span>
             </div>
             <p className="text-xs text-gray-500">
-              PNG, JPG, WEBP up to 5MB each ({images.length}/{maxImages} images)
+              JPEG, PNG, HEIC, WebP, GIF and other image formats up to 5MB each ({images.length}/{maxImages} images)
             </p>
           </div>
         )}

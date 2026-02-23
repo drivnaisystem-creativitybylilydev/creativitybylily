@@ -171,9 +171,12 @@ export default function EditEventPage() {
     setError('');
 
     try {
-      // Validate file type
-      if (!file.type.startsWith('image/')) {
-        throw new Error('File must be an image');
+      const allowedExtensions = ['jpg', 'jpeg', 'png', 'heic', 'heif', 'webp', 'gif', 'bmp', 'tiff', 'tif', 'avif'];
+      const ext = (file.name.split('.').pop() || '').toLowerCase();
+      const isImageMime = file.type.startsWith('image/');
+      const isImageExtension = allowedExtensions.includes(ext);
+      if (!isImageMime && !isImageExtension) {
+        throw new Error('File must be an image (e.g. JPEG, PNG, HEIC, WebP)');
       }
 
       // Validate file size (max 5MB)
@@ -442,7 +445,7 @@ export default function EditEventPage() {
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept="image/*"
+                  accept="image/jpeg,image/jpg,image/png,image/heic,image/heif,image/webp,image/gif,image/bmp,image/tiff,image/avif,image/*"
                   onChange={handleFileSelect}
                   className="hidden"
                 />
@@ -470,7 +473,7 @@ export default function EditEventPage() {
                       <span className="text-[color:var(--logo-pink)] font-semibold">Click to upload</span>
                       <span className="text-gray-600"> or drag and drop</span>
                     </div>
-                    <p className="text-xs text-gray-500">PNG, JPG, WEBP up to 5MB</p>
+                    <p className="text-xs text-gray-500">JPEG, PNG, HEIC, WebP, GIF and other image formats up to 5MB</p>
                   </div>
                 )}
               </div>
