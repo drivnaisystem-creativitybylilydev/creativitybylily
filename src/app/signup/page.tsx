@@ -50,8 +50,14 @@ export default function SignupPage() {
         throw signUpError;
       }
 
+      // Supabase returns user with empty identities when email is already registered (no error thrown)
+      if (data.user?.identities && data.user.identities.length === 0) {
+        setError('This email is already registered. Please sign in instead.');
+        return;
+      }
+
       if (data.user) {
-        // Success - redirect to confirmation page
+        // New user - redirect to confirmation page (verification email sent)
         router.push('/signup/confirmation');
       }
     } catch (err: any) {
@@ -76,6 +82,14 @@ export default function SignupPage() {
           {error && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4">
               <p className="text-sm text-red-800">{error}</p>
+              {error.includes('already registered') && (
+                <Link
+                  href="/login"
+                  className="inline-block mt-3 text-sm font-medium text-[color:var(--logo-pink)] hover:underline"
+                >
+                  Go to sign in →
+                </Link>
+              )}
             </div>
           )}
           <div className="space-y-4">
