@@ -72,13 +72,18 @@ export async function POST(request: Request) {
     // Initialize Shippo client
     const shippo = new Shippo({ apiKeyHeader: shippoApiKey });
 
-    // Create shipment to get rates
-    const shipment = await shippo.shipments.create({
+    // Use USPS carrier account ID so checkout rates match label generation
+    const uspsCarrierAccountId = process.env.SHIPPO_USPS_CARRIER_ACCOUNT_ID || '1d497f7b1b0f4d3eadea640f83e9f49d';
+    const shipmentCreateParams: Parameters<typeof shippo.shipments.create>[0] = {
       addressFrom: fromAddress,
       addressTo: toAddress,
       parcels: [parcel],
       async: false,
-    });
+    };
+    if (uspsCarrierAccountId) {
+      (shipmentCreateParams as any).carrierAccounts = [uspsCarrierAccountId];
+    }
+    const shipment = await shippo.shipments.create(shipmentCreateParams);
 
     if (!shipment || shipment.status === 'ERROR') {
       const errorMessage = shipment?.messages?.[0]?.text || 'Failed to calculate shipping rates';

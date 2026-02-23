@@ -185,13 +185,18 @@ export async function POST(
       // If not using test address, use the original address as-is
       
       // Step 2: Create Shippo shipment
-      // Shippo v2 uses camelCase parameter names
-      const shipment = await shippo.shipments.create({
+      // Use USPS carrier account ID so rates/labels come from your enabled account
+      const uspsCarrierAccountId = process.env.SHIPPO_USPS_CARRIER_ACCOUNT_ID || '1d497f7b1b0f4d3eadea640f83e9f49d';
+      const shipmentCreateParams: Parameters<typeof shippo.shipments.create>[0] = {
         addressFrom: fromAddress,
         addressTo: finalToAddress,
         parcels: [parcel],
         async: false, // Synchronous for immediate rates
-      });
+      };
+      if (uspsCarrierAccountId) {
+        (shipmentCreateParams as any).carrierAccounts = [uspsCarrierAccountId];
+      }
+      const shipment = await shippo.shipments.create(shipmentCreateParams);
 
       if (!shipment || shipment.status === 'ERROR') {
         const errorMessage = shipment?.messages?.[0]?.text || 'Failed to create Shippo shipment';
