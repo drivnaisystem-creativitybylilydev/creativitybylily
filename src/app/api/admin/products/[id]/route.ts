@@ -124,23 +124,49 @@ export async function DELETE(
     const { id } = await params;
     const supabase = createAdminClient();
 
-    // Instead of deleting, we'll just deactivate the product
+    // Fetch the product first so we can clean up its images from storage
+    const { data: product } = await supabase
+      .from('products')
+      .select('images, image_url')
+      .eq('id', id)
+      .single();
+
+    // Delete the product from the database
     const { error } = await supabase
       .from('products')
-      .update({ is_active: false })
+      .delete()
       .eq('id', id);
 
     if (error) {
-      console.error('Error deactivating product:', error);
+      console.error('Error deleting product:', error);
       return NextResponse.json(
-        { error: 'Failed to deactivate product' },
+        { error: 'Failed to delete product' },
         { status: 500 }
       );
     }
 
-    // Revalidate the admin products page cache so deactivated product updates immediately
+    // Clean up images from Supabase Storage (best-effort, don't fail if this errors)
+    if (product) {
+      const allUrls: string[] = [
+        ...(Array.isArray(product.images) ? product.images : []),
+        product.image_url,
+      ].filter(Boolean);
+
+      const storagePaths = allUrls
+        .map((url: string) => {
+          // Extract path after /product-images/ from the Supabase Storage URL
+          const match = url.match(/\/product-images\/(.+)$/);
+          return match ? match[1] : null;
+        })
+        .filter(Boolean) as string[];
+
+      if (storagePaths.length > 0) {
+        await supabase.storage.from('product-images').remove(storagePaths);
+      }
+    }
+
     revalidatePath('/admin/products');
-    revalidatePath('/products'); // Also revalidate customer-facing products page
+    revalidatePath('/products');
 
     return NextResponse.json({ success: true });
   } catch (error) {

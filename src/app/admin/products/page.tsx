@@ -1,6 +1,7 @@
 import { createAdminClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import Image from 'next/image';
+import DeleteProductButton from '@/components/admin/DeleteProductButton';
 
 export default async function AdminProductsPage() {
   const supabase = createAdminClient();
@@ -69,7 +70,7 @@ export default async function AdminProductsPage() {
                   Stock: {product.inventory_count || 0}
                 </span>
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-2 items-center">
                 <Link
                   href={`/admin/products/${product.id}`}
                   className="flex-1 text-center bg-gray-100 text-gray-700 px-4 py-2 rounded-lg font-medium hover:bg-gray-200 transition-colors"
@@ -83,6 +84,11 @@ export default async function AdminProductsPage() {
                 >
                   View
                 </Link>
+                <DeleteProductButton
+                  productId={product.id}
+                  productTitle={product.title}
+                  variant="icon"
+                />
               </div>
             </div>
           </div>

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import ImageUpload from '@/components/admin/ImageUpload';
+import DeleteProductButton from '@/components/admin/DeleteProductButton';
 
 export default function EditProductPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
@@ -164,8 +165,19 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
         >
           ← Back to Products
         </Link>
-        <h1 className="text-4xl font-light text-gray-900 mb-2">Edit Product</h1>
-        <p className="text-gray-600">Update product information</p>
+        <div className="flex items-start justify-between">
+          <div>
+            <h1 className="text-4xl font-light text-gray-900 mb-2">Edit Product</h1>
+            <p className="text-gray-600">Update product information</p>
+          </div>
+          {productId && (
+            <DeleteProductButton
+              productId={productId}
+              productTitle={formData.title || 'this product'}
+              variant="button"
+            />
+          )}
+        </div>
       </div>
 
       <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
