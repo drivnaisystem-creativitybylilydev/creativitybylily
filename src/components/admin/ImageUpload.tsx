@@ -30,6 +30,8 @@ export default function ImageUpload({ images, onImagesChange, maxImages = 10 }: 
 
     try {
       const allowedExtensions = ['jpg', 'jpeg', 'png', 'heic', 'heif', 'webp', 'gif', 'bmp', 'tiff', 'tif', 'avif'];
+      const MAX_SIZE = 50 * 1024 * 1024; // 50 MB — file goes directly to Supabase, not through Vercel
+
       const uploadPromises = filesToUpload.map(async (file) => {
         const ext = (file.name.split('.').pop() || '').toLowerCase();
         const isImageMime = file.type.startsWith('image/');
@@ -38,29 +40,41 @@ export default function ImageUpload({ images, onImagesChange, maxImages = 10 }: 
           throw new Error(`${file.name} is not a supported image (use JPEG, PNG, HEIC, WebP, etc.)`);
         }
 
-        // Validate file size (max 5MB)
-        if (file.size > 5 * 1024 * 1024) {
-          throw new Error(`${file.name} is too large. Maximum size is 5MB.`);
+        if (file.size > MAX_SIZE) {
+          throw new Error(`${file.name} is too large. Maximum size is 50 MB.`);
         }
 
-        // Create FormData
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('folder', 'products'); // Store in products folder
-
-        // Upload to API
-        const response = await fetch('/api/admin/upload-image', {
+        // Step 1: Ask the API for a signed upload URL (only metadata sent through Vercel)
+        const metaRes = await fetch('/api/admin/upload-image', {
           method: 'POST',
-          body: formData,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            folder: 'products',
+            filename: file.name,
+            contentType: file.type || 'image/jpeg',
+          }),
         });
 
-        if (!response.ok) {
-          const error = await response.json();
-          throw new Error(error.error || 'Upload failed');
+        if (!metaRes.ok) {
+          const err = await metaRes.json();
+          throw new Error(err.error || 'Failed to get upload URL');
         }
 
-        const data = await response.json();
-        return data.url;
+        const { signedUrl, publicUrl } = await metaRes.json();
+
+        // Step 2: Upload the file directly from the browser to Supabase Storage
+        // (bypasses Vercel entirely — no serverless body size limit)
+        const uploadRes = await fetch(signedUrl, {
+          method: 'PUT',
+          body: file,
+          headers: { 'Content-Type': file.type || 'application/octet-stream' },
+        });
+
+        if (!uploadRes.ok) {
+          throw new Error(`Upload failed for ${file.name}`);
+        }
+
+        return publicUrl as string;
       });
 
       const uploadedUrls = await Promise.all(uploadPromises);
@@ -146,7 +160,7 @@ export default function ImageUpload({ images, onImagesChange, maxImages = 10 }: 
               <span className="text-gray-600"> or drag and drop</span>
             </div>
             <p className="text-xs text-gray-500">
-              JPEG, PNG, HEIC, WebP, GIF and other image formats up to 5MB each ({images.length}/{maxImages} images)
+              JPEG, PNG, HEIC, WebP, GIF and other image formats up to 50 MB each ({images.length}/{maxImages} images)
             </p>
           </div>
         )}

@@ -3,22 +3,26 @@ import { createAdminClient } from '@/lib/supabase/server';
 
 const BUCKET = 'product-images';
 const ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'heic', 'heif', 'webp', 'gif', 'bmp', 'tiff', 'tif', 'avif'];
-const MAX_SIZE = 5 * 1024 * 1024; // 5 MB
 
+/**
+ * Returns a signed upload URL so the browser can upload directly to
+ * Supabase Storage without the file passing through Vercel.
+ * This removes Vercel's 4.5 MB serverless body-size limit entirely.
+ */
 export async function POST(request: Request) {
   try {
     const supabase = createAdminClient();
+    const { folder = 'products', filename, contentType } = await request.json();
 
-    const formData = await request.formData();
-    const file = formData.get('file') as File;
-    const folder = (formData.get('folder') as string) || 'products';
-
-    if (!file) {
-      return NextResponse.json({ error: 'No file provided' }, { status: 400 });
+    if (!filename || !contentType) {
+      return NextResponse.json(
+        { error: 'filename and contentType are required' },
+        { status: 400 }
+      );
     }
 
-    const extension = (file.name.split('.').pop() || '').toLowerCase();
-    const isAllowedMime = file.type.startsWith('image/');
+    const extension = (filename.split('.').pop() || '').toLowerCase();
+    const isAllowedMime = (contentType as string).startsWith('image/');
     const isAllowedExtension = ALLOWED_EXTENSIONS.includes(extension);
 
     if (!isAllowedMime && !isAllowedExtension) {
@@ -28,47 +32,37 @@ export async function POST(request: Request) {
       );
     }
 
-    if (file.size > MAX_SIZE) {
-      return NextResponse.json(
-        { error: 'File size must be less than 5 MB' },
-        { status: 400 }
-      );
-    }
-
     const timestamp = Date.now();
     const randomString = Math.random().toString(36).substring(2, 15);
     const ext = extension || 'jpg';
     const storagePath = `${folder}/${timestamp}-${randomString}.${ext}`;
 
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-
     const { data, error } = await supabase.storage
       .from(BUCKET)
-      .upload(storagePath, buffer, {
-        contentType: file.type || `image/${ext}`,
-        upsert: false,
-      });
+      .createSignedUploadUrl(storagePath);
 
     if (error) {
-      console.error('Supabase storage upload error:', error);
+      console.error('Error creating signed upload URL:', error);
       return NextResponse.json(
-        { error: `Upload failed: ${error.message}` },
+        { error: `Failed to create upload URL: ${error.message}` },
         { status: 500 }
       );
     }
 
     const { data: urlData } = supabase.storage
       .from(BUCKET)
-      .getPublicUrl(data.path);
+      .getPublicUrl(storagePath);
 
     return NextResponse.json({
-      success: true,
-      url: urlData.publicUrl,
-      filename: data.path,
+      signedUrl: data.signedUrl,
+      path: storagePath,
+      publicUrl: urlData.publicUrl,
     });
   } catch (error) {
-    console.error('Error uploading image:', error);
-    return NextResponse.json({ error: 'Failed to upload image' }, { status: 500 });
+    console.error('Error in upload-image route:', error);
+    return NextResponse.json(
+      { error: 'Failed to create upload URL' },
+      { status: 500 }
+    );
   }
 }
