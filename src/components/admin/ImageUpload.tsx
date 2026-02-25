@@ -2,6 +2,13 @@
 
 import { useState, useRef } from 'react';
 import Image from 'next/image';
+import { createClient } from '@supabase/supabase-js';
+
+// Browser-side Supabase client (anon key — used only for uploadToSignedUrl)
+const supabaseBrowser = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 type ImageUploadProps = {
   images: string[];
@@ -60,18 +67,18 @@ export default function ImageUpload({ images, onImagesChange, maxImages = 10 }: 
           throw new Error(err.error || 'Failed to get upload URL');
         }
 
-        const { signedUrl, publicUrl } = await metaRes.json();
+        const { token, path, publicUrl } = await metaRes.json();
 
         // Step 2: Upload the file directly from the browser to Supabase Storage
-        // (bypasses Vercel entirely — no serverless body size limit)
-        const uploadRes = await fetch(signedUrl, {
-          method: 'PUT',
-          body: file,
-          headers: { 'Content-Type': file.type || 'application/octet-stream' },
-        });
+        // using uploadToSignedUrl — bypasses Vercel entirely and handles CORS correctly
+        const { error: uploadError } = await supabaseBrowser.storage
+          .from('product-images')
+          .uploadToSignedUrl(path, token, file, {
+            contentType: file.type || 'image/jpeg',
+          });
 
-        if (!uploadRes.ok) {
-          throw new Error(`Upload failed for ${file.name}`);
+        if (uploadError) {
+          throw new Error(`Upload failed for ${file.name}: ${uploadError.message}`);
         }
 
         return publicUrl as string;
@@ -81,7 +88,7 @@ export default function ImageUpload({ images, onImagesChange, maxImages = 10 }: 
       onImagesChange([...images, ...uploadedUrls]);
     } catch (error: any) {
       console.error('Upload error:', error);
-      alert(error.message || 'Failed to upload images. Please try again.');
+      alert(`Upload failed: ${error.message || 'Unknown error. Check the browser console for details.'}`);
     } finally {
       setIsUploading(false);
       setUploadProgress({});

@@ -55,6 +55,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       signedUrl: data.signedUrl,
+      token: data.token,
       path: storagePath,
       publicUrl: urlData.publicUrl,
     });
