@@ -117,11 +117,12 @@ export default function ImageUpload({ images, onImagesChange, maxImages = 10 }: 
 
   return (
     <div className="space-y-4">
-      {/* Upload Area */}
-      <div
+      {/* Upload Area — wrapped in <label> for reliable iOS/iPad file picker trigger */}
+      <label
+        htmlFor="image-file-input"
         onDrop={handleDrop}
         onDragOver={handleDragOver}
-        className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+        className={`block border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer ${
           isUploading
             ? 'border-[color:var(--logo-pink)] bg-pink-50'
             : 'border-gray-300 hover:border-[color:var(--logo-pink)] hover:bg-pink-50/50'
@@ -129,13 +130,14 @@ export default function ImageUpload({ images, onImagesChange, maxImages = 10 }: 
       >
         <input
           ref={fileInputRef}
+          id="image-file-input"
           type="file"
           multiple
           accept="image/jpeg,image/jpg,image/png,image/heic,image/heif,image/webp,image/gif,image/bmp,image/tiff,image/avif,image/*"
           onChange={(e) => handleFileSelect(e.target.files)}
           className="hidden"
         />
-        
+
         {isUploading ? (
           <div className="space-y-2">
             <div className="w-12 h-12 border-4 border-[color:var(--logo-pink)] border-t-transparent rounded-full animate-spin mx-auto"></div>
@@ -157,21 +159,17 @@ export default function ImageUpload({ images, onImagesChange, maxImages = 10 }: 
               />
             </svg>
             <div>
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className="text-[color:var(--logo-pink)] font-semibold hover:opacity-80 transition-opacity"
-              >
-                Click to upload
-              </button>
+              <span className="text-[color:var(--logo-pink)] font-semibold">
+                Tap to choose photos
+              </span>
               <span className="text-gray-600"> or drag and drop</span>
             </div>
             <p className="text-xs text-gray-500">
-              JPEG, PNG, HEIC, WebP, GIF and other image formats up to 50 MB each ({images.length}/{maxImages} images)
+              JPEG, PNG, HEIC, WebP and other formats up to 50 MB each ({images.length}/{maxImages} images)
             </p>
           </div>
         )}
-      </div>
+      </label>
 
       {/* Image Preview Grid */}
       {images.length > 0 && (
