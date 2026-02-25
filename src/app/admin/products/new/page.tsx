@@ -119,7 +119,7 @@ export default function NewProductPage() {
         >
           ← Back to Products
         </Link>
-        <h1 className="text-4xl font-light text-gray-900 mb-2">Add New Product</h1>
+        <h1 className="text-3xl sm:text-4xl font-light text-gray-900 mb-2">Add New Product</h1>
         <p className="text-gray-600">Create a new product for your store</p>
       </div>
 

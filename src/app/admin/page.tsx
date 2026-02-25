@@ -15,7 +15,7 @@ export default async function AdminDashboard() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-4xl font-light text-gray-900 mb-2">Dashboard</h1>
+        <h1 className="text-3xl sm:text-4xl font-light text-gray-900 mb-2">Dashboard</h1>
         <p className="text-gray-600">Overview of your e-commerce store</p>
       </div>
 

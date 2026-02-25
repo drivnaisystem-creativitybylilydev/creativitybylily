@@ -48,7 +48,7 @@ export default async function AdminCustomersPage() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-4xl font-light text-gray-900 mb-2">Customers</h1>
+        <h1 className="text-3xl sm:text-4xl font-light text-gray-900 mb-2">Customers</h1>
         <p className="text-gray-600">View and manage your customer database</p>
       </div>
 

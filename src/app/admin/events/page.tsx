@@ -129,14 +129,14 @@ export default async function AdminEventsPage({
 
   return (
     <div>
-      <div className="mb-8 flex items-center justify-between">
+      <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-4xl font-light text-gray-900 mb-2">Events & Pop-Ups</h1>
+          <h1 className="text-3xl sm:text-4xl font-light text-gray-900 mb-2">Events & Pop-Ups</h1>
           <p className="text-gray-600">Manage events, pop-up shops, and markets</p>
         </div>
         <Link
           href="/admin/events/new"
-          className="bg-[color:var(--logo-pink)] text-white px-6 py-3 rounded-full font-medium hover:opacity-90 transition-opacity shadow-lg"
+          className="self-start sm:self-auto bg-[color:var(--logo-pink)] text-white px-6 py-3 rounded-full font-medium hover:opacity-90 transition-opacity shadow-lg whitespace-nowrap"
         >
           + Add Event
         </Link>

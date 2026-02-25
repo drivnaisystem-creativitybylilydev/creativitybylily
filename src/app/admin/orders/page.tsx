@@ -27,7 +27,7 @@ export default async function AdminOrdersPage() {
       <MarkAsViewed type="orders" ids={orderIds} />
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-4xl font-light text-gray-900 mb-2">Orders</h1>
+          <h1 className="text-3xl sm:text-4xl font-light text-gray-900 mb-2">Orders</h1>
           <p className="text-gray-600">Manage and track all customer orders</p>
         </div>
       </div>

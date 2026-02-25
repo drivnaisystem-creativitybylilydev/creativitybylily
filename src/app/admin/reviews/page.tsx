@@ -154,9 +154,9 @@ export default function AdminReviewsPage() {
 
   return (
     <div>
-      <div className="mb-8 flex items-center justify-between">
+      <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-4xl font-light text-gray-900 mb-2">Reviews</h1>
+          <h1 className="text-3xl sm:text-4xl font-light text-gray-900 mb-2">Reviews</h1>
           <p className="text-gray-600">
             Moderate customer reviews and respond to feedback
           </p>

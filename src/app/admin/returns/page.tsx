@@ -55,7 +55,7 @@ export default async function AdminReturnsPage() {
       <MarkAsViewed type="returns" ids={returnIds} />
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-4xl font-light text-gray-900 mb-2">Returns</h1>
+          <h1 className="text-3xl sm:text-4xl font-light text-gray-900 mb-2">Returns</h1>
           <p className="text-gray-600">Manage customer return requests</p>
         </div>
       </div>

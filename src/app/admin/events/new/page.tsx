@@ -219,7 +219,7 @@ export default function NewEventPage() {
         >
           ← Back to Events
         </Link>
-        <h1 className="text-4xl font-light text-gray-900 mb-2">Add New Event</h1>
+        <h1 className="text-3xl sm:text-4xl font-light text-gray-900 mb-2">Add New Event</h1>
         <p className="text-gray-600">Create a new event, pop-up shop, or market</p>
       </div>
 

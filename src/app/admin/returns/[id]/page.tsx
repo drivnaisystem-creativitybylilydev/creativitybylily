@@ -73,7 +73,7 @@ export default async function ReturnDetailPage({
         </Link>
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-4xl font-light text-gray-900 mb-2">
+            <h1 className="text-3xl sm:text-4xl font-light text-gray-900 mb-2">
               Return #{returnRequest.return_number}
             </h1>
             <p className="text-gray-600">

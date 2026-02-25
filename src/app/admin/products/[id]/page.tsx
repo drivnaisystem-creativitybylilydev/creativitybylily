@@ -167,7 +167,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
         </Link>
         <div className="flex items-start justify-between">
           <div>
-            <h1 className="text-4xl font-light text-gray-900 mb-2">Edit Product</h1>
+            <h1 className="text-3xl sm:text-4xl font-light text-gray-900 mb-2">Edit Product</h1>
             <p className="text-gray-600">Update product information</p>
           </div>
           {productId && (
