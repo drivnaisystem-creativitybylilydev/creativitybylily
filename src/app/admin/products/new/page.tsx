@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import ImageUpload from '@/components/admin/ImageUpload';
+import VariantEditor from '@/components/admin/VariantEditor';
+import type { ProductVariant } from '@/lib/supabase/types';
 
 export default function NewProductPage() {
   const router = useRouter();
@@ -21,6 +23,7 @@ export default function NewProductPage() {
     images: [] as string[],
     inventory_count: '0',
     is_active: true,
+    variants: [] as ProductVariant[],
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -288,6 +291,18 @@ export default function NewProductPage() {
                 {errors.image_url}
               </p>
             )}
+          </div>
+
+          {/* Variants */}
+          <div>
+            <h2 className="text-xl font-semibold text-gray-900 mb-1">Variants</h2>
+            <p className="text-sm text-gray-600 mb-4">
+              Add variants for different sizes, colours, lengths, etc. Customers will choose one before adding to cart.
+            </p>
+            <VariantEditor
+              variants={formData.variants}
+              onChange={variants => setFormData(prev => ({ ...prev, variants }))}
+            />
           </div>
 
           {/* Status */}

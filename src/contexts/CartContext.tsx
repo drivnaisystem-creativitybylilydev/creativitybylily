@@ -123,7 +123,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const getTotalPrice = () => {
     return items.reduce((total, item) => {
-      return total + item.product.price * item.quantity;
+      const variant = item.variantId
+        ? item.product.variants?.find((v: any) => v.id === item.variantId)
+        : null;
+      const priceModifier = variant?.price_modifier ?? 0;
+      return total + (item.product.price + priceModifier) * item.quantity;
     }, 0);
   };
 

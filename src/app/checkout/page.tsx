@@ -414,12 +414,17 @@ export default function CheckoutPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           userId: userId || null,
-          items: items.map(item => ({
-            productId: item.product.id,
-            variantId: item.variantId,
-            quantity: item.quantity,
-            price: item.product.price,
-          })),
+          items: items.map(item => {
+            const variant = item.variantId
+              ? item.product.variants?.find((v: any) => v.id === item.variantId)
+              : null;
+            return {
+              productId: item.product.id,
+              variantId: item.variantId,
+              quantity: item.quantity,
+              price: item.product.price + (variant?.price_modifier ?? 0),
+            };
+          }),
           shippingAddress: {
             email: formData.email,
             firstName: formData.firstName,

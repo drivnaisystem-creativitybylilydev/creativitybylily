@@ -6,6 +6,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import ImageUpload from '@/components/admin/ImageUpload';
 import DeleteProductButton from '@/components/admin/DeleteProductButton';
+import VariantEditor from '@/components/admin/VariantEditor';
+import type { ProductVariant } from '@/lib/supabase/types';
 
 export default function EditProductPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
@@ -25,6 +27,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
     images: [] as string[],
     inventory_count: '0',
     is_active: true,
+    variants: [] as ProductVariant[],
   });
 
   useEffect(() => {
@@ -53,6 +56,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
           images: product.images && product.images.length > 0 ? product.images : [product.image_url || ''],
           inventory_count: product.inventory_count?.toString() || '0',
           is_active: product.is_active !== false,
+          variants: Array.isArray(product.variants) ? product.variants : [],
         });
       } catch (error: any) {
         console.error('Error loading product:', error);
@@ -334,6 +338,18 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                 {errors.image_url}
               </p>
             )}
+          </div>
+
+          {/* Variants */}
+          <div>
+            <h2 className="text-xl font-semibold text-gray-900 mb-1">Variants</h2>
+            <p className="text-sm text-gray-600 mb-4">
+              Add variants for different sizes, colours, lengths, etc. Customers will choose one before adding to cart.
+            </p>
+            <VariantEditor
+              variants={formData.variants}
+              onChange={variants => setFormData(prev => ({ ...prev, variants }))}
+            />
           </div>
 
           {/* Status */}

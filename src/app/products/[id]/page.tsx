@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getProductBySlug, getRelatedProducts, getProducts } from "@/lib/supabase/products";
 import type { Metadata } from "next";
-import AddToCartButton from "@/components/AddToCartButton";
+import ProductActions from "@/components/ProductActions";
 import ProductImageGallery from "@/components/ProductImageGallery";
 import ProductReviewsSection from "@/components/ProductReviewsSection";
 
@@ -83,7 +83,7 @@ export default async function ProductDetailPage(props: PageProps) {
             </div>
             <div className="text-2xl font-semibold text-[color:var(--logo-pink)]">${product.price}</div>
             <p className="text-gray-600 leading-relaxed">{product.description}</p>
-            <AddToCartButton product={product} />
+            <ProductActions product={product} />
             <div className="pt-4 border-t border-gray-200">
               <h3 className="font-serif text-lg text-gray-800 mb-2">Product Details</h3>
               <ul className="text-sm text-gray-600 space-y-1">

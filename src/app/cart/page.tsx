@@ -93,6 +93,14 @@ export default function CartPage() {
                       {item.product.title}
                     </Link>
                     <p className="text-sm text-gray-500 mt-1">{item.product.category}</p>
+                    {item.variantId && (() => {
+                      const variant = item.product.variants?.find((v: any) => v.id === item.variantId);
+                      return variant ? (
+                        <p className="text-sm text-[color:var(--logo-pink)] font-medium mt-0.5">
+                          {variant.name}
+                        </p>
+                      ) : null;
+                    })()}
                   </div>
                   <div className="flex items-center justify-between mt-4">
                     <div className="flex flex-col gap-2">
@@ -141,7 +149,13 @@ export default function CartPage() {
                     </div>
                     <div className="text-right">
                       <p className="text-lg font-semibold text-[color:var(--logo-pink)]">
-                        ${(item.product.price * item.quantity).toFixed(2)}
+                        {(() => {
+                          const variant = item.variantId
+                            ? item.product.variants?.find((v: any) => v.id === item.variantId)
+                            : null;
+                          const unitPrice = item.product.price + (variant?.price_modifier ?? 0);
+                          return `$${(unitPrice * item.quantity).toFixed(2)}`;
+                        })()}
                       </p>
                       <button
                         onClick={() => removeItem(item.product.id, item.variantId)}
