@@ -11,7 +11,7 @@ export type Database = {
           id: string;
           title: string;
           slug: string;
-          category: 'earrings' | 'necklaces' | 'bracelets';
+          category: 'earrings' | 'necklaces' | 'bracelets' | 'anklets';
           description: string;
           price: number;
           compare_at_price: number | null;

@@ -45,7 +45,7 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
 /**
  * Fetch products by category
  */
-export async function getProductsByCategory(category: 'earrings' | 'necklaces' | 'bracelets'): Promise<Product[]> {
+export async function getProductsByCategory(category: 'earrings' | 'necklaces' | 'bracelets' | 'anklets'): Promise<Product[]> {
   const supabase = createServerClient();
   
   const { data, error } = await supabase

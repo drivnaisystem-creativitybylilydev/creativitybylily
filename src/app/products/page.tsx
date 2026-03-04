@@ -34,7 +34,7 @@ export default function ProductsPage() {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const category = urlParams.get('category');
-    if (category && ['earrings', 'necklaces', 'bracelets'].includes(category)) {
+    if (category && ['earrings', 'necklaces', 'bracelets', 'anklets'].includes(category)) {
       setSelectedCategory(category);
     }
   }, []);

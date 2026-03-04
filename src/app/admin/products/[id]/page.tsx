@@ -237,7 +237,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                 >
                   <option value="earrings">Earrings</option>
                   <option value="necklaces">Necklaces</option>
-                  <option value="bracelets">Bracelets</option>
+                  <option value="bracelets">Bracelets</option>                  <option value="anklets">Anklets</option>
                 </select>
               </div>
 

@@ -64,7 +64,7 @@ export default function NewProductPage() {
     if (formData.images.length === 0 && !formData.image_url.trim()) {
       newErrors.image_url = 'At least one product image is required';
     }
-    if (!['earrings', 'necklaces', 'bracelets'].includes(formData.category)) {
+    if (!['earrings', 'necklaces', 'bracelets', 'anklets'].includes(formData.category)) {
       newErrors.category = 'Valid category is required';
     }
 
@@ -184,7 +184,7 @@ export default function NewProductPage() {
                 >
                   <option value="earrings">Earrings</option>
                   <option value="necklaces">Necklaces</option>
-                  <option value="bracelets">Bracelets</option>
+                  <option value="bracelets">Bracelets</option>                  <option value="anklets">Anklets</option>
                 </select>
                 {errors.category && <p className="text-red-600 text-sm mt-1 font-medium">{errors.category}</p>}
               </div>

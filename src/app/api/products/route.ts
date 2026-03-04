@@ -7,8 +7,8 @@ export async function GET(request: Request) {
     const category = searchParams.get('category');
 
     let products;
-    if (category && ['earrings', 'necklaces', 'bracelets'].includes(category)) {
-      products = await getProductsByCategory(category as 'earrings' | 'necklaces' | 'bracelets');
+    if (category && ['earrings', 'necklaces', 'bracelets', 'anklets'].includes(category)) {
+      products = await getProductsByCategory(category as 'earrings' | 'necklaces' | 'bracelets' | 'anklets');
     } else {
       products = await getProducts();
     }

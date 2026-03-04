@@ -28,7 +28,7 @@ export async function POST(request: Request) {
     }
 
     // Validate category
-    if (!['earrings', 'necklaces', 'bracelets'].includes(category)) {
+    if (!['earrings', 'necklaces', 'bracelets', 'anklets'].includes(category)) {
       return NextResponse.json(
         { error: 'Invalid category' },
         { status: 400 }
