@@ -31,6 +31,7 @@ export default function ProductCarousel() {
     { name: 'Bracelets', key: 'bracelets', description: 'Stackable and statement pieces for every wrist' },
     { name: 'Necklaces', key: 'necklaces', description: 'Elegant pieces to complete your look' },
     { name: 'Earrings', key: 'earrings', description: 'From dangle to stud, find your perfect pair' },
+    { name: 'Anklets', key: 'anklets', description: 'Delicate ankle pieces perfect for coastal style' },
   ];
 
   const getCategoryProducts = (categoryKey: string, limit: number) => {
