@@ -56,7 +56,7 @@ export default function CheckoutPage() {
 
   const subtotal = getTotalPrice();
   const FREE_SHIPPING_THRESHOLD = 35;
-  const DEFAULT_SHIPPING_COST = 6.99; // Default flat rate shown before calculation
+  const DEFAULT_SHIPPING_COST = 4; // Fallback before API returns (matches flat $4 rate)
   
   // Calculate shipping: free if subtotal >= $35, otherwise use calculated rate or default
   const shipping = subtotal >= FREE_SHIPPING_THRESHOLD 
