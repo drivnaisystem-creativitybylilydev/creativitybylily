@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import PrivacyEasterEggLink from './PrivacyEasterEggLink';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -101,9 +102,7 @@ export default function Footer() {
         <div className="border-t-2 border-[color:var(--logo-pink)] pt-8">
           {/* Legal Links Row */}
           <div className="flex flex-wrap items-center justify-center gap-4 md:gap-6 mb-6">
-            <Link href="/privacy" className="text-gray-900 hover:text-[color:var(--logo-pink)] transition-colors text-sm">
-              Privacy Policy
-            </Link>
+            <PrivacyEasterEggLink />
             <span className="text-gray-400">•</span>
             <Link href="/terms" className="text-gray-900 hover:text-[color:var(--logo-pink)] transition-colors text-sm">
               Terms of Service
