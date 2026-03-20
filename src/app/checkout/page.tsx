@@ -56,7 +56,7 @@ export default function CheckoutPage() {
 
   const subtotal = getTotalPrice();
   const FREE_SHIPPING_THRESHOLD = 35;
-  const DEFAULT_SHIPPING_COST = 4; // Fallback before API returns (matches flat $4 rate)
+  const DEFAULT_SHIPPING_COST = 6; // Fallback before API returns (matches flat $6 rate)
   
   // Calculate shipping: free if subtotal >= $35, otherwise use calculated rate or default
   const shipping = subtotal >= FREE_SHIPPING_THRESHOLD 
@@ -333,7 +333,7 @@ export default function CheckoutPage() {
       console.error('Error calculating shipping:', error);
       setShippingError(error.message || 'Unable to calculate shipping. Please try again.');
       // Set a default shipping cost as fallback
-      setShippingCost(6.99);
+      setShippingCost(DEFAULT_SHIPPING_COST);
     } finally {
       setIsCalculatingShipping(false);
     }

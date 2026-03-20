@@ -9,7 +9,7 @@ export default function CartPage() {
   const total = getTotalPrice();
   const itemCount = getTotalItems();
   const FREE_SHIPPING_THRESHOLD = 35;
-  const DEFAULT_SHIPPING_COST = 6.99;
+  const DEFAULT_SHIPPING_COST = 6;
   
   // Calculate shipping: free if total >= $35, otherwise show default
   const shipping = total >= FREE_SHIPPING_THRESHOLD ? 0 : DEFAULT_SHIPPING_COST;
