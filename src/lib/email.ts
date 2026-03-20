@@ -5,6 +5,7 @@ import { ReturnRequestReceivedEmail } from '@/emails/ReturnRequestReceived';
 import { ReturnApprovedEmail } from '@/emails/ReturnApproved';
 import { RefundProcessedEmail } from '@/emails/RefundProcessed';
 import { ShippingConfirmationEmail } from '@/emails/ShippingConfirmation';
+import { AdminNewOrderEmail } from '@/emails/AdminNewOrderEmail';
 
 // Lazy initialization - only create Resend client when needed
 let resend: Resend | null = null;
@@ -119,6 +120,99 @@ export async function sendOrderConfirmationEmail({
     return { success: true, data };
   } catch (error) {
     console.error('Error rendering/sending email:', error);
+    return { success: false, error };
+  }
+}
+
+/** Comma-separated list in ADMIN_ORDER_NOTIFY_EMAIL (e.g. shop@cbl.com, partner@...) */
+function getAdminOrderNotifyRecipients(): string[] {
+  const raw = process.env.ADMIN_ORDER_NOTIFY_EMAIL?.trim();
+  if (!raw) return [];
+  return raw.split(',').map((s) => s.trim()).filter(Boolean);
+}
+
+interface AdminNewOrderItem {
+  productTitle: string;
+  productImage: string;
+  quantity: number;
+  price: number;
+  variantName?: string | null;
+}
+
+interface SendAdminNewOrderNotificationParams {
+  orderId: string;
+  orderNumber: string;
+  customerName: string;
+  customerEmail: string;
+  customerPhone?: string | null;
+  items: AdminNewOrderItem[];
+  subtotal: number;
+  tax: number;
+  shipping: number;
+  total: number;
+  shippingAddress: SendOrderConfirmationParams['shippingAddress'];
+  paymentId?: string | null;
+}
+
+/**
+ * Internal alert when a web order is placed. Set ADMIN_ORDER_NOTIFY_EMAIL in Vercel (comma-separated for multiple).
+ * Does not throw; logs on failure so checkout still succeeds.
+ */
+export async function sendAdminNewOrderNotification(
+  params: SendAdminNewOrderNotificationParams
+) {
+  const recipients = getAdminOrderNotifyRecipients();
+  const client = getResendClient();
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://creativitybylilyco.com';
+
+  if (!client || !process.env.RESEND_FROM_EMAIL) {
+    console.log('📧 [DEV MODE] Admin new-order notification would be sent:');
+    console.log('   To (set ADMIN_ORDER_NOTIFY_EMAIL):', recipients.length ? recipients.join(', ') : '(not configured)');
+    console.log('   Order:', params.orderNumber);
+    return { success: true, data: { devMode: true } };
+  }
+
+  if (recipients.length === 0) {
+    console.warn(
+      'Admin new-order email skipped: set ADMIN_ORDER_NOTIFY_EMAIL to your shop inbox (comma-separated for multiple).'
+    );
+    return { success: true, data: { skipped: true } };
+  }
+
+  try {
+    const emailHtml = await render(
+      AdminNewOrderEmail({
+        orderId: params.orderId,
+        orderNumber: params.orderNumber,
+        customerName: params.customerName,
+        customerEmail: params.customerEmail,
+        customerPhone: params.customerPhone,
+        items: params.items,
+        subtotal: params.subtotal,
+        tax: params.tax,
+        shipping: params.shipping,
+        total: params.total,
+        shippingAddress: params.shippingAddress,
+        paymentId: params.paymentId,
+        siteUrl,
+      })
+    );
+
+    const { data, error } = await client.emails.send({
+      from: process.env.RESEND_FROM_EMAIL,
+      to: recipients,
+      subject: `New order: ${params.orderNumber} | creativity by lily`,
+      html: emailHtml,
+    });
+
+    if (error) {
+      console.error('Error sending admin new-order email:', error);
+      return { success: false, error };
+    }
+
+    return { success: true, data };
+  } catch (error) {
+    console.error('Error rendering/sending admin new-order email:', error);
     return { success: false, error };
   }
 }

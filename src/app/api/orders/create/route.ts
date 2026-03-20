@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
-import { sendOrderConfirmationEmail } from '@/lib/email';
+import { sendOrderConfirmationEmail, sendAdminNewOrderNotification } from '@/lib/email';
 
 export async function POST(request: Request) {
   try {
@@ -214,22 +214,43 @@ export async function POST(request: Request) {
         .select(`
           quantity,
           price,
+          variant_id,
           products (
             id,
             title,
-            image_url
+            image_url,
+            variants
           )
         `)
         .eq('order_id', order.id);
 
       if (orderItemsWithProducts) {
-        const emailItems = orderItemsWithProducts.map((item: any) => ({
-          productId: item.products.id,
-          productTitle: item.products.title,
-          productImage: item.products.image_url,
-          quantity: item.quantity,
-          price: item.price,
-        }));
+        const emailItems = orderItemsWithProducts.map((item: any) => {
+          const variants =
+            (item.products?.variants as Array<{ id: string; name: string }> | null) || [];
+          const variantName = item.variant_id
+            ? variants.find((v) => v.id === item.variant_id)?.name ?? null
+            : null;
+          return {
+            productId: item.products.id,
+            productTitle: item.products.title,
+            productImage: item.products.image_url,
+            variantName,
+            quantity: item.quantity,
+            price: item.price,
+          };
+        });
+
+        const shippingAddr = {
+          firstName: customerFirstName,
+          lastName: customerLastName,
+          address: shippingAddress.address,
+          address2: shippingAddress.address2,
+          city: shippingAddress.city,
+          state: shippingAddress.state,
+          zip: shippingAddress.zip,
+          country: shippingAddress.country || 'US',
+        };
 
         await sendOrderConfirmationEmail({
           orderNumber: order.order_number,
@@ -240,17 +261,31 @@ export async function POST(request: Request) {
           tax,
           shipping: shippingCost,
           total,
-          shippingAddress: {
-            firstName: customerFirstName,
-            lastName: customerLastName,
-            address: shippingAddress.address,
-            address2: shippingAddress.address2,
-            city: shippingAddress.city,
-            state: shippingAddress.state,
-            zip: shippingAddress.zip,
-            country: shippingAddress.country || 'US',
-          },
+          shippingAddress: shippingAddr,
         });
+
+        const adminLineItems = emailItems.map((row) => ({
+          productTitle: row.productTitle,
+          productImage: row.productImage,
+          quantity: row.quantity,
+          price: row.price,
+          variantName: row.variantName,
+        }));
+
+        await sendAdminNewOrderNotification({
+          orderId: order.id,
+          orderNumber: order.order_number,
+          customerName: `${customerFirstName} ${customerLastName}`,
+          customerEmail: customerEmail,
+          customerPhone: customerPhone || null,
+          items: adminLineItems,
+          subtotal,
+          tax,
+          shipping: shippingCost,
+          total,
+          shippingAddress: shippingAddr,
+          paymentId: paymentId || null,
+        }).catch((err) => console.error('Admin new-order notification failed:', err));
       }
     } catch (emailError) {
       // Don't fail the order if email fails, just log it

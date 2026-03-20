@@ -6,6 +6,7 @@ import { ShippingConfirmationEmail } from '@/emails/ShippingConfirmation';
 import { ReturnRequestReceivedEmail } from '@/emails/ReturnRequestReceived';
 import { ReturnApprovedEmail } from '@/emails/ReturnApproved';
 import { RefundProcessedEmail } from '@/emails/RefundProcessed';
+import { AdminNewOrderEmail } from '@/emails/AdminNewOrderEmail';
 
 // Only allow in development
 export async function GET(request: Request) {
@@ -150,9 +151,35 @@ export async function GET(request: Request) {
         );
         break;
 
+      case 'admin-new-order':
+        emailHtml = await render(
+          AdminNewOrderEmail({
+            orderId: '00000000-0000-0000-0000-000000000001',
+            orderNumber: sampleData.orderNumber,
+            customerName: sampleData.customerName,
+            customerEmail: sampleData.customerEmail,
+            customerPhone: '555-123-4567',
+            items: sampleData.items.map((item) => ({
+              productTitle: item.productTitle,
+              productImage: item.productImage,
+              quantity: item.quantity,
+              price: item.price,
+              variantName: item.variantName,
+            })),
+            subtotal: sampleData.subtotal,
+            tax: sampleData.tax,
+            shipping: sampleData.shipping,
+            total: sampleData.total,
+            shippingAddress: sampleData.shippingAddress,
+            paymentId: 'sq_payment_preview_123',
+            siteUrl,
+          })
+        );
+        break;
+
       default:
         return NextResponse.json(
-          { error: 'Invalid email type. Use: order, shipping, return-request, return-approved, refund' },
+          { error: 'Invalid email type. Use: order, admin-new-order, shipping, return-request, return-approved, refund' },
           { status: 400 }
         );
     }
@@ -252,6 +279,7 @@ export async function POST(request: Request) {
 
   const subjects: Record<string, string> = {
     order: `Order Confirmation - ${sampleData.orderNumber} | creativity by lily`,
+    'admin-new-order': `New order: ${sampleData.orderNumber} | creativity by lily`,
     shipping: `Your Order Has Shipped - ${sampleData.orderNumber} | creativity by lily`,
     'return-request': `Return Request Received - ${sampleData.returnNumber} | creativity by lily`,
     'return-approved': `Return Approved - ${sampleData.returnNumber} | creativity by lily`,
@@ -259,7 +287,7 @@ export async function POST(request: Request) {
   };
   if (!subjects[emailType]) {
     return NextResponse.json(
-      { error: 'Invalid type. Use: order, shipping, return-request, return-approved, refund' },
+      { error: 'Invalid type. Use: order, admin-new-order, shipping, return-request, return-approved, refund' },
       { status: 400 }
     );
   }
@@ -279,6 +307,31 @@ export async function POST(request: Request) {
             shipping: sampleData.shipping,
             total: sampleData.total,
             shippingAddress: sampleData.shippingAddress,
+            siteUrl,
+          })
+        );
+        break;
+      case 'admin-new-order':
+        emailHtml = await render(
+          AdminNewOrderEmail({
+            orderId: '00000000-0000-0000-0000-000000000001',
+            orderNumber: sampleData.orderNumber,
+            customerName: sampleData.customerName,
+            customerEmail: sampleData.customerEmail,
+            customerPhone: '555-123-4567',
+            items: sampleData.items.map((item) => ({
+              productTitle: item.productTitle,
+              productImage: item.productImage,
+              quantity: item.quantity,
+              price: item.price,
+              variantName: item.variantName,
+            })),
+            subtotal: sampleData.subtotal,
+            tax: sampleData.tax,
+            shipping: sampleData.shipping,
+            total: sampleData.total,
+            shippingAddress: sampleData.shippingAddress,
+            paymentId: 'sq_payment_preview_123',
             siteUrl,
           })
         );

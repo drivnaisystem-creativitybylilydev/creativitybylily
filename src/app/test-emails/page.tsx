@@ -12,6 +12,11 @@ export default function TestEmailsPage() {
 
   const emailTypes = [
     { value: 'order', label: 'Order Confirmation', description: 'Sent when customer places an order' },
+    {
+      value: 'admin-new-order',
+      label: 'Admin: New order alert',
+      description: 'Sent to ADMIN_ORDER_NOTIFY_EMAIL when a sale completes',
+    },
     { value: 'shipping', label: 'Shipping Confirmation', description: 'Sent when order ships' },
     { value: 'return-request', label: 'Return Request Received', description: 'Sent when customer submits return' },
     { value: 'return-approved', label: 'Return Approved', description: 'Sent when admin approves return' },

@@ -53,6 +53,7 @@ Get order confirmation emails sending in production (Vercel + Resend).
    |-----------------------|---------------------------------|-------------|
    | `RESEND_API_KEY`      | `re_xxxx...` (your API key)     | Production  |
    | `RESEND_FROM_EMAIL`   | `orders@creativitybylilyco.com` (or your chosen address) | Production  |
+   | `ADMIN_ORDER_NOTIFY_EMAIL` | **(Optional but recommended)** Your shop inbox — e.g. `creativitybylilyco@gmail.com`. When set, you get a **branded “new order”** email (customer + line items + link to admin) on every website purchase. Use **comma-separated** addresses for multiple recipients. |
 
 4. If you use a different live URL, add or update:
    - `NEXT_PUBLIC_SITE_URL` = `https://your-actual-domain.com`
@@ -90,12 +91,22 @@ Get order confirmation emails sending in production (Vercel + Resend).
 
 ---
 
+## Admin “new order” emails
+
+When `ADMIN_ORDER_NOTIFY_EMAIL` is set, each successful checkout also sends the **store owner** a separate branded email (subject: **New order: {order#} \| creativity by lily**) with customer contact info, shipping address, items, totals, optional Square payment id, and a **View order in admin** link.
+
+- **Preview (local):** `/api/test/emails?type=admin-new-order`
+- If the variable is **not** set, checkout still works; the server logs a one-line warning so you remember to configure it.
+
+---
+
 ## Summary checklist
 
 - [ ] Resend account created
 - [ ] Domain added and verified in Resend (DNS records added at registrar)
 - [ ] API key created and copied
 - [ ] `RESEND_API_KEY` and `RESEND_FROM_EMAIL` set in Vercel (Production)
+- [ ] `ADMIN_ORDER_NOTIFY_EMAIL` set to the inbox that should receive new-order alerts (optional but recommended)
 - [ ] Project redeployed on Vercel
 - [ ] Test order placed on live site; confirmation email received and looks correct
 
