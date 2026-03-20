@@ -9,7 +9,19 @@ export async function GET(request: Request) {
 
     const supabase = createAdminClient();
 
-    // Build date filter
+    // All-time order count (never filtered by date — matches "every order in the system")
+    const { count: totalOrdersAllTime, error: countAllTimeError } = await supabase
+      .from('orders')
+      .select('*', { count: 'exact', head: true });
+
+    if (countAllTimeError) {
+      return NextResponse.json(
+        { error: countAllTimeError.message || 'Failed to count orders' },
+        { status: 500 }
+      );
+    }
+
+    // Build date filter for charts / period KPIs
     let ordersQuery = supabase.from('orders').select('*');
     let shipmentsQuery = supabase.from('shipments').select('*');
 
@@ -22,7 +34,7 @@ export async function GET(request: Request) {
       shipmentsQuery = shipmentsQuery.lte('created_at', endDate);
     }
 
-    // Fetch orders and shipments
+    // Fetch orders and shipments for the selected window
     const { data: orders, error: ordersError } = await ordersQuery;
     const { data: shipments, error: shipmentsError } = await shipmentsQuery;
 
@@ -33,15 +45,16 @@ export async function GET(request: Request) {
       );
     }
 
-    // Calculate KPIs
-    const totalOrders = orders?.length || 0;
+    // Period-scoped KPIs (charts use the same filtered `orders` array)
+    const totalOrdersInPeriod = orders?.length || 0;
     const totalLabels = shipments?.filter(s => s.status === 'purchased').length || 0;
     const totalRevenue = orders?.reduce((sum, order) => sum + Number(order.total || 0), 0) || 0;
-    const averageOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+    const averageOrderValue =
+      totalOrdersInPeriod > 0 ? totalRevenue / totalOrdersInPeriod : 0;
 
     // Order status breakdown
     const statusCounts: Record<string, number> = {};
-    orders?.forEach(order => {
+    orders?.forEach((order) => {
       const status = order.status || 'unknown';
       statusCounts[status] = (statusCounts[status] || 0) + 1;
     });
@@ -72,7 +85,8 @@ export async function GET(request: Request) {
 
     return NextResponse.json({
       kpis: {
-        totalOrders,
+        totalOrdersAllTime: totalOrdersAllTime ?? 0,
+        totalOrdersInPeriod,
         totalLabels,
         totalRevenue,
         averageOrderValue,
@@ -80,7 +94,8 @@ export async function GET(request: Request) {
       orderStatusBreakdown: Object.entries(statusCounts).map(([status, count]) => ({
         status,
         count,
-        percentage: totalOrders > 0 ? (count / totalOrders) * 100 : 0,
+        percentage:
+          totalOrdersInPeriod > 0 ? (count / totalOrdersInPeriod) * 100 : 0,
       })),
       carrierBreakdown: Object.entries(carrierCounts).map(([carrier, count]) => ({
         carrier: carrier.toUpperCase(),

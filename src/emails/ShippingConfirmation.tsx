@@ -1,6 +1,7 @@
 import { Section, Text, Link } from '@react-email/components';
 import * as React from 'react';
 import { EmailLayout, EmailFooterSignature, emailStyles } from './shared/EmailLayout';
+import { getEmailSiteUrl } from './shared/emailSiteUrl';
 
 interface ShippingConfirmationProps {
   orderNumber: string;
@@ -21,7 +22,7 @@ export const ShippingConfirmationEmail = ({
   items,
   siteUrl = 'https://creativitybylilyco.com',
 }: ShippingConfirmationProps) => {
-  const url = siteUrl.startsWith('http') ? siteUrl : `https://${siteUrl}`;
+  const url = getEmailSiteUrl(siteUrl);
   return (
     <EmailLayout siteUrl={siteUrl}>
       <Section style={emailStyles.content}>

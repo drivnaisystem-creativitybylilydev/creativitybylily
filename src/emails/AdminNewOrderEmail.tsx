@@ -8,7 +8,8 @@ import {
   Hr,
 } from '@react-email/components';
 import * as React from 'react';
-import { EmailLayout, emailStyles } from './shared/EmailLayout';
+import { EmailLayout, EmailFooterSignature, emailStyles } from './shared/EmailLayout';
+import { emailAssetSrc, getEmailSiteUrl } from './shared/emailSiteUrl';
 
 interface AdminOrderItem {
   productTitle: string;
@@ -58,7 +59,7 @@ export const AdminNewOrderEmail = ({
   paymentId,
   siteUrl = 'https://creativitybylilyco.com',
 }: AdminNewOrderEmailProps) => {
-  const baseUrl = siteUrl.startsWith('http') ? siteUrl : `https://${siteUrl}`;
+  const baseUrl = getEmailSiteUrl(siteUrl);
   const adminOrderUrl = `${baseUrl}/admin/orders/${orderId}`;
 
   return (
@@ -114,7 +115,7 @@ export const AdminNewOrderEmail = ({
             <Row>
               <Column style={itemImageColumn}>
                 <Img
-                  src={item.productImage.startsWith('http') ? item.productImage : `${baseUrl}${item.productImage}`}
+                  src={emailAssetSrc(siteUrl, item.productImage)}
                   width={72}
                   height={72}
                   alt={item.productTitle}
@@ -174,6 +175,12 @@ export const AdminNewOrderEmail = ({
             Open order in admin
           </Link>
         </Text>
+        <Text style={emailStyles.footerText}>
+          <Link href={baseUrl} style={emailStyles.footerLink}>
+            Visit our website
+          </Link>
+        </Text>
+        <EmailFooterSignature />
       </Section>
     </EmailLayout>
   );

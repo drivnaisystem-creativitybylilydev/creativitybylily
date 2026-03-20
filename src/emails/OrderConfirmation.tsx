@@ -9,6 +9,7 @@ import {
 } from '@react-email/components';
 import * as React from 'react';
 import { EmailLayout, EmailFooterSignature, emailStyles } from './shared/EmailLayout';
+import { emailAssetSrc, getEmailSiteUrl } from './shared/emailSiteUrl';
 
 interface OrderItem {
   productId: string;
@@ -54,6 +55,7 @@ export const OrderConfirmationEmail = ({
   shippingAddress,
   siteUrl = 'https://creativitybylilyco.com',
 }: OrderConfirmationEmailProps) => {
+  const shopUrl = getEmailSiteUrl(siteUrl);
   return (
     <EmailLayout siteUrl={siteUrl}>
       <Section style={emailStyles.content}>
@@ -74,7 +76,7 @@ export const OrderConfirmationEmail = ({
             <Row>
               <Column style={itemImageColumn}>
                 <Img
-                  src={item.productImage.startsWith('http') ? item.productImage : `${siteUrl}${item.productImage}`}
+                  src={emailAssetSrc(siteUrl, item.productImage)}
                   width={100}
                   height={100}
                   alt={item.productTitle}
@@ -134,7 +136,7 @@ export const OrderConfirmationEmail = ({
       <Section style={emailStyles.footer}>
         <Text style={emailStyles.footerText}>We'll send you a shipping confirmation email once your order is on its way!</Text>
         <Text style={emailStyles.footerText}>
-          <Link href={siteUrl.startsWith('http') ? siteUrl : `https://${siteUrl}`} style={emailStyles.footerLink}>Visit our website</Link>
+          <Link href={shopUrl} style={emailStyles.footerLink}>Visit our website</Link>
         </Text>
         <EmailFooterSignature />
       </Section>

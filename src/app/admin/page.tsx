@@ -1,22 +1,41 @@
 import { createAdminClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import AnalyticsDashboard from '@/components/admin/AnalyticsDashboard';
+import AdminDashboardRefresh from '@/components/admin/AdminDashboardRefresh';
+import MarkAsViewed from '@/components/admin/MarkAsViewed';
+
+export const dynamic = 'force-dynamic';
 
 export default async function AdminDashboard() {
   const supabase = createAdminClient();
 
-  // Get recent orders for the table
-  const { data: orders } = await supabase
-    .from('orders')
-    .select('*')
-    .order('created_at', { ascending: false })
-    .limit(10);
+  const [{ data: orders }, { count: totalOrderCount, error: countError }] = await Promise.all([
+    supabase.from('orders').select('*').order('created_at', { ascending: false }).limit(10),
+    supabase.from('orders').select('*', { count: 'exact', head: true }),
+  ]);
+
+  const orderTotal = countError ? null : totalOrderCount ?? 0;
+  const recentIds = orders?.map((o: { id: string }) => o.id) || [];
 
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-3xl sm:text-4xl font-light text-gray-900 mb-2">Dashboard</h1>
-        <p className="text-gray-600">Overview of your e-commerce store</p>
+      <MarkAsViewed type="orders" ids={recentIds} />
+      <div className="mb-8 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl sm:text-4xl font-light text-gray-900 mb-2">Dashboard</h1>
+          <p className="text-gray-600">Overview of your e-commerce store</p>
+          {orderTotal !== null && (
+            <p className="text-sm text-gray-500 mt-2">
+              <span className="font-medium text-gray-700">{orderTotal}</span> order
+              {orderTotal === 1 ? '' : 's'} in the database · red badge = orders not yet opened on the full{' '}
+              <Link href="/admin/orders" className="text-[color:var(--logo-pink)] hover:underline">
+                Orders
+              </Link>{' '}
+              page
+            </p>
+          )}
+        </div>
+        <AdminDashboardRefresh />
       </div>
 
       {/* Analytics Dashboard with Charts */}
@@ -24,13 +43,23 @@ export default async function AdminDashboard() {
 
       {/* Recent Orders Table */}
       <div className="mt-8 bg-white rounded-xl shadow-sm border border-gray-200">
-        <div className="p-6 border-b border-gray-200 flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-gray-900">Recent Orders</h2>
+        <div className="p-6 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <div>
+            <h2 className="text-xl font-semibold text-gray-900">Recent orders</h2>
+            {orderTotal !== null && (
+              <p className="text-sm text-gray-500 mt-1">
+                Showing {orders?.length ?? 0} most recent
+                {orderTotal > (orders?.length ?? 0)
+                  ? ` · ${orderTotal} total — open Orders for the full list`
+                  : ''}
+              </p>
+            )}
+          </div>
           <Link
             href="/admin/orders"
-            className="text-sm text-[color:var(--logo-pink)] hover:opacity-80 transition-opacity font-medium"
+            className="text-sm text-[color:var(--logo-pink)] hover:opacity-80 transition-opacity font-medium whitespace-nowrap"
           >
-            View All →
+            View all orders →
           </Link>
         </div>
         <div className="overflow-x-auto">

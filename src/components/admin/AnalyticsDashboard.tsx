@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   LineChart,
   Line,
@@ -19,7 +19,8 @@ import {
 
 type AnalyticsData = {
   kpis: {
-    totalOrders: number;
+    totalOrdersAllTime: number;
+    totalOrdersInPeriod: number;
     totalLabels: number;
     totalRevenue: number;
     averageOrderValue: number;
@@ -31,54 +32,69 @@ type AnalyticsData = {
 
 const COLORS = ['#ec4899', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
 
+function periodLabel(range: '7d' | '30d' | '90d' | 'all'): string {
+  if (range === '7d') return 'last 7 days';
+  if (range === '30d') return 'last 30 days';
+  if (range === '90d') return 'last 90 days';
+  return 'all time';
+}
+
 export default function AnalyticsDashboard() {
   const [dateRange, setDateRange] = useState<'7d' | '30d' | '90d' | 'all'>('30d');
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    async function fetchAnalytics() {
-      setLoading(true);
-      try {
-        const now = new Date();
-        let startDate: Date;
+  const loadAnalytics = useCallback(async () => {
+    setLoading(true);
+    try {
+      const now = new Date();
+      let startDate: Date;
 
-        switch (dateRange) {
-          case '7d':
-            startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-            break;
-          case '30d':
-            startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-            break;
-          case '90d':
-            startDate = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
-            break;
-          default:
-            startDate = new Date(0);
-        }
-
-        const params = new URLSearchParams({
-          startDate: startDate.toISOString(),
-          endDate: now.toISOString(),
-        });
-
-        const response = await fetch(`/api/admin/analytics?${params}`);
-        const analyticsData = await response.json();
-
-        if (!response.ok) {
-          throw new Error(analyticsData.error || 'Failed to fetch analytics');
-        }
-
-        setData(analyticsData);
-      } catch (error) {
-        console.error('Error fetching analytics:', error);
-      } finally {
-        setLoading(false);
+      switch (dateRange) {
+        case '7d':
+          startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+          break;
+        case '30d':
+          startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+          break;
+        case '90d':
+          startDate = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+          break;
+        default:
+          startDate = new Date(0);
       }
-    }
 
-    fetchAnalytics();
+      const params = new URLSearchParams({
+        startDate: startDate.toISOString(),
+        endDate: now.toISOString(),
+      });
+
+      const response = await fetch(`/api/admin/analytics?${params}`);
+      const analyticsData = await response.json();
+
+      if (!response.ok) {
+        throw new Error(analyticsData.error || 'Failed to fetch analytics');
+      }
+
+      setData(analyticsData);
+    } catch (error) {
+      console.error('Error fetching analytics:', error);
+    } finally {
+      setLoading(false);
+    }
   }, [dateRange]);
+
+  useEffect(() => {
+    loadAnalytics();
+  }, [loadAnalytics]);
+
+  useEffect(() => {
+    const onRefresh = () => {
+      loadAnalytics();
+    };
+    window.addEventListener('admin-dashboard-refresh', onRefresh);
+    return () => window.removeEventListener('admin-dashboard-refresh', onRefresh);
+  }, [loadAnalytics]);
 
   if (loading) {
     return (
@@ -127,8 +143,13 @@ export default function AnalyticsDashboard() {
         <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Total Orders</p>
-              <p className="text-3xl font-bold text-gray-900">{data.kpis.totalOrders}</p>
+              <p className="text-sm text-gray-600 mb-1">Total orders (all time)</p>
+              <p className="text-3xl font-bold text-gray-900">
+                {data.kpis.totalOrdersAllTime}
+              </p>
+              <p className="text-xs text-gray-500 mt-2">
+                {data.kpis.totalOrdersInPeriod} in {periodLabel(dateRange)} · charts use this range
+              </p>
             </div>
             <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
               <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

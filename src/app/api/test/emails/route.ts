@@ -8,7 +8,8 @@ import { ReturnApprovedEmail } from '@/emails/ReturnApproved';
 import { RefundProcessedEmail } from '@/emails/RefundProcessed';
 import { AdminNewOrderEmail } from '@/emails/AdminNewOrderEmail';
 
-// Only allow in development
+// Preview + send helpers are for local development only. For production, use Resend → Logs
+// or Resend’s API docs curl; see EMAIL-TESTING-GUIDE.md.
 export async function GET(request: Request) {
   if (process.env.NODE_ENV === 'production') {
     return NextResponse.json({ error: 'Not available in production' }, { status: 403 });

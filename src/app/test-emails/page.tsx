@@ -127,12 +127,16 @@ export default function TestEmailsPage() {
         </div>
 
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <h3 className="font-semibold text-yellow-900 mb-2">Preview only</h3>
+          <h3 className="font-semibold text-yellow-900 mb-2">Development only</h3>
           <p className="text-sm text-yellow-800 mb-2">
-            The links above open the template as HTML in the browser (no email is sent). Use the form above to send a real test to your inbox.
+            Previews and “send test” only work on <strong>localhost</strong> with{' '}
+            <code className="bg-yellow-100 px-1 rounded">RESEND_API_KEY</code> and{' '}
+            <code className="bg-yellow-100 px-1 rounded">RESEND_FROM_EMAIL</code> in{' '}
+            <code className="bg-yellow-100 px-1 rounded">.env.local</code>.
           </p>
           <p className="text-sm text-yellow-800">
-            Ensure <code className="bg-yellow-100 px-1 rounded">RESEND_API_KEY</code> and <code className="bg-yellow-100 px-1 rounded">RESEND_FROM_EMAIL</code> are in <code className="bg-yellow-100 px-1 rounded">.env.local</code> and restart the dev server.
+            On the live site, check that real sends work in the{' '}
+            <strong>Resend dashboard → Logs</strong> (or use Resend’s docs to fire a one-off API test — same as your other project).
           </p>
         </div>
       </div>

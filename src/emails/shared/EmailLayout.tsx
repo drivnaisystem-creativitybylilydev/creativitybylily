@@ -9,7 +9,7 @@ import {
   Link,
 } from '@react-email/components';
 import * as React from 'react';
-import { LOGO_DATA_URL } from './logoDataUrl';
+import { getEmailSiteUrl, getDeploymentBaseUrl } from './emailSiteUrl';
 
 const BRAND_LOGO_PINK = '#ff72a6';
 const SOFT_PINK = '#f8e8e8';
@@ -117,19 +117,19 @@ export const emailStyles = {
   },
 } as const;
 
-const DEFAULT_SITE_URL = 'https://creativitybylilyco.com';
-
 export interface EmailLayoutProps {
   siteUrl?: string;
   children: React.ReactNode;
 }
 
-export function EmailHeader({ siteUrl = DEFAULT_SITE_URL }: { siteUrl?: string }) {
-  // Use embedded logo from public/brand_logo.webp so it always shows (no external URL needed)
+export function EmailHeader({ siteUrl = getDeploymentBaseUrl() }: { siteUrl?: string }) {
+  // Hosted logo from the live site (WebP) so Gmail / Apple Mail load it reliably; localhost is never used.
+  const publicBase = getEmailSiteUrl(siteUrl);
+  const logoSrc = `${publicBase}/brand_logo.webp`;
   return (
     <Section style={emailStyles.header}>
       <Img
-        src={LOGO_DATA_URL}
+        src={logoSrc}
         width={64}
         height={64}
         alt="creativity by lily"
@@ -150,7 +150,7 @@ export function EmailFooterSignature() {
   );
 }
 
-export function EmailLayout({ siteUrl = DEFAULT_SITE_URL, children }: EmailLayoutProps) {
+export function EmailLayout({ siteUrl = getDeploymentBaseUrl(), children }: EmailLayoutProps) {
   return (
     <Html>
       <Head>
@@ -169,4 +169,4 @@ export function EmailLayout({ siteUrl = DEFAULT_SITE_URL, children }: EmailLayou
   );
 }
 
-export { DEFAULT_SITE_URL };
+export { getDeploymentBaseUrl };

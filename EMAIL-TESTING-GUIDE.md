@@ -1,5 +1,15 @@
 # Email Testing Guide
 
+## Simple checks with Resend (no extra app setup)
+
+1. **Local branded templates** — Run `npm run dev`, open **`/test-emails`**, preview HTML or send a test to your inbox (uses `RESEND_API_KEY` + `RESEND_FROM_EMAIL` in `.env.local`). Each send appears in **Resend → Logs**.
+2. **Production** — After a real order or flow, open **Resend → Logs** to confirm delivery, bounces, etc. Same pattern as testing in another project with Resend only.
+3. **One-off API test** — In **Resend’s dashboard / API docs**, use their example request with your API key, `from`, and `to` if you want to verify the key without involving this repo.
+
+> The `/api/test/emails` route is **disabled on the live site** on purpose (so it can’t be abused). Use localhost + Resend for template tests, and Resend’s UI for everything else.
+
+---
+
 ## 🚀 Quick Start Checklist
 
 Before testing, make sure:

@@ -1,6 +1,7 @@
 import { Section, Row, Column, Text, Link } from '@react-email/components';
 import * as React from 'react';
 import { EmailLayout, EmailFooterSignature, emailStyles } from './shared/EmailLayout';
+import { getEmailSiteUrl } from './shared/emailSiteUrl';
 
 interface ReturnApprovedProps {
   returnNumber: string;
@@ -25,7 +26,7 @@ export const ReturnApprovedEmail = ({
   refundAmount,
   siteUrl = 'https://creativitybylilyco.com',
 }: ReturnApprovedProps) => {
-  const url = siteUrl.startsWith('http') ? siteUrl : `https://${siteUrl}`;
+  const url = getEmailSiteUrl(siteUrl);
   return (
     <EmailLayout siteUrl={siteUrl}>
       <Section style={emailStyles.content}>

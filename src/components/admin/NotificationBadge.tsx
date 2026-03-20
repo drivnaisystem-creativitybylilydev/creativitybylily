@@ -32,7 +32,15 @@ export default function NotificationBadge({ type }: { type: 'orders' | 'returns'
     // Refresh notifications every 30 seconds
     const interval = setInterval(fetchNotifications, 30000);
 
-    return () => clearInterval(interval);
+    const onImmediateRefresh = () => {
+      fetchNotifications();
+    };
+    window.addEventListener('admin-dashboard-refresh', onImmediateRefresh);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('admin-dashboard-refresh', onImmediateRefresh);
+    };
   }, [type]);
 
   if (isLoading || count === 0) {
