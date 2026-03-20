@@ -8,11 +8,18 @@ export default function Footer() {
     <footer style={{ backgroundColor: 'var(--soft-pink)' }}>
       <div className="max-w-7xl mx-auto px-6 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-8">
-          {/* Brand */}
+          {/* Brand (easter egg: click title → admin login) */}
           <div>
-            <h3 className="font-[family-name:var(--font-script)] text-2xl text-[color:var(--logo-pink)] mb-4">
-              Creativity by Lily
-            </h3>
+            <Link
+              href="/admin/login"
+              prefetch={false}
+              className="group block mb-4 w-fit rounded-sm no-underline outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--logo-pink)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--soft-pink)]"
+              aria-label="Creativity by Lily"
+            >
+              <h3 className="font-[family-name:var(--font-script)] text-2xl text-[color:var(--logo-pink)] mb-0 transition-opacity group-hover:opacity-85">
+                Creativity by Lily
+              </h3>
+            </Link>
             <p className="text-gray-900 text-sm leading-relaxed">
               Handcrafted jewelry inspired by the beauty of Cape Cod. Each piece is made with love and attention to detail.
             </p>

@@ -114,8 +114,10 @@ export async function POST(request: Request) {
       orderNumber = `CBY-${date}-${random}`;
     }
 
-    // Extract customer info from shipping address for easy querying
-    const customerEmail = shippingAddress.email;
+    // Extract customer info from shipping address for easy querying (normalize email for matching)
+    const customerEmail = typeof shippingAddress.email === 'string'
+      ? shippingAddress.email.trim().toLowerCase()
+      : shippingAddress.email;
     const customerFirstName = shippingAddress.firstName;
     const customerLastName = shippingAddress.lastName;
     const customerPhone = shippingAddress.phone;

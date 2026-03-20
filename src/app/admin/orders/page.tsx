@@ -3,6 +3,9 @@ import Link from 'next/link';
 import MarkAsViewed from '@/components/admin/MarkAsViewed';
 import DeleteOrderButtonInline from '@/components/admin/DeleteOrderButtonInline';
 
+/** Always fresh list (avoid stale empty state after new orders). */
+export const dynamic = 'force-dynamic';
+
 export default async function AdminOrdersPage() {
   const supabase = createAdminClient();
 

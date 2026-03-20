@@ -409,11 +409,14 @@ export default function CheckoutPage() {
       if (!paymentResponse.ok) {
         throw new Error(paymentData.error || 'Payment processing failed');
       }
+      // Re-read session so userId is set even if checkout loaded before auth finished (avoids null user_id on orders)
+      const { data: { session: checkoutSession } } = await supabase.auth.getSession();
+      const effectiveUserId = checkoutSession?.user?.id ?? userId;
       const response = await fetch('/api/orders/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userId: userId || null,
+          userId: effectiveUserId || null,
           items: items.map(item => {
             const variant = item.variantId
               ? item.product.variants?.find((v: any) => v.id === item.variantId)

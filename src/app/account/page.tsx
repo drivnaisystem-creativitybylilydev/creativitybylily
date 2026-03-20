@@ -80,10 +80,8 @@ export default function AccountPage() {
           setProfile(profileData);
         }
 
-        // Get user orders
-        const { data: ordersData } = await supabase
-          .from('orders')
-          .select(`
+        // Orders linked to account OR guest checkout with same email (needs RLS: supabase/rls-orders-by-account-email.sql)
+        const orderSelect = `
             *,
             order_items (
               *,
@@ -93,13 +91,31 @@ export default function AccountPage() {
                 image_url
               )
             )
-          `)
-          .eq('user_id', session.user.id)
-          .order('created_at', { ascending: false });
+          `;
+        const [{ data: ordersByUserId }, { data: ordersByEmail }] = await Promise.all([
+          supabase
+            .from('orders')
+            .select(orderSelect)
+            .eq('user_id', session.user.id)
+            .order('created_at', { ascending: false }),
+          session.user.email
+            ? supabase
+                .from('orders')
+                .select(orderSelect)
+                .is('user_id', null)
+                .ilike('customer_email', session.user.email.trim())
+                .order('created_at', { ascending: false })
+            : Promise.resolve({ data: null as Order[] | null }),
+        ]);
 
-        if (ordersData) {
-          setOrders(ordersData as Order[]);
+        const merged = new Map<string, Order>();
+        for (const row of [...(ordersByUserId || []), ...(ordersByEmail || [])]) {
+          merged.set(row.id, row as Order);
         }
+        const combined = Array.from(merged.values()).sort(
+          (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        );
+        setOrders(combined);
 
         // Get user returns
         const { data: returnsData } = await supabase
