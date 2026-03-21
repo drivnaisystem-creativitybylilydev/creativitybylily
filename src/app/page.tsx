@@ -1,6 +1,7 @@
 import dynamic from "next/dynamic";
 import { Suspense } from "react";
 import HeroSection from "@/components/HeroSection";
+import AboutUsSection from "@/components/AboutUsSection";
 
 const DynamicProductCarousel = dynamic(() => import("@/components/ProductCarousel"), { ssr: true });
 const DynamicCustomerFavorites = dynamic(() => import("@/components/CustomerFavorites"), { ssr: true });
@@ -11,8 +12,8 @@ export default function Home() {
     <div className="min-h-screen bg-[#faf8f5]">
       <HeroSection />
 
-      {/* About Section */}
-      <section id="about" className="py-20 bg-white">
+      {/* Intro / values — About nav anchor is on AboutUsSection below */}
+      <section id="handmade" className="py-20 bg-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="font-serif text-4xl font-light text-gray-800 mb-8">
             Handmade with Love
@@ -54,6 +55,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <AboutUsSection />
 
       {/* Customer Favorites Section - lazy loaded */}
       <section className="py-20 bg-[#faf8f5]">

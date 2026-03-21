@@ -49,11 +49,12 @@ export default function ProductCarousel() {
           each piece designed to bring a touch of coastal elegance to your style.
         </p>
         
-        {/* Category Tabs */}
-        <div className="flex flex-wrap justify-center gap-4 text-sm mb-8">
+        {/* Category Tabs + Shop all */}
+        <div className="flex flex-wrap justify-center items-center gap-3 sm:gap-4 text-sm mb-8">
           {categories.map((category) => (
             <button
               key={category.key}
+              type="button"
               onClick={() => setActiveCategory(category.key)}
               className={`px-6 py-3 rounded-full font-medium transition-all duration-300 shadow-sm ${
                 activeCategory === category.key
@@ -64,6 +65,12 @@ export default function ProductCarousel() {
               {category.name} ({getCategoryProducts(category.key, products.length).length})
             </button>
           ))}
+          <Link
+            href="/products"
+            className="px-6 py-3 rounded-full font-medium transition-all duration-300 shadow-sm border-2 border-[color:var(--logo-pink)] text-[color:var(--logo-pink)] bg-white hover:bg-[color:var(--logo-pink)] hover:text-white"
+          >
+            Shop all
+          </Link>
         </div>
       </div>
 

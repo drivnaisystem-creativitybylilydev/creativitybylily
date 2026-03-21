@@ -127,7 +127,7 @@ export default function HeroSlideshow() {
               Shop Collection
             </Link>
             <Link 
-              href="#about"
+              href="/#about"
               className="border-2 border-[color:var(--logo-pink)] text-[color:var(--logo-pink)] px-10 py-5 rounded-full font-medium hover:bg-[color:var(--logo-pink)] hover:text-white transition-all duration-300 transform hover:-translate-y-1"
               style={{
                 boxShadow: '0 4px 15px rgba(236, 72, 153, 0.2)'
