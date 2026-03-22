@@ -53,11 +53,12 @@ export default function AboutUsStoryCarousel({ variant = 'full' }: Props) {
   const isPlaceholder = !active?.src;
 
   const outerClass = isTeaser
-    ? 'mx-auto flex w-full min-w-0 max-w-xl min-h-0 flex-col lg:max-w-none'
+    ? 'mx-auto flex h-full min-h-0 w-full min-w-0 max-w-xl flex-col lg:max-w-none lg:min-h-0'
     : 'mx-auto flex w-full min-w-0 max-w-lg flex-col sm:max-w-xl';
 
+  /* Teaser: on lg+, flex column fills grid cell so image frame matches text panel height */
   const frameClass = isTeaser
-    ? `relative w-full overflow-hidden rounded-[2rem] bg-stone-100 transition-shadow duration-500 aspect-[5/3] max-h-[13rem] sm:max-h-[15rem] md:max-h-[17rem] shadow-lg ring-1 ring-black/5 ${
+    ? `relative w-full min-h-[17.5rem] overflow-hidden rounded-[2rem] bg-stone-100 transition-shadow duration-500 shadow-lg ring-1 ring-black/5 aspect-[4/5] sm:min-h-[20rem] lg:aspect-auto lg:h-full lg:min-h-0 lg:flex-1 ${
         isPlaceholder ? 'ring-2 ring-[color:var(--logo-pink)]/45' : ''
       }`
     : `relative w-full overflow-hidden rounded-[2rem] bg-stone-100 transition-shadow duration-500 aspect-[4/5] max-h-[min(85vh,40rem)] ${
@@ -85,7 +86,7 @@ export default function AboutUsStoryCarousel({ variant = 'full' }: Props) {
                 fill
                 className="object-cover"
                 sizes={isTeaser ? '(max-width: 1024px) 100vw, 45vw' : '(max-width: 640px) 100vw, 480px'}
-                priority={index === 0 && !isTeaser}
+                priority={index === 0}
               />
               <div
                 className="pointer-events-none absolute inset-0"
@@ -172,8 +173,9 @@ export default function AboutUsStoryCarousel({ variant = 'full' }: Props) {
         )}
       </div>
 
+      {/* Mobile / stacked layout: extra CTAs below image. Desktop: left column already has links; keep column = image height only */}
       {isTeaser && (
-        <div className="mt-5 flex flex-col items-center gap-2 sm:mt-6">
+        <div className="mt-5 flex flex-col items-center gap-2 sm:mt-6 lg:hidden">
           <Link
             href="/about#gallery"
             className="inline-flex items-center justify-center rounded-full bg-[color:var(--logo-pink)] px-6 py-2.5 text-sm font-medium text-white shadow-sm transition-opacity hover:opacity-90 sm:px-8 sm:py-3 sm:text-base"

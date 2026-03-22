@@ -15,9 +15,9 @@ export default function AboutUsSection() {
       <CoastalBackdropLayers />
 
       <div className="relative z-10 mx-auto max-w-7xl px-6">
-        <div className="grid min-h-0 grid-cols-1 gap-12 lg:grid-cols-2 lg:items-start lg:gap-16 xl:gap-20">
+        <div className="grid min-h-0 grid-cols-1 gap-12 lg:grid-cols-2 lg:grid-rows-1 lg:items-stretch lg:gap-16 xl:gap-20">
           <div
-            className="min-h-0 space-y-6 rounded-3xl border border-stone-200/70 p-8 text-left shadow-lg backdrop-blur-[2px] sm:space-y-8 sm:p-10 lg:min-w-0 lg:p-12"
+            className="min-h-0 space-y-6 rounded-3xl border border-stone-200/70 p-8 text-left shadow-lg backdrop-blur-[2px] sm:space-y-8 sm:p-10 lg:min-w-0 lg:h-full lg:p-12"
             style={{
               backgroundColor: 'rgba(247, 240, 232, 0.92)',
               boxShadow: '0 4px 6px -1px rgba(0,0,0,0.06), 0 10px 24px -8px rgba(90, 60, 40, 0.08)',
@@ -78,7 +78,7 @@ export default function AboutUsSection() {
             </div>
           </div>
 
-          <div className="flex min-h-0 w-full min-w-0 flex-col">
+          <div className="flex min-h-0 w-full min-w-0 flex-col lg:h-full lg:min-h-0">
             <AboutUsStoryCarousel variant="teaser" />
           </div>
         </div>
