@@ -253,7 +253,7 @@ export default function HeroSection() {
               Shop Collection
             </Link>
             <Link
-              href="/#about"
+              href="/about"
               className="shop-collection-btn bg-[color:var(--logo-pink)] text-white px-6 py-3 md:px-8 md:py-4 rounded-full font-medium text-center inline-block text-sm md:text-base"
               style={{
                 background: "linear-gradient(135deg, var(--logo-pink) 0%, #ec4899 100%)",

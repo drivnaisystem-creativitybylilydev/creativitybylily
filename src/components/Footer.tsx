@@ -40,7 +40,7 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/#about" className="text-gray-900 hover:text-[color:var(--logo-pink)] transition-colors text-sm">
+                <Link href="/about" className="text-gray-900 hover:text-[color:var(--logo-pink)] transition-colors text-sm">
                   About
                 </Link>
               </li>

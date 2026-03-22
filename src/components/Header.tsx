@@ -68,7 +68,7 @@ export default function Header() {
           <Link href="/" className="text-[color:var(--logo-pink)] hover:opacity-80 transition-opacity">Home</Link>
           <Link href="/products" className="text-[color:var(--logo-pink)] hover:opacity-80 transition-opacity">Shop</Link>
           <Link href="/events" className="text-[color:var(--logo-pink)] hover:opacity-80 transition-opacity">Events</Link>
-          <Link href="/#about" className="text-[color:var(--logo-pink)] hover:opacity-80 transition-opacity">About</Link>
+          <Link href="/about" className="text-[color:var(--logo-pink)] hover:opacity-80 transition-opacity">About</Link>
           <Link href="/contact" className="text-[color:var(--logo-pink)] hover:opacity-80 transition-opacity">Contact</Link>
         </nav>
         <div className="flex items-center gap-4 ml-auto">

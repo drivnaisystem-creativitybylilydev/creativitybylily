@@ -1,15 +1,12 @@
 # About section carousel images
 
-1. Add your photos here (e.g. `1.webp`, `2.jpg`, …).
-2. Open `src/components/AboutUsStoryCarousel.tsx` and set `ABOUT_CAROUSEL_FILES` to those filenames in order.
+Files are listed in **`src/lib/aboutCarousel.ts`** as `ABOUT_CAROUSEL_FILES` (order = slide order). URLs are case-sensitive.
 
-Example:
+Current files:
 
-```ts
-const ABOUT_CAROUSEL_FILES: readonly string[] = [
-  'lily-studio.webp',
-  'cape-inspiration.jpg',
-];
-```
+- `IMG_4659.JPG`
+- `IMG_5042_jpg.JPG`
 
-While the list is **empty**, the carousel shows **empty placeholder slots** (same layout, no images).
+To replace or add photos: drop files in this folder and update that array.
+
+While the array is **empty**, the carousel shows **placeholder slots** only.
