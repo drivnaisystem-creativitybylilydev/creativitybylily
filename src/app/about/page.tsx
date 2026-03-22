@@ -10,7 +10,7 @@ export const metadata = {
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-[#faf8f5] py-20">
-      <div className="mx-auto max-w-4xl px-6">
+      <div className="mx-auto max-w-6xl px-6">
         <div className="mb-12 text-center">
           <p
             className="mb-3 text-sm font-medium uppercase tracking-[0.2em] text-[color:var(--logo-pink)]"
@@ -24,16 +24,19 @@ export default function AboutPage() {
           </p>
         </div>
 
-        <div className="mb-10 rounded-2xl bg-white p-8 shadow-sm sm:p-10">
-          <OurStoryContent />
-        </div>
+        {/* Text + gallery side by side on large screens */}
+        <div className="grid min-h-0 grid-cols-1 gap-10 lg:grid-cols-2 lg:grid-rows-1 lg:items-stretch lg:gap-12">
+          <div className="min-h-0 rounded-2xl bg-white p-8 shadow-sm sm:p-10 lg:h-full lg:min-h-0">
+            <OurStoryContent />
+          </div>
 
-        <div id="gallery" className="scroll-mt-24 rounded-2xl bg-white p-6 shadow-sm sm:p-8 md:p-10">
-          <h2 className="mb-2 text-center font-serif text-2xl font-light text-gray-900 sm:mb-6">Gallery</h2>
-          <p className="mb-6 text-center text-sm text-gray-600 sm:text-base">
-            A glimpse behind Creativity By Lily Co.
-          </p>
-          <AboutUsStoryCarousel variant="full" />
+          <div
+            id="gallery"
+            className="flex min-h-0 flex-col lg:h-full lg:min-h-0"
+            aria-label="Photo gallery"
+          >
+            <AboutUsStoryCarousel variant="full" fillColumn />
+          </div>
         </div>
 
         <div className="mt-12 text-center">

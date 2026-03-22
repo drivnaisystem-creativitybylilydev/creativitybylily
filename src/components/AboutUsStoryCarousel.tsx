@@ -5,6 +5,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ABOUT_CAROUSEL_FILES } from '@/lib/aboutCarousel';
 
+/** Shown on the first slide only (overlay + richer alt text). */
+export const ABOUT_FIRST_SLIDE_CAPTION = 'Lily Matthews - Founder and CEO';
+
 /** How many empty slots to show when no files are configured yet */
 const PLACEHOLDER_SLOT_COUNT = 4;
 
@@ -14,7 +17,10 @@ function buildSlides(): Slide[] {
   if (ABOUT_CAROUSEL_FILES.length > 0) {
     return ABOUT_CAROUSEL_FILES.map((file, i) => ({
       src: `/about-carousel/${file}`,
-      alt: `About us photo ${i + 1}`,
+      alt:
+        i === 0
+          ? `${ABOUT_FIRST_SLIDE_CAPTION}, Creativity By Lily`
+          : `About us photo ${i + 1}`,
     }));
   }
   return Array.from({ length: PLACEHOLDER_SLOT_COUNT }, (_, i) => ({
@@ -28,9 +34,11 @@ export type AboutUsStoryCarouselVariant = 'full' | 'teaser';
 type Props = {
   /** `teaser`: cropped peek on the home page. `full`: full carousel on /about. */
   variant?: AboutUsStoryCarouselVariant;
+  /** When true, carousel fills the grid cell height on large screens (e.g. /about two-column layout). */
+  fillColumn?: boolean;
 };
 
-export default function AboutUsStoryCarousel({ variant = 'full' }: Props) {
+export default function AboutUsStoryCarousel({ variant = 'full', fillColumn = false }: Props) {
   const slides = buildSlides();
   const [index, setIndex] = useState(0);
   const isTeaser = variant === 'teaser';
@@ -51,19 +59,26 @@ export default function AboutUsStoryCarousel({ variant = 'full' }: Props) {
 
   const active = slides[index] ?? slides[0];
   const isPlaceholder = !active?.src;
+  const showFounderCaption = Boolean(active?.src && index === 0);
 
   const outerClass = isTeaser
     ? 'mx-auto flex h-full min-h-0 w-full min-w-0 max-w-xl flex-col lg:max-w-none lg:min-h-0'
-    : 'mx-auto flex w-full min-w-0 max-w-lg flex-col sm:max-w-xl';
+    : fillColumn
+      ? 'mx-auto flex h-full min-h-0 w-full min-w-0 max-w-lg flex-col sm:max-w-none'
+      : 'mx-auto flex w-full min-w-0 max-w-lg flex-col sm:max-w-xl';
 
-  /* Teaser: on lg+, flex column fills grid cell so image frame matches text panel height */
+  /* Teaser: on lg+, flex column fills grid cell. Full + fillColumn: same for /about layout. */
   const frameClass = isTeaser
     ? `relative w-full min-h-[17.5rem] overflow-hidden rounded-[2rem] bg-stone-100 transition-shadow duration-500 shadow-lg ring-1 ring-black/5 aspect-[4/5] sm:min-h-[20rem] lg:aspect-auto lg:h-full lg:min-h-0 lg:flex-1 ${
         isPlaceholder ? 'ring-2 ring-[color:var(--logo-pink)]/45' : ''
       }`
-    : `relative w-full overflow-hidden rounded-[2rem] bg-stone-100 transition-shadow duration-500 aspect-[4/5] max-h-[min(85vh,40rem)] ${
-        isPlaceholder ? 'ring-2 ring-[color:var(--logo-pink)]/45' : 'shadow-xl ring-1 ring-black/5'
-      }`;
+    : fillColumn
+      ? `relative w-full min-h-[20rem] overflow-hidden rounded-[2rem] bg-stone-100 transition-shadow duration-500 shadow-xl ring-1 ring-black/5 aspect-[4/5] sm:min-h-[22rem] lg:aspect-auto lg:h-full lg:min-h-0 lg:max-h-none lg:flex-1 ${
+          isPlaceholder ? 'ring-2 ring-[color:var(--logo-pink)]/45' : ''
+        }`
+      : `relative w-full overflow-hidden rounded-[2rem] bg-stone-100 transition-shadow duration-500 aspect-[4/5] max-h-[min(85vh,40rem)] ${
+          isPlaceholder ? 'ring-2 ring-[color:var(--logo-pink)]/45' : 'shadow-xl ring-1 ring-black/5'
+        }`;
 
   const frameStyle = isPlaceholder
     ? {
@@ -85,14 +100,20 @@ export default function AboutUsStoryCarousel({ variant = 'full' }: Props) {
                 alt={active.alt}
                 fill
                 className="object-cover"
-                sizes={isTeaser ? '(max-width: 1024px) 100vw, 45vw' : '(max-width: 640px) 100vw, 480px'}
+                sizes={
+                  isTeaser
+                    ? '(max-width: 1024px) 100vw, 45vw'
+                    : fillColumn
+                      ? '(max-width: 1024px) 100vw, 50vw'
+                      : '(max-width: 640px) 100vw, 480px'
+                }
                 priority={index === 0}
               />
               <div
                 className="pointer-events-none absolute inset-0"
                 style={{
                   background:
-                    'linear-gradient(to top, rgba(45,45,45,0.45) 0%, transparent 50%), linear-gradient(135deg, rgba(255,114,166,0.15) 0%, transparent 45%)',
+                    'linear-gradient(to top, rgba(45,45,45,0.5) 0%, transparent 55%), linear-gradient(135deg, rgba(255,114,166,0.12) 0%, transparent 45%)',
                 }}
               />
               {isTeaser && (
@@ -148,6 +169,17 @@ export default function AboutUsStoryCarousel({ variant = 'full' }: Props) {
           </>
         )}
 
+        {showFounderCaption && (
+          <div className="pointer-events-none absolute bottom-12 left-0 right-0 z-[18] px-4 sm:bottom-14">
+            <p
+              className="text-center text-sm font-semibold tracking-wide text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.85)] sm:text-base"
+              style={{ fontFamily: 'var(--font-playfair), Georgia, serif' }}
+            >
+              {ABOUT_FIRST_SLIDE_CAPTION}
+            </p>
+          </div>
+        )}
+
         {slides.length > 1 && (
           <div className="pointer-events-auto absolute bottom-3 left-0 right-0 z-20 flex justify-center gap-2 px-4">
             {slides.map((_, i) => (
@@ -163,28 +195,14 @@ export default function AboutUsStoryCarousel({ variant = 'full' }: Props) {
             ))}
           </div>
         )}
-
-        {isTeaser && active?.src && (
-          <div className="pointer-events-none absolute bottom-10 left-0 right-0 z-[15] flex justify-center px-4 sm:bottom-11">
-            <p className="text-center text-xs font-medium tracking-wide text-white/95 drop-shadow-md sm:text-sm">
-              Peek — full photos on our story page
-            </p>
-          </div>
-        )}
       </div>
 
-      {/* Mobile / stacked layout: extra CTAs below image. Desktop: left column already has links; keep column = image height only */}
+      {/* Mobile: single CTA below teaser carousel (desktop uses button in text column) */}
       {isTeaser && (
-        <div className="mt-5 flex flex-col items-center gap-2 sm:mt-6 lg:hidden">
-          <Link
-            href="/about#gallery"
-            className="inline-flex items-center justify-center rounded-full bg-[color:var(--logo-pink)] px-6 py-2.5 text-sm font-medium text-white shadow-sm transition-opacity hover:opacity-90 sm:px-8 sm:py-3 sm:text-base"
-          >
-            View full gallery
-          </Link>
+        <div className="mt-5 flex justify-center sm:mt-6 lg:hidden">
           <Link
             href="/about"
-            className="text-sm font-medium text-[color:var(--logo-pink)] underline-offset-4 transition-opacity hover:opacity-80 hover:underline"
+            className="inline-flex items-center justify-center rounded-full bg-[color:var(--logo-pink)] px-6 py-2.5 text-sm font-medium text-white shadow-sm transition-opacity hover:opacity-90 sm:px-8 sm:py-3 sm:text-base"
           >
             Read our full story
           </Link>

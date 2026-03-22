@@ -62,18 +62,12 @@ export default function AboutUsSection() {
               />
             </div>
 
-            <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+            <div>
               <Link
                 href="/about"
                 className="inline-flex items-center justify-center rounded-full bg-[color:var(--logo-pink)] px-6 py-3 text-center text-sm font-medium text-white shadow-sm transition-opacity hover:opacity-90 sm:px-8 sm:text-base"
               >
                 Read our full story
-              </Link>
-              <Link
-                href="/about#gallery"
-                className="text-center text-sm font-medium text-[color:var(--logo-pink)] underline-offset-4 transition-opacity hover:opacity-80 hover:underline sm:text-left sm:text-base"
-              >
-                View photo gallery →
               </Link>
             </div>
           </div>
