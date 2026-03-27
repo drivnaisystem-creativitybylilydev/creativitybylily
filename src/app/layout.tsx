@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Inter, Dancing_Script } from "next/font/google";
+import { Playfair_Display, Inter, Dancing_Script, Allura } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/contexts/CartContext";
 import Header from "@/components/Header";
@@ -23,6 +23,14 @@ const script = Dancing_Script({
   variable: "--font-script",
   subsets: ["latin"],
   weight: ["400", "700"],
+  display: "swap",
+});
+
+/** Elegant script for product titles & shop headings (Sunhoney-style) */
+const allura = Allura({
+  weight: "400",
+  variable: "--font-allura",
+  subsets: ["latin"],
   display: "swap",
 });
 
@@ -110,7 +118,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${playfair.variable} ${inter.variable} ${script.variable} antialiased`}
+        className={`${playfair.variable} ${inter.variable} ${script.variable} ${allura.variable} antialiased`}
       >
         <AuthErrorHandler />
         <CartProvider>

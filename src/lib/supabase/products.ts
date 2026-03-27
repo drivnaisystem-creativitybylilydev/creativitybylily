@@ -85,6 +85,12 @@ export async function getProductsListing(options: {
   return products;
 }
 
+/** Top products by sales order (for BESTSELLER badges). Empty sales → recent-first order from listing. */
+export async function getBestsellerProductIdSet(limit = 36): Promise<Set<string>> {
+  const products = await getProductsListing({ sort: 'bestseller' });
+  return new Set(products.slice(0, limit).map((p) => p.id));
+}
+
 /**
  * Fetch all active products from Supabase
  */

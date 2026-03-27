@@ -32,7 +32,7 @@ export default function ProductImageGallery({ images, productTitle }: ProductIma
   return (
     <div className="space-y-4">
       {/* Main image display */}
-      <div className="relative aspect-square w-full overflow-hidden rounded-2xl bg-white shadow-sm">
+      <div className="relative aspect-[3/4] w-full overflow-hidden rounded-lg bg-white shadow-sm">
         {mainFailed ? (
           <ImagePlaceholder />
         ) : (
@@ -68,7 +68,7 @@ export default function ProductImageGallery({ images, productTitle }: ProductIma
                   src={imageUrl} 
                   alt={`${productTitle} - Image ${index + 1}`}
                   fill 
-                  className="object-cover hover:scale-105 transition-transform duration-300"
+                  className="object-cover transition-transform duration-300 ease-out hover:scale-[1.02]"
                   onError={() => setFailedImages(prev => new Set(prev).add(index))}
                 />
               )}

@@ -8,7 +8,10 @@
   --accent-pink: #f4c2c2;
   --warm-beige: #f7f0e8;
   --soft-pink: #f8e8e8;
-  --logo-pink: #ff72a6; /* matches logo script tone */
+  /* Sunhoney-inspired palette: soft pink for brand/script; readable body muted */
+  --sunhoney-pink: #e394a5;
+  --text-muted: #666666;
+  --logo-pink: #e394a5; /* primary actions + aligns with lifestyle aesthetic */
 }
 
 @theme inline {
@@ -116,6 +119,19 @@ body {
 
 .about-carousel-fade {
   animation: aboutCarouselFadeIn 0.7s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
 }
 
 /* Hero section: soft pastel wash + feathered/fading edges so images blend (no sharp borders) */

@@ -1,11 +1,18 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getProductBySlug, getRelatedProducts, getProducts } from "@/lib/supabase/products";
+import {
+  getProductBySlug,
+  getRelatedProducts,
+  getBestsellerProductIdSet,
+} from "@/lib/supabase/products";
 import type { Metadata } from "next";
 import ProductActions from "@/components/ProductActions";
 import ProductImageGallery from "@/components/ProductImageGallery";
 import ProductReviewsSection from "@/components/ProductReviewsSection";
+import BestsellerTag from "@/components/BestsellerTag";
+
+const productHeadingFont = { fontFamily: "var(--font-allura), var(--font-script), cursive" } as const;
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -50,6 +57,8 @@ export default async function ProductDetailPage(props: PageProps) {
   const product = await getProductBySlug(id);
   if (!product) return notFound();
 
+  const bestsellerIds = await getBestsellerProductIdSet(36);
+
   // Get all images for this product (use images array from database, fallback to main image)
   const productImages = product.images && Array.isArray(product.images) && product.images.length > 0 
     ? product.images.filter((img: string) => img && img.trim() !== '') // Filter out empty strings
@@ -65,28 +74,41 @@ export default async function ProductDetailPage(props: PageProps) {
   return (
     <div className="min-h-screen bg-[#faf8f5]">
       <div className="mx-auto max-w-6xl px-6 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-          <div>
+        <div className="grid grid-cols-1 gap-12 md:grid-cols-2">
+          <div className="relative">
+            {bestsellerIds.has(product.id) && <BestsellerTag />}
             <ProductImageGallery images={productImages} productTitle={product.title} />
           </div>
           <div className="flex flex-col gap-6">
             <div>
-              <div className="flex items-center gap-3 mb-2">
-                <h1 className="font-serif text-3xl font-light text-gray-800">{product.title}</h1>
+              <div className="mb-2 flex flex-wrap items-center gap-3">
+                <h1
+                  className="text-4xl font-normal text-[color:var(--sunhoney-pink)] md:text-5xl"
+                  style={productHeadingFont}
+                >
+                  {product.title}
+                </h1>
                 {(product.inventory_count || 0) === 0 && (
-                  <span className="bg-red-500 text-white text-xs font-bold px-3 py-1.5 rounded-full">
+                  <span className="rounded-full bg-red-500 px-3 py-1.5 text-xs font-bold text-white">
                     Out of Stock
                   </span>
                 )}
               </div>
-              <p className="text-sm text-gray-500">Handcrafted on Cape Cod</p>
+              <p className="text-sm text-[color:var(--text-muted)]">Handcrafted on Cape Cod</p>
             </div>
-            <div className="text-2xl font-semibold text-[color:var(--logo-pink)]">${product.price}</div>
-            <p className="text-gray-600 leading-relaxed">{product.description}</p>
+            <div
+              className="text-3xl font-normal text-[color:var(--sunhoney-pink)]"
+              style={productHeadingFont}
+            >
+              ${product.price}
+            </div>
+            <p className="leading-relaxed text-[color:var(--text-muted)]">{product.description}</p>
             <ProductActions product={product} />
-            <div className="pt-4 border-t border-gray-200">
-              <h3 className="font-serif text-lg text-gray-800 mb-2">Product Details</h3>
-              <ul className="text-sm text-gray-600 space-y-1">
+            <div className="border-t border-gray-200 pt-4">
+              <h3 className="mb-2 text-lg font-normal text-[color:var(--sunhoney-pink)]" style={productHeadingFont}>
+                Product Details
+              </h3>
+              <ul className="space-y-1 text-sm text-[color:var(--text-muted)]">
                 <li>• Waterproof & Hypoallergenic</li>
                 <li>• Handcrafted with love</li>
                 <li>• Made on Cape Cod</li>
@@ -101,48 +123,54 @@ export default async function ProductDetailPage(props: PageProps) {
 
         {/* Product Recommendations Section */}
         <div className="mt-20">
-          <div className="text-center mb-12">
-            <h2 className="font-serif text-3xl font-light text-gray-800 mb-4">
+          <div className="mb-12 text-center">
+            <h2
+              className="mb-4 text-3xl font-normal text-[color:var(--sunhoney-pink)] md:text-4xl"
+              style={productHeadingFont}
+            >
               You Might Also Like
             </h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
+            <p className="mx-auto max-w-2xl text-[color:var(--text-muted)]">
               Discover more handcrafted pieces from our collection
             </p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+          <div className="grid grid-cols-2 gap-6 md:grid-cols-2 lg:grid-cols-4">
             {recommendedProducts.map((recommendedProduct) => (
               <Link
                 key={recommendedProduct.id}
                 href={`/products/${recommendedProduct.slug}`}
-                className="group bg-white rounded-2xl shadow-sm overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+                className="group overflow-hidden rounded-2xl bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
               >
-                <div className="relative aspect-square overflow-hidden">
+                <div className="relative aspect-[3/4] overflow-hidden rounded-t-lg">
                   <Image
                     src={recommendedProduct.image_url}
                     alt={recommendedProduct.title}
                     fill
-                    className="object-cover group-hover:scale-110 transition-transform duration-500"
-                    sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 16vw"
+                    className="object-cover transition-transform duration-300 ease-out group-hover:scale-[1.02]"
+                    sizes="(max-width: 768px) 50vw, 25vw"
                     loading="lazy"
                     quality={75}
                   />
-                  {/* Category Badge */}
-                  <div className="absolute top-3 left-3">
-                    <span className="bg-white/90 backdrop-blur-sm text-xs font-medium px-2 py-1 rounded-full text-gray-700">
+                  {bestsellerIds.has(recommendedProduct.id) && <BestsellerTag />}
+                  <div className="absolute bottom-3 left-3">
+                    <span className="rounded-full bg-white/90 px-2 py-1 text-xs font-medium capitalize text-[color:var(--text-muted)] backdrop-blur-sm">
                       {recommendedProduct.category}
                     </span>
                   </div>
                 </div>
                 <div className="p-4">
-                  <h3 className="font-serif text-sm text-gray-800 mb-2 line-clamp-2 group-hover:text-[color:var(--logo-pink)] transition-colors">
+                  <h3
+                    className="mb-2 line-clamp-2 text-lg font-normal text-[color:var(--sunhoney-pink)] transition-opacity group-hover:opacity-90"
+                    style={productHeadingFont}
+                  >
                     {recommendedProduct.title}
                   </h3>
                   <div className="flex items-center justify-between">
-                    <span className="text-lg font-semibold text-[color:var(--logo-pink)]">
+                    <span className="text-lg font-normal text-[color:var(--sunhoney-pink)]" style={productHeadingFont}>
                       ${recommendedProduct.price}
                     </span>
-                    <span className="text-[color:var(--logo-pink)] hover:opacity-80 transition-opacity text-xs font-medium">
+                    <span className="text-xs font-medium text-[color:var(--sunhoney-pink)] transition-opacity hover:opacity-80">
                       View →
                     </span>
                   </div>

@@ -9,6 +9,8 @@ import { useCart } from '@/contexts/CartContext';
 import ProductRatingBadge from '@/components/ProductRatingBadge';
 import { CoastalBackdropLayers } from '@/components/CoastalBackdrop';
 import { Filter } from 'lucide-react';
+import BestsellerTag from '@/components/BestsellerTag';
+import { useBestsellerProductIds } from '@/hooks/useBestsellerProductIds';
 
 const SORT_OPTIONS = [
   { value: 'newest', label: 'Newest' },
@@ -65,6 +67,7 @@ function ProductsPageInner() {
   const [searchInput, setSearchInput] = useState(urlQ);
   const debouncedSearch = useDebouncedValue(searchInput, 400);
   const { addItem } = useCart();
+  const bestsellerIds = useBestsellerProductIds();
 
   const selectedCategory = ['all', 'earrings', 'necklaces', 'bracelets', 'anklets'].includes(urlCategory)
     ? urlCategory
@@ -263,31 +266,32 @@ function ProductsPageInner() {
             <p className="text-gray-500 text-lg">Loading products...</p>
           </div>
         ) : products.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 lg:gap-8 w-full">
+          <div className="grid w-full grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 lg:gap-8">
             {products.map((product) => (
               <div
                 key={product.id}
-                className="group bg-white rounded-2xl shadow-sm overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 w-full min-w-0"
+                className="group min-w-0 w-full overflow-hidden rounded-2xl bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
               >
                 <Link href={`/products/${product.slug}`}>
-                  <div className="relative aspect-square overflow-hidden">
+                  <div className="relative aspect-[3/4] overflow-hidden rounded-t-lg">
                     <Image
                       src={product.image_url}
                       alt={product.title}
                       fill
-                      className={`object-cover group-hover:scale-110 transition-transform duration-500 ${
+                      className={`object-cover transition-transform duration-300 ease-out group-hover:scale-[1.02] ${
                         (product.inventory_count || 0) === 0 ? 'opacity-60' : ''
                       }`}
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, (max-width: 1536px) 25vw, 20vw"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
                     />
-                    <div className="absolute top-3 left-3">
-                      <span className="bg-white/90 backdrop-blur-sm text-xs font-medium px-2 py-1 rounded-full text-gray-700">
+                    {bestsellerIds.has(product.id) && <BestsellerTag />}
+                    <div className="absolute bottom-3 left-3">
+                      <span className="rounded-full bg-white/90 px-2 py-1 text-xs font-medium capitalize text-[color:var(--text-muted)] backdrop-blur-sm">
                         {product.category}
                       </span>
                     </div>
                     {(product.inventory_count || 0) === 0 && (
-                      <div className="absolute top-3 right-3">
-                        <span className="bg-red-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                      <div className="absolute right-3 top-3">
+                        <span className="rounded-full bg-red-500 px-3 py-1.5 text-xs font-bold text-white shadow-lg">
                           Out of Stock
                         </span>
                       </div>
@@ -296,16 +300,24 @@ function ProductsPageInner() {
                 </Link>
                 <div className="p-6">
                   <Link href={`/products/${product.slug}`}>
-                    <h2 className="font-serif text-lg text-gray-800 mb-2 line-clamp-2 hover:text-[color:var(--logo-pink)] transition-colors">
+                    <h2
+                      className="mb-2 line-clamp-2 text-xl font-normal leading-snug tracking-wide text-[color:var(--sunhoney-pink)] transition-colors hover:opacity-90"
+                      style={{ fontFamily: 'var(--font-allura), var(--font-script), cursive' }}
+                    >
                       {product.title}
                     </h2>
-                    <p className="text-sm text-gray-500 mb-2">Handcrafted on Cape Cod</p>
+                    <p className="mb-2 text-sm text-[color:var(--text-muted)]">Handcrafted on Cape Cod</p>
                   </Link>
                   <div className="mb-4">
                     <ProductRatingBadge productId={product.id} compact />
                   </div>
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-xl font-semibold text-[color:var(--logo-pink)]">${product.price}</span>
+                  <div className="mb-4 flex items-center justify-between">
+                    <span
+                      className="text-2xl font-normal text-[color:var(--sunhoney-pink)]"
+                      style={{ fontFamily: 'var(--font-allura), var(--font-script), cursive' }}
+                    >
+                      ${product.price}
+                    </span>
                   </div>
                   <div className="flex gap-2">
                     <Link
