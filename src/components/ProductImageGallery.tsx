@@ -32,7 +32,7 @@ export default function ProductImageGallery({ images, productTitle }: ProductIma
   return (
     <div className="space-y-4">
       {/* Main image display */}
-      <div className="relative aspect-[3/4] w-full overflow-hidden rounded-lg bg-white shadow-sm">
+      <div className="relative aspect-[3/4] w-full overflow-hidden rounded-none border border-stone-200/80 bg-white shadow-sm">
         {mainFailed ? (
           <ImagePlaceholder />
         ) : (
@@ -55,7 +55,7 @@ export default function ProductImageGallery({ images, productTitle }: ProductIma
               key={index}
               type="button"
               onClick={() => setSelectedImageIndex(index)}
-              className={`relative aspect-square overflow-hidden rounded-lg bg-white shadow-sm cursor-pointer hover:shadow-md transition-all border-2 ${
+              className={`relative aspect-square overflow-hidden rounded-none bg-white shadow-sm cursor-pointer hover:shadow-md transition-all border-2 ${
                 selectedImageIndex === index
                   ? 'border-[color:var(--logo-pink)] shadow-md'
                   : 'border-transparent'

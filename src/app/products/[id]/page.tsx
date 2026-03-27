@@ -11,8 +11,12 @@ import ProductActions from "@/components/ProductActions";
 import ProductImageGallery from "@/components/ProductImageGallery";
 import ProductReviewsSection from "@/components/ProductReviewsSection";
 import BestsellerTag from "@/components/BestsellerTag";
-
-const productHeadingFont = { fontFamily: "var(--font-allura), var(--font-script), cursive" } as const;
+import {
+  sunhoneyPDPTitleClass,
+  sunhoneyProductNameClass,
+  sunhoneyProductPriceClass,
+  sunhoneySectionHeadingClass,
+} from "@/lib/productDisplayStyle";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -82,10 +86,7 @@ export default async function ProductDetailPage(props: PageProps) {
           <div className="flex flex-col gap-6">
             <div>
               <div className="mb-2 flex flex-wrap items-center gap-3">
-                <h1
-                  className="text-4xl font-normal text-[color:var(--sunhoney-pink)] md:text-5xl"
-                  style={productHeadingFont}
-                >
+                <h1 className={sunhoneyPDPTitleClass}>
                   {product.title}
                 </h1>
                 {(product.inventory_count || 0) === 0 && (
@@ -96,17 +97,14 @@ export default async function ProductDetailPage(props: PageProps) {
               </div>
               <p className="text-sm text-[color:var(--text-muted)]">Handcrafted on Cape Cod</p>
             </div>
-            <div
-              className="text-3xl font-normal text-[color:var(--sunhoney-pink)]"
-              style={productHeadingFont}
-            >
+            <div className={`${sunhoneyProductPriceClass} !text-left text-base sm:text-lg md:text-xl`}>
               ${product.price}
             </div>
             <p className="leading-relaxed text-[color:var(--text-muted)]">{product.description}</p>
             <ProductActions product={product} />
             <div className="border-t border-gray-200 pt-4">
-              <h3 className="mb-2 text-lg font-normal text-[color:var(--sunhoney-pink)]" style={productHeadingFont}>
-                Product Details
+              <h3 className={`mb-2 text-sm sm:text-base ${sunhoneySectionHeadingClass}`}>
+                Product details
               </h3>
               <ul className="space-y-1 text-sm text-[color:var(--text-muted)]">
                 <li>• Waterproof & Hypoallergenic</li>
@@ -124,11 +122,8 @@ export default async function ProductDetailPage(props: PageProps) {
         {/* Product Recommendations Section */}
         <div className="mt-20">
           <div className="mb-12 text-center">
-            <h2
-              className="mb-4 text-3xl font-normal text-[color:var(--sunhoney-pink)] md:text-4xl"
-              style={productHeadingFont}
-            >
-              You Might Also Like
+            <h2 className={`mb-4 text-2xl sm:text-3xl md:text-4xl ${sunhoneySectionHeadingClass} text-center`}>
+              You might also like
             </h2>
             <p className="mx-auto max-w-2xl text-[color:var(--text-muted)]">
               Discover more handcrafted pieces from our collection
@@ -140,9 +135,9 @@ export default async function ProductDetailPage(props: PageProps) {
               <Link
                 key={recommendedProduct.id}
                 href={`/products/${recommendedProduct.slug}`}
-                className="group overflow-hidden rounded-2xl bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+                className="group block border border-stone-200/80 bg-white shadow-sm transition-shadow duration-300 hover:shadow-md"
               >
-                <div className="relative aspect-[3/4] overflow-hidden rounded-t-lg">
+                <div className="relative aspect-[3/4] overflow-hidden rounded-none bg-stone-50">
                   <Image
                     src={recommendedProduct.image_url}
                     alt={recommendedProduct.title}
@@ -153,27 +148,17 @@ export default async function ProductDetailPage(props: PageProps) {
                     quality={75}
                   />
                   {bestsellerIds.has(recommendedProduct.id) && <BestsellerTag />}
-                  <div className="absolute bottom-3 left-3">
-                    <span className="rounded-full bg-white/90 px-2 py-1 text-xs font-medium capitalize text-[color:var(--text-muted)] backdrop-blur-sm">
+                  <div className="absolute left-2 top-2">
+                    <span className="rounded-none border border-stone-200/80 bg-white/95 px-2 py-1 text-[10px] font-medium uppercase tracking-wider text-[color:var(--text-muted)] backdrop-blur-sm">
                       {recommendedProduct.category}
                     </span>
                   </div>
                 </div>
-                <div className="p-4">
-                  <h3
-                    className="mb-2 line-clamp-2 text-lg font-normal text-[color:var(--sunhoney-pink)] transition-opacity group-hover:opacity-90"
-                    style={productHeadingFont}
-                  >
+                <div className="space-y-2 border-t border-stone-200/80 px-3 py-4 text-center">
+                  <h3 className={`${sunhoneyProductNameClass} line-clamp-4`}>
                     {recommendedProduct.title}
                   </h3>
-                  <div className="flex items-center justify-between">
-                    <span className="text-lg font-normal text-[color:var(--sunhoney-pink)]" style={productHeadingFont}>
-                      ${recommendedProduct.price}
-                    </span>
-                    <span className="text-xs font-medium text-[color:var(--sunhoney-pink)] transition-opacity hover:opacity-80">
-                      View →
-                    </span>
-                  </div>
+                  <p className={sunhoneyProductPriceClass}>${recommendedProduct.price}</p>
                 </div>
               </Link>
             ))}

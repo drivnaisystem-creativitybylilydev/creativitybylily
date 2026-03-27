@@ -11,6 +11,7 @@ import { CoastalBackdropLayers } from '@/components/CoastalBackdrop';
 import { Filter } from 'lucide-react';
 import BestsellerTag from '@/components/BestsellerTag';
 import { useBestsellerProductIds } from '@/hooks/useBestsellerProductIds';
+import { sunhoneyProductNameClass, sunhoneyProductPriceClass } from '@/lib/productDisplayStyle';
 
 const SORT_OPTIONS = [
   { value: 'newest', label: 'Newest' },
@@ -270,10 +271,10 @@ function ProductsPageInner() {
             {products.map((product) => (
               <div
                 key={product.id}
-                className="group min-w-0 w-full overflow-hidden rounded-2xl bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+                className="group min-w-0 w-full overflow-hidden rounded-none border border-stone-200/80 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md"
               >
-                <Link href={`/products/${product.slug}`}>
-                  <div className="relative aspect-[3/4] overflow-hidden rounded-t-lg">
+                <Link href={`/products/${product.slug}`} className="block">
+                  <div className="relative aspect-[3/4] overflow-hidden rounded-none bg-stone-50">
                     <Image
                       src={product.image_url}
                       alt={product.title}
@@ -284,63 +285,54 @@ function ProductsPageInner() {
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
                     />
                     {bestsellerIds.has(product.id) && <BestsellerTag />}
-                    <div className="absolute bottom-3 left-3">
-                      <span className="rounded-full bg-white/90 px-2 py-1 text-xs font-medium capitalize text-[color:var(--text-muted)] backdrop-blur-sm">
+                    <div className="absolute bottom-2 left-2">
+                      <span className="bg-white/95 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-[color:var(--text-muted)]">
                         {product.category}
                       </span>
                     </div>
                     {(product.inventory_count || 0) === 0 && (
-                      <div className="absolute right-3 top-3">
-                        <span className="rounded-full bg-red-500 px-3 py-1.5 text-xs font-bold text-white shadow-lg">
-                          Out of Stock
+                      <div className="absolute right-2 top-2">
+                        <span className="bg-red-500 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-white sm:text-xs">
+                          Out of stock
                         </span>
                       </div>
                     )}
                   </div>
                 </Link>
-                <div className="p-6">
-                  <Link href={`/products/${product.slug}`}>
+                <div className="border-t border-stone-100 px-4 pb-6 pt-5 text-center">
+                  <Link href={`/products/${product.slug}`} className="block">
                     <h2
-                      className="mb-2 line-clamp-2 text-xl font-normal leading-snug tracking-wide text-[color:var(--sunhoney-pink)] transition-colors hover:opacity-90"
-                      style={{ fontFamily: 'var(--font-allura), var(--font-script), cursive' }}
+                      className={`${sunhoneyProductNameClass} line-clamp-4 transition-opacity hover:opacity-90`}
                     >
                       {product.title}
                     </h2>
-                    <p className="mb-2 text-sm text-[color:var(--text-muted)]">Handcrafted on Cape Cod</p>
                   </Link>
-                  <div className="mb-4">
+                  <p className={`${sunhoneyProductPriceClass} mt-3`}>${product.price}</p>
+                  <div className="mt-4 flex justify-center">
                     <ProductRatingBadge productId={product.id} compact />
                   </div>
-                  <div className="mb-4 flex items-center justify-between">
-                    <span
-                      className="text-2xl font-normal text-[color:var(--sunhoney-pink)]"
-                      style={{ fontFamily: 'var(--font-allura), var(--font-script), cursive' }}
-                    >
-                      ${product.price}
-                    </span>
-                  </div>
-                  <div className="flex gap-2">
+                  <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:justify-center">
                     <Link
                       href={`/products/${product.slug}`}
-                      className="flex-1 text-center text-[color:var(--logo-pink)] hover:opacity-80 transition-opacity text-sm font-medium py-2"
+                      className="border border-[color:var(--logo-pink)] px-4 py-2 text-center text-xs font-medium uppercase tracking-wider text-[color:var(--logo-pink)] transition-opacity hover:opacity-80 sm:flex-1"
                     >
-                      View Details →
+                      Details
                     </Link>
                     {(product.inventory_count || 0) > 0 ? (
                       <button
                         type="button"
                         onClick={() => addItem(product, 1)}
-                        className="flex-1 bg-[color:var(--logo-pink)] text-white px-4 py-2 rounded-full text-sm font-medium hover:opacity-90 transition-opacity"
+                        className="bg-[color:var(--logo-pink)] px-4 py-2 text-xs font-medium uppercase tracking-wider text-white transition-opacity hover:opacity-90 sm:flex-1"
                       >
-                        Add to Cart
+                        Add to cart
                       </button>
                     ) : (
                       <button
                         type="button"
                         disabled
-                        className="flex-1 bg-gray-300 text-gray-500 px-4 py-2 rounded-full text-sm font-medium cursor-not-allowed"
+                        className="cursor-not-allowed bg-stone-200 px-4 py-2 text-xs font-medium uppercase tracking-wider text-stone-500 sm:flex-1"
                       >
-                        Out of Stock
+                        Sold out
                       </button>
                     )}
                   </div>

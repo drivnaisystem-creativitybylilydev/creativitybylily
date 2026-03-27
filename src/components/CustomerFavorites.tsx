@@ -6,6 +6,11 @@ import Link from 'next/link';
 import type { Product } from '@/lib/supabase/types';
 import BestsellerTag from '@/components/BestsellerTag';
 import { useBestsellerProductIds } from '@/hooks/useBestsellerProductIds';
+import {
+  sunhoneyProductNameClass,
+  sunhoneyProductPriceClass,
+  sunhoneySectionHeadingClass,
+} from '@/lib/productDisplayStyle';
 
 export default function CustomerFavorites() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -29,15 +34,11 @@ export default function CustomerFavorites() {
     fetchProducts();
   }, []);
 
-  const headingFont = { fontFamily: 'var(--font-allura), var(--font-script), cursive' } as const;
-
   return (
     <div className="mx-auto max-w-7xl px-6">
       <div className="mb-12 text-center">
-        <h2 className="mb-6 text-5xl font-normal text-[color:var(--sunhoney-pink)]" style={headingFont}>
-          Customer Favorites
-        </h2>
-        <p className="mx-auto max-w-2xl text-xl text-[color:var(--text-muted)]">
+        <h2 className={`mb-6 text-3xl sm:text-4xl md:text-5xl ${sunhoneySectionHeadingClass}`}>Customer favorites</h2>
+        <p className="mx-auto max-w-2xl text-[color:var(--text-muted)]">
           Discover our most loved pieces, handpicked by our community
         </p>
       </div>
@@ -53,14 +54,11 @@ export default function CustomerFavorites() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 md:gap-8">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 md:gap-8 lg:grid-cols-4">
             {products.map((product) => (
-              <Link
-                key={product.id}
-                href={`/products/${product.slug}`}
-                className="group overflow-hidden rounded-2xl bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
-              >
-                <div className="relative aspect-[3/4] overflow-hidden rounded-t-2xl">
+              <Link key={product.id} href={`/products/${product.slug}`} className="group block">
+                <div className="relative aspect-[3/4] overflow-hidden rounded-none border border-stone-200/80 bg-stone-50">
+                  {bestsellerIds.has(product.id) && <BestsellerTag />}
                   <Image
                     src={product.image_url}
                     alt={product.title}
@@ -70,34 +68,15 @@ export default function CustomerFavorites() {
                     loading="lazy"
                     quality={75}
                   />
-                  {bestsellerIds.has(product.id) && <BestsellerTag />}
-                  <div className="absolute right-3 top-3">
-                    <span className="rounded-full bg-white/90 px-2.5 py-1 text-xs font-medium capitalize text-[color:var(--text-muted)] backdrop-blur-sm">
+                  <div className="absolute right-2 top-2">
+                    <span className="rounded-none border border-stone-200/80 bg-white/95 px-2 py-1 text-[10px] font-medium uppercase tracking-wider text-[color:var(--text-muted)] backdrop-blur-sm sm:text-xs">
                       {product.category}
                     </span>
                   </div>
                 </div>
-
-                <div className="p-5">
-                  <h3
-                    className="mb-2 line-clamp-2 text-xl font-normal text-[color:var(--sunhoney-pink)] transition-colors group-hover:opacity-90"
-                    style={headingFont}
-                  >
-                    {product.title}
-                  </h3>
-                  <div className="flex items-center justify-between">
-                    <p className="text-xl font-normal text-[color:var(--sunhoney-pink)]" style={headingFont}>
-                      ${product.price}
-                    </p>
-                    <svg
-                      className="h-5 w-5 text-[color:var(--text-muted)] transition-colors group-hover:text-[color:var(--sunhoney-pink)]"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </div>
+                <div className="mt-4 space-y-2 border-t border-stone-200/80 pt-4 text-center">
+                  <h3 className={`${sunhoneyProductNameClass} line-clamp-4 group-hover:opacity-90`}>{product.title}</h3>
+                  <p className={sunhoneyProductPriceClass}>${product.price}</p>
                 </div>
               </Link>
             ))}
@@ -108,7 +87,7 @@ export default function CustomerFavorites() {
               href="/products"
               className="inline-flex transform items-center gap-2 rounded-full bg-[color:var(--logo-pink)] px-8 py-4 font-medium text-white shadow-lg transition-all duration-300 hover:-translate-y-1 hover:opacity-95 hover:shadow-xl"
             >
-              Shop All Products
+              Shop all products
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>

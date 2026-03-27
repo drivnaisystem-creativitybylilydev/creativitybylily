@@ -6,6 +6,11 @@ import Link from 'next/link';
 import type { Product } from '@/lib/supabase/types';
 import BestsellerTag from '@/components/BestsellerTag';
 import { useBestsellerProductIds } from '@/hooks/useBestsellerProductIds';
+import {
+  sunhoneyProductNameClass,
+  sunhoneyProductPriceClass,
+  sunhoneySectionHeadingClass,
+} from '@/lib/productDisplayStyle';
 
 export default function ProductCarousel() {
   const [activeCategory, setActiveCategory] = useState('bracelets');
@@ -40,18 +45,11 @@ export default function ProductCarousel() {
     return products.filter((p) => p.category === categoryKey).slice(0, limit);
   };
 
-  const headingFont = { fontFamily: 'var(--font-allura), var(--font-script), cursive' } as const;
-
   return (
     <div className="mx-auto max-w-7xl px-6 py-12">
       <div className="mb-12 text-center">
-        <h2
-          className="mb-6 text-5xl font-normal text-[color:var(--sunhoney-pink)]"
-          style={headingFont}
-        >
-          Our Collection
-        </h2>
-        <p className="mx-auto mb-8 max-w-3xl text-xl text-[color:var(--text-muted)]">
+        <h2 className={`mb-6 text-3xl sm:text-4xl md:text-5xl ${sunhoneySectionHeadingClass}`}>Our collection</h2>
+        <p className="mx-auto mb-8 max-w-3xl text-base text-[color:var(--text-muted)] sm:text-lg">
           Discover our carefully curated selection of handcrafted jewelry, each piece designed to bring a touch of
           coastal elegance to your style.
         </p>
@@ -80,20 +78,20 @@ export default function ProductCarousel() {
         </div>
       </div>
 
-      <div className="rounded-3xl bg-white p-8 shadow-lg">
+      <div className="border border-stone-200/80 bg-white p-6 shadow-lg sm:p-8">
         {categories.map((category) =>
           activeCategory === category.key ? (
             <div key={category.key} className="animate-fade-in">
-              <div className="mb-8 flex flex-col items-center justify-between md:flex-row">
+              <div className="mb-8 flex flex-col items-center justify-between gap-4 md:flex-row">
                 <div className="text-center md:text-left">
-                  <h3 className="mb-2 text-3xl font-normal text-[color:var(--sunhoney-pink)]" style={headingFont}>
-                    {category.name} Collection
+                  <h3 className={`mb-2 text-2xl sm:text-3xl ${sunhoneySectionHeadingClass} md:text-left`}>
+                    {category.name} collection
                   </h3>
                   <p className="text-[color:var(--text-muted)]">{category.description}</p>
                 </div>
                 <Link
                   href={`/products?category=${category.key}`}
-                  className="mt-4 rounded-full bg-[color:var(--logo-pink)] px-6 py-3 font-medium text-white shadow-lg transition-opacity duration-300 hover:opacity-90 hover:shadow-xl md:mt-0"
+                  className="rounded-full bg-[color:var(--logo-pink)] px-6 py-3 font-medium text-white shadow-lg transition-opacity duration-300 hover:opacity-90"
                 >
                   Shop {category.name}
                 </Link>
@@ -105,7 +103,7 @@ export default function ProductCarousel() {
                 <div className="grid grid-cols-2 gap-4 md:grid-cols-2 md:gap-6 lg:grid-cols-3 xl:grid-cols-4">
                   {getCategoryProducts(category.key, 8).map((product) => (
                     <Link key={product.id} href={`/products/${product.slug}`} className="group block">
-                      <div className="relative mb-3 aspect-[3/4] overflow-hidden rounded-lg shadow-sm">
+                      <div className="relative aspect-[3/4] overflow-hidden rounded-none bg-stone-50">
                         {bestsellerIds.has(product.id) && <BestsellerTag />}
                         <Image
                           src={product.image_url}
@@ -117,15 +115,12 @@ export default function ProductCarousel() {
                           sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                         />
                       </div>
-                      <h4
-                        className="line-clamp-2 text-lg font-normal text-[color:var(--sunhoney-pink)]"
-                        style={headingFont}
-                      >
-                        {product.title}
-                      </h4>
-                      <p className="text-base font-normal text-[color:var(--sunhoney-pink)]" style={headingFont}>
-                        ${product.price}
-                      </p>
+                      <div className="mt-4 space-y-2 px-0.5">
+                        <h4 className={`${sunhoneyProductNameClass} line-clamp-4 group-hover:opacity-90`}>
+                          {product.title}
+                        </h4>
+                        <p className={sunhoneyProductPriceClass}>${product.price}</p>
+                      </div>
                     </Link>
                   ))}
                 </div>
