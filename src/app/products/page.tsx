@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import { useState, useEffect, Suspense, type CSSProperties } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
@@ -10,6 +9,7 @@ import ProductRatingBadge from '@/components/ProductRatingBadge';
 import { CoastalBackdropLayers } from '@/components/CoastalBackdrop';
 import { Filter } from 'lucide-react';
 import BestsellerTag from '@/components/BestsellerTag';
+import ProductCardImageHover from '@/components/ProductCardImageHover';
 import ScrollReveal from '@/components/ScrollReveal';
 import { useBestsellerProductIds } from '@/hooks/useBestsellerProductIds';
 import { sunhoneyProductNameClass, sunhoneyProductPriceClass } from '@/lib/productDisplayStyle';
@@ -276,30 +276,27 @@ function ProductsPageInner() {
               >
                 <Link href={`/products/${product.slug}`} className="block">
                   <ScrollReveal className="block w-full">
-                    <div className="relative aspect-[3/4] overflow-hidden rounded-none bg-stone-50">
-                      <Image
-                        src={product.image_url}
-                        alt={product.title}
-                        fill
-                        className={`object-cover transition-transform duration-300 ease-out group-hover:scale-[1.02] ${
-                          (product.inventory_count || 0) === 0 ? 'opacity-60' : ''
-                        }`}
-                        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
-                      />
+                    <ProductCardImageHover
+                      imageUrl={product.image_url}
+                      images={product.images}
+                      alt={product.title}
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
+                      dimmed={(product.inventory_count || 0) === 0}
+                    >
                       {bestsellerIds.has(product.id) && <BestsellerTag />}
-                      <div className="absolute bottom-1.5 left-1.5 sm:bottom-2 sm:left-2">
+                      <div className="pointer-events-none absolute bottom-1.5 left-1.5 z-[1] sm:bottom-2 sm:left-2">
                         <span className="bg-white/95 px-1.5 py-0.5 text-[9px] font-medium uppercase leading-tight tracking-wider text-[color:var(--text-muted)] sm:px-2 sm:text-[10px]">
                           {product.category}
                         </span>
                       </div>
                       {(product.inventory_count || 0) === 0 && (
-                        <div className="absolute right-1.5 top-1.5 sm:right-2 sm:top-2">
+                        <div className="pointer-events-none absolute right-1.5 top-1.5 z-[1] sm:right-2 sm:top-2">
                           <span className="bg-red-500 px-1.5 py-0.5 text-[9px] font-bold uppercase leading-tight tracking-wide text-white sm:px-2 sm:py-1 sm:text-[10px] sm:text-xs">
                             Out of stock
                           </span>
                         </div>
                       )}
-                    </div>
+                    </ProductCardImageHover>
                   </ScrollReveal>
                 </Link>
                 <div className="border-t border-stone-100 px-2.5 pb-4 pt-3.5 text-center sm:px-4 sm:pb-6 sm:pt-5">

@@ -1,10 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import type { Product } from '@/lib/supabase/types';
 import BestsellerTag from '@/components/BestsellerTag';
+import ProductCardImageHover from '@/components/ProductCardImageHover';
 import { useBestsellerProductIds } from '@/hooks/useBestsellerProductIds';
 
 const headingFont = { fontFamily: 'var(--font-allura), var(--font-script), cursive' } as const;
@@ -63,23 +63,20 @@ export default function CustomerFavorites() {
                 href={`/products/${product.slug}`}
                 className="group min-w-0 overflow-hidden rounded-2xl bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
               >
-                <div className="relative aspect-[3/4] overflow-hidden rounded-t-2xl">
-                  <Image
-                    src={product.image_url}
-                    alt={product.title}
-                    fill
-                    className="object-cover transition-transform duration-300 ease-out group-hover:scale-[1.02]"
-                    sizes="(max-width: 640px) 50vw, (max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-                    loading="lazy"
-                    quality={75}
-                  />
+                <ProductCardImageHover
+                  imageUrl={product.image_url}
+                  images={product.images}
+                  alt={product.title}
+                  sizes="(max-width: 640px) 50vw, (max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                  containerClassName="relative aspect-[3/4] overflow-hidden rounded-t-2xl bg-stone-50"
+                >
                   {bestsellerIds.has(product.id) && <BestsellerTag />}
-                  <div className="absolute right-2 top-2">
+                  <div className="pointer-events-none absolute right-2 top-2 z-[1]">
                     <span className="rounded-full bg-white/90 px-2 py-1 text-[10px] font-medium capitalize text-[color:var(--text-muted)] backdrop-blur-sm sm:text-xs">
                       {product.category}
                     </span>
                   </div>
-                </div>
+                </ProductCardImageHover>
 
                 <div className="p-3.5 sm:p-5">
                   <h3

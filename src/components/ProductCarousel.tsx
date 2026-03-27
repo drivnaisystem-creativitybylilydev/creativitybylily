@@ -1,10 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import type { Product } from '@/lib/supabase/types';
 import BestsellerTag from '@/components/BestsellerTag';
+import ProductCardImageHover from '@/components/ProductCardImageHover';
 import { useBestsellerProductIds } from '@/hooks/useBestsellerProductIds';
 
 const headingFont = { fontFamily: 'var(--font-allura), var(--font-script), cursive' } as const;
@@ -109,18 +109,15 @@ export default function ProductCarousel() {
                   {getCategoryProducts(category.key, 8).map((product) => (
                     <Link key={product.id} href={`/products/${product.slug}`} className="group block min-w-0">
                       <div className="overflow-hidden rounded-2xl bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
-                        <div className="relative aspect-[3/4] overflow-hidden rounded-t-2xl">
-                          <Image
-                            src={product.image_url}
-                            alt={product.title}
-                            fill
-                            className="object-cover transition-transform duration-300 ease-out group-hover:scale-[1.02]"
-                            loading="lazy"
-                            quality={75}
-                            sizes="(max-width: 640px) 50vw, (max-width: 1200px) 33vw, 25vw"
-                          />
+                        <ProductCardImageHover
+                          imageUrl={product.image_url}
+                          images={product.images}
+                          alt={product.title}
+                          sizes="(max-width: 640px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                          containerClassName="relative aspect-[3/4] overflow-hidden rounded-t-2xl bg-stone-50"
+                        >
                           {bestsellerIds.has(product.id) && <BestsellerTag />}
-                        </div>
+                        </ProductCardImageHover>
                         <div className="p-4 sm:p-5">
                           <h4
                             className="mb-2 line-clamp-2 text-lg font-normal text-[color:var(--sunhoney-pink)] transition-colors group-hover:opacity-90 sm:text-xl"
