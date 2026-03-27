@@ -20,8 +20,8 @@ type ProductCardImageHoverProps = {
 };
 
 /**
- * Crossfades to a second product image on hover when `images` includes another URL.
- * No-op when only one URL — behaves like a single image.
+ * Swaps to a second product image on hover when `images` includes another URL.
+ * Uses z-index + visibility so the hidden layer never bleeds through during transitions.
  */
 export default function ProductCardImageHover({
   imageUrl,
@@ -41,8 +41,9 @@ export default function ProductCardImageHover({
   const secondary = urls.length > 1 ? urls[1] : null;
   const showSecond = Boolean(secondary && hover);
 
-  const baseImg =
-    'object-cover transition-[opacity,transform] duration-300 ease-out group-hover:scale-[1.02]';
+  /* No opacity transition — instant swap avoids two semi-transparent layers bleeding together */
+  const imgBase =
+    'absolute inset-0 h-full w-full object-cover transition-transform duration-300 ease-out group-hover:scale-[1.02]';
   const dim = dimmed ? 'opacity-60' : '';
 
   if (!primary) {
@@ -51,7 +52,7 @@ export default function ProductCardImageHover({
 
   return (
     <div
-      className={containerClassName}
+      className={['isolate', containerClassName].filter(Boolean).join(' ')}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
@@ -59,22 +60,30 @@ export default function ProductCardImageHover({
         src={primary}
         alt={alt}
         fill
-        className={`${baseImg} ${dim} ${showSecond ? 'opacity-0' : 'opacity-100'}`}
         sizes={sizes}
         quality={quality}
         loading={priority ? 'eager' : loading}
         priority={priority}
+        className={`${imgBase} ${dim} ${
+          showSecond
+            ? 'z-[1] opacity-0 invisible pointer-events-none'
+            : 'z-[2] opacity-100 visible'
+        }`}
       />
       {secondary ? (
         <Image
           src={secondary}
           alt=""
           fill
-          className={`absolute inset-0 ${baseImg} ${dim} ${showSecond ? 'opacity-100' : 'opacity-0'}`}
           sizes={sizes}
           quality={quality}
           loading={loading}
           aria-hidden
+          className={`${imgBase} ${dim} ${
+            showSecond
+              ? 'z-[2] opacity-100 visible'
+              : 'z-[1] opacity-0 invisible pointer-events-none'
+          }`}
         />
       ) : null}
       {children}

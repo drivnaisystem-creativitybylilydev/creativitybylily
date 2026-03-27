@@ -58,39 +58,41 @@ export default function CustomerFavorites() {
         <>
           <div className="grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3 lg:grid-cols-4">
             {products.map((product) => (
-              <Link
+              <div
                 key={product.id}
-                href={`/products/${product.slug}`}
-                className="group min-w-0 overflow-hidden rounded-2xl bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+                className="group min-w-0 w-full overflow-hidden rounded-none border border-stone-200/80 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md"
               >
-                <ProductCardImageHover
-                  imageUrl={product.image_url}
-                  images={product.images}
-                  alt={product.title}
-                  sizes="(max-width: 640px) 50vw, (max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-                  containerClassName="relative aspect-[3/4] overflow-hidden rounded-t-2xl bg-stone-50"
-                >
-                  {bestsellerIds.has(product.id) && <BestsellerTag />}
-                  <div className="pointer-events-none absolute right-2 top-2 z-[1]">
-                    <span className="rounded-full bg-white/90 px-2 py-1 text-[10px] font-medium capitalize text-[color:var(--text-muted)] backdrop-blur-sm sm:text-xs">
-                      {product.category}
-                    </span>
-                  </div>
-                </ProductCardImageHover>
-
-                <div className="p-3.5 sm:p-5">
-                  <h3
-                    className="mb-1.5 line-clamp-2 text-base font-normal text-[color:var(--sunhoney-pink)] transition-colors group-hover:opacity-90 sm:mb-2 sm:text-lg"
-                    style={headingFont}
+                <Link href={`/products/${product.slug}`} className="block">
+                  <ProductCardImageHover
+                    imageUrl={product.image_url}
+                    images={product.images}
+                    alt={product.title}
+                    sizes="(max-width: 640px) 50vw, (max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                   >
-                    {product.title}
-                  </h3>
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="text-base font-normal text-[color:var(--sunhoney-pink)] sm:text-lg" style={headingFont}>
-                      ${product.price}
-                    </p>
+                    {bestsellerIds.has(product.id) && <BestsellerTag />}
+                    <div className="pointer-events-none absolute bottom-1.5 left-1.5 z-[3] sm:bottom-2 sm:left-2">
+                      <span className="bg-white/95 px-1.5 py-0.5 text-[9px] font-medium uppercase leading-tight tracking-wider text-[color:var(--text-muted)] sm:px-2 sm:text-[10px]">
+                        {product.category}
+                      </span>
+                    </div>
+                  </ProductCardImageHover>
+                </Link>
+
+                <div className="border-t border-stone-100 px-2.5 pb-4 pt-3.5 sm:px-4 sm:pb-5 sm:pt-4">
+                  <Link href={`/products/${product.slug}`} className="flex items-start justify-between gap-2">
+                    <div className="min-w-0 flex-1">
+                      <h3
+                        className="mb-1 line-clamp-2 text-sm font-normal text-[color:var(--sunhoney-pink)] transition-colors group-hover:opacity-90 sm:mb-1.5 sm:text-base"
+                        style={headingFont}
+                      >
+                        {product.title}
+                      </h3>
+                      <p className="text-sm font-normal text-[color:var(--sunhoney-pink)] sm:text-base" style={headingFont}>
+                        ${product.price}
+                      </p>
+                    </div>
                     <svg
-                      className="h-4 w-4 shrink-0 text-[color:var(--text-muted)] transition-colors group-hover:text-[color:var(--sunhoney-pink)] sm:h-5 sm:w-5"
+                      className="mt-0.5 h-4 w-4 shrink-0 text-[color:var(--text-muted)] transition-colors group-hover:text-[color:var(--sunhoney-pink)] sm:h-5 sm:w-5"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -98,9 +100,9 @@ export default function CustomerFavorites() {
                     >
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
-                  </div>
+                  </Link>
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
 

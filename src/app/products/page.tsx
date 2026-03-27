@@ -284,13 +284,13 @@ function ProductsPageInner() {
                       dimmed={(product.inventory_count || 0) === 0}
                     >
                       {bestsellerIds.has(product.id) && <BestsellerTag />}
-                      <div className="pointer-events-none absolute bottom-1.5 left-1.5 z-[1] sm:bottom-2 sm:left-2">
+                      <div className="pointer-events-none absolute bottom-1.5 left-1.5 z-[3] sm:bottom-2 sm:left-2">
                         <span className="bg-white/95 px-1.5 py-0.5 text-[9px] font-medium uppercase leading-tight tracking-wider text-[color:var(--text-muted)] sm:px-2 sm:text-[10px]">
                           {product.category}
                         </span>
                       </div>
                       {(product.inventory_count || 0) === 0 && (
-                        <div className="pointer-events-none absolute right-1.5 top-1.5 z-[1] sm:right-2 sm:top-2">
+                        <div className="pointer-events-none absolute right-1.5 top-1.5 z-[3] sm:right-2 sm:top-2">
                           <span className="bg-red-500 px-1.5 py-0.5 text-[9px] font-bold uppercase leading-tight tracking-wide text-white sm:px-2 sm:py-1 sm:text-[10px] sm:text-xs">
                             Out of stock
                           </span>

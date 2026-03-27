@@ -34,7 +34,7 @@ export default function RelatedProductsGrid({ products, bestsellerProductIds }: 
               sizes="(max-width: 640px) 50vw, 25vw"
             >
               {set.has(recommendedProduct.id) && <BestsellerTag />}
-              <div className="pointer-events-none absolute left-1.5 top-1.5 z-[1] sm:left-2 sm:top-2">
+              <div className="pointer-events-none absolute left-1.5 top-1.5 z-[3] sm:left-2 sm:top-2">
                 <span className="rounded-none border border-stone-200/80 bg-white/95 px-1.5 py-0.5 text-[9px] font-medium uppercase leading-tight tracking-wider text-[color:var(--text-muted)] backdrop-blur-sm sm:px-2 sm:py-1 sm:text-[10px]">
                   {recommendedProduct.category}
                 </span>

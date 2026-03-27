@@ -107,30 +107,42 @@ export default function ProductCarousel() {
               ) : (
                 <div className="grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                   {getCategoryProducts(category.key, 8).map((product) => (
-                    <Link key={product.id} href={`/products/${product.slug}`} className="group block min-w-0">
-                      <div className="overflow-hidden rounded-2xl bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+                    <div
+                      key={product.id}
+                      className="group min-w-0 w-full overflow-hidden rounded-none border border-stone-200/80 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md"
+                    >
+                      <Link href={`/products/${product.slug}`} className="block">
                         <ProductCardImageHover
                           imageUrl={product.image_url}
                           images={product.images}
                           alt={product.title}
                           sizes="(max-width: 640px) 50vw, (max-width: 1200px) 33vw, 25vw"
-                          containerClassName="relative aspect-[3/4] overflow-hidden rounded-t-2xl bg-stone-50"
                         >
                           {bestsellerIds.has(product.id) && <BestsellerTag />}
+                          <div className="pointer-events-none absolute bottom-1.5 left-1.5 z-[3] sm:bottom-2 sm:left-2">
+                            <span className="bg-white/95 px-1.5 py-0.5 text-[9px] font-medium uppercase leading-tight tracking-wider text-[color:var(--text-muted)] sm:px-2 sm:text-[10px]">
+                              {product.category}
+                            </span>
+                          </div>
                         </ProductCardImageHover>
-                        <div className="p-4 sm:p-5">
+                      </Link>
+                      <div className="border-t border-stone-100 px-2.5 pb-4 pt-3.5 sm:px-4 sm:pb-5 sm:pt-4">
+                        <Link href={`/products/${product.slug}`} className="block">
                           <h4
-                            className="mb-2 line-clamp-2 text-lg font-normal text-[color:var(--sunhoney-pink)] transition-colors group-hover:opacity-90 sm:text-xl"
+                            className="mb-2 line-clamp-2 text-base font-normal text-[color:var(--sunhoney-pink)] transition-colors group-hover:opacity-90 sm:text-lg"
                             style={headingFont}
                           >
                             {product.title}
                           </h4>
-                          <p className="text-lg font-normal text-[color:var(--sunhoney-pink)] sm:text-xl" style={headingFont}>
-                            ${product.price}
-                          </p>
-                        </div>
+                        </Link>
+                        <p
+                          className="text-base font-normal text-[color:var(--sunhoney-pink)] sm:text-lg"
+                          style={headingFont}
+                        >
+                          ${product.price}
+                        </p>
                       </div>
-                    </Link>
+                    </div>
                   ))}
                 </div>
               )}
