@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
@@ -11,9 +10,9 @@ import ProductActions from "@/components/ProductActions";
 import ProductImageGallery from "@/components/ProductImageGallery";
 import ProductReviewsSection from "@/components/ProductReviewsSection";
 import BestsellerTag from "@/components/BestsellerTag";
+import RelatedProductsGrid from "@/components/RelatedProductsGrid";
 import {
   sunhoneyPDPTitleClass,
-  sunhoneyProductNameClass,
   sunhoneyProductPriceClass,
   sunhoneySectionHeadingClass,
 } from "@/lib/productDisplayStyle";
@@ -75,10 +74,12 @@ export default async function ProductDetailPage(props: PageProps) {
     6
   );
 
+  const bestsellerProductIds = Array.from(bestsellerIds);
+
   return (
     <div className="min-h-screen bg-[#faf8f5]">
-      <div className="mx-auto max-w-6xl px-6 py-16">
-        <div className="grid grid-cols-1 gap-12 md:grid-cols-2">
+      <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-16">
+        <div className="grid grid-cols-1 gap-8 sm:gap-10 md:grid-cols-2 md:gap-12">
           <div className="relative">
             {bestsellerIds.has(product.id) && <BestsellerTag />}
             <ProductImageGallery images={productImages} productTitle={product.title} />
@@ -120,52 +121,20 @@ export default async function ProductDetailPage(props: PageProps) {
         <ProductReviewsSection productId={product.id} />
 
         {/* Product Recommendations Section */}
-        <div className="mt-20">
-          <div className="mb-12 text-center">
-            <h2 className={`mb-4 text-2xl sm:text-3xl md:text-4xl ${sunhoneySectionHeadingClass} text-center`}>
+        <div className="mt-14 sm:mt-20">
+          <div className="mb-8 text-center sm:mb-12">
+            <h2 className={`mb-3 text-2xl sm:mb-4 sm:text-3xl md:text-4xl ${sunhoneySectionHeadingClass} text-center`}>
               You might also like
             </h2>
-            <p className="mx-auto max-w-2xl text-[color:var(--text-muted)]">
+            <p className="mx-auto max-w-2xl px-1 text-sm text-[color:var(--text-muted)] sm:text-base">
               Discover more handcrafted pieces from our collection
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-6 md:grid-cols-2 lg:grid-cols-4">
-            {recommendedProducts.map((recommendedProduct) => (
-              <Link
-                key={recommendedProduct.id}
-                href={`/products/${recommendedProduct.slug}`}
-                className="group block border border-stone-200/80 bg-white shadow-sm transition-shadow duration-300 hover:shadow-md"
-              >
-                <div className="relative aspect-[3/4] overflow-hidden rounded-none bg-stone-50">
-                  <Image
-                    src={recommendedProduct.image_url}
-                    alt={recommendedProduct.title}
-                    fill
-                    className="object-cover transition-transform duration-300 ease-out group-hover:scale-[1.02]"
-                    sizes="(max-width: 768px) 50vw, 25vw"
-                    loading="lazy"
-                    quality={75}
-                  />
-                  {bestsellerIds.has(recommendedProduct.id) && <BestsellerTag />}
-                  <div className="absolute left-2 top-2">
-                    <span className="rounded-none border border-stone-200/80 bg-white/95 px-2 py-1 text-[10px] font-medium uppercase tracking-wider text-[color:var(--text-muted)] backdrop-blur-sm">
-                      {recommendedProduct.category}
-                    </span>
-                  </div>
-                </div>
-                <div className="space-y-2 border-t border-stone-200/80 px-3 py-4 text-center">
-                  <h3 className={`${sunhoneyProductNameClass} line-clamp-4`}>
-                    {recommendedProduct.title}
-                  </h3>
-                  <p className={sunhoneyProductPriceClass}>${recommendedProduct.price}</p>
-                </div>
-              </Link>
-            ))}
-          </div>
+          <RelatedProductsGrid products={recommendedProducts} bestsellerProductIds={bestsellerProductIds} />
 
           {/* Call to Action */}
-          <div className="text-center mt-12">
+          <div className="mt-10 text-center sm:mt-12">
             <Link
               href="/products"
               className="inline-flex items-center gap-2 bg-[color:var(--logo-pink)] text-white px-8 py-4 rounded-full font-medium hover:opacity-90 transition-opacity duration-300 shadow-lg hover:shadow-xl"

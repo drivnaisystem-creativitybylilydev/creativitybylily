@@ -10,6 +10,7 @@ import ProductRatingBadge from '@/components/ProductRatingBadge';
 import { CoastalBackdropLayers } from '@/components/CoastalBackdrop';
 import { Filter } from 'lucide-react';
 import BestsellerTag from '@/components/BestsellerTag';
+import ScrollReveal from '@/components/ScrollReveal';
 import { useBestsellerProductIds } from '@/hooks/useBestsellerProductIds';
 import { sunhoneyProductNameClass, sunhoneyProductPriceClass } from '@/lib/productDisplayStyle';
 
@@ -175,7 +176,7 @@ function ProductsPageInner() {
             </p>
 
             {/* Filter icon (sort) + category chips — filter sits left of All Products */}
-            <div className="flex flex-wrap justify-center items-center gap-3 mb-6">
+            <div className="mb-6 flex flex-wrap items-center justify-center gap-2 sm:gap-3">
             <div
               className={`relative inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border bg-white shadow-sm transition-colors hover:border-[color:var(--logo-pink)]/40 hover:text-[color:var(--logo-pink)] focus-within:ring-2 focus-within:ring-[color:var(--logo-pink)]/25 focus-within:border-[color:var(--logo-pink)] ${
                 sortValue !== 'newest'
@@ -209,7 +210,7 @@ function ProductsPageInner() {
                 key={category}
                 type="button"
                 onClick={() => setCategory(category)}
-                className={`px-6 py-3 rounded-full font-medium transition-all duration-300 ${
+                className={`rounded-full px-4 py-2.5 text-sm font-medium transition-all duration-300 sm:px-6 sm:py-3 sm:text-base ${
                   selectedCategory === category
                     ? 'bg-[color:var(--logo-pink)] text-white shadow-lg'
                     : 'bg-white text-gray-700 hover:bg-gray-50 shadow-sm'
@@ -226,8 +227,8 @@ function ProductsPageInner() {
               Search products by name
             </label>
             <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 sm:left-4">
+                <svg className="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -243,7 +244,7 @@ function ProductsPageInner() {
                 onChange={(e) => setSearchInput(e.target.value)}
                 placeholder="Search by product name…"
                 autoComplete="off"
-                className="w-full rounded-full border border-stone-200 bg-white py-3.5 pl-12 pr-5 text-gray-800 placeholder:text-stone-400 shadow-sm focus:border-[color:var(--logo-pink)] focus:outline-none focus:ring-2 focus:ring-[color:var(--logo-pink)]/25"
+                className="w-full rounded-full border border-stone-200 bg-white py-3 pl-11 pr-4 text-sm text-gray-800 placeholder:text-stone-400 shadow-sm focus:border-[color:var(--logo-pink)] focus:outline-none focus:ring-2 focus:ring-[color:var(--logo-pink)]/25 sm:py-3.5 sm:pl-12 sm:pr-5 sm:text-base"
               />
             </div>
             </div>
@@ -261,60 +262,64 @@ function ProductsPageInner() {
         <div className="h-[3px] w-full rounded-none" style={SHOP_PINK_GLOW_RULE_STYLE} />
       </div>
 
-      <div className={`mx-auto w-full max-w-none pb-16 pt-6 ${pagePad}`}>
+      <div className={`mx-auto w-full max-w-none pb-12 pt-4 sm:pb-16 sm:pt-6 ${pagePad}`}>
         {loading ? (
-          <div className="text-center py-16">
-            <p className="text-gray-500 text-lg">Loading products...</p>
+          <div className="py-12 text-center sm:py-16">
+            <p className="text-base text-gray-500 sm:text-lg">Loading products...</p>
           </div>
         ) : products.length > 0 ? (
-          <div className="grid w-full grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 lg:gap-8">
+          <div className="grid w-full grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4 lg:gap-8">
             {products.map((product) => (
               <div
                 key={product.id}
                 className="group min-w-0 w-full overflow-hidden rounded-none border border-stone-200/80 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md"
               >
                 <Link href={`/products/${product.slug}`} className="block">
-                  <div className="relative aspect-[3/4] overflow-hidden rounded-none bg-stone-50">
-                    <Image
-                      src={product.image_url}
-                      alt={product.title}
-                      fill
-                      className={`object-cover transition-transform duration-300 ease-out group-hover:scale-[1.02] ${
-                        (product.inventory_count || 0) === 0 ? 'opacity-60' : ''
-                      }`}
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
-                    />
-                    {bestsellerIds.has(product.id) && <BestsellerTag />}
-                    <div className="absolute bottom-2 left-2">
-                      <span className="bg-white/95 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-[color:var(--text-muted)]">
-                        {product.category}
-                      </span>
-                    </div>
-                    {(product.inventory_count || 0) === 0 && (
-                      <div className="absolute right-2 top-2">
-                        <span className="bg-red-500 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-white sm:text-xs">
-                          Out of stock
+                  <ScrollReveal className="block w-full">
+                    <div className="relative aspect-[3/4] overflow-hidden rounded-none bg-stone-50">
+                      <Image
+                        src={product.image_url}
+                        alt={product.title}
+                        fill
+                        className={`object-cover transition-transform duration-300 ease-out group-hover:scale-[1.02] ${
+                          (product.inventory_count || 0) === 0 ? 'opacity-60' : ''
+                        }`}
+                        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
+                      />
+                      {bestsellerIds.has(product.id) && <BestsellerTag />}
+                      <div className="absolute bottom-1.5 left-1.5 sm:bottom-2 sm:left-2">
+                        <span className="bg-white/95 px-1.5 py-0.5 text-[9px] font-medium uppercase leading-tight tracking-wider text-[color:var(--text-muted)] sm:px-2 sm:text-[10px]">
+                          {product.category}
                         </span>
                       </div>
-                    )}
-                  </div>
+                      {(product.inventory_count || 0) === 0 && (
+                        <div className="absolute right-1.5 top-1.5 sm:right-2 sm:top-2">
+                          <span className="bg-red-500 px-1.5 py-0.5 text-[9px] font-bold uppercase leading-tight tracking-wide text-white sm:px-2 sm:py-1 sm:text-[10px] sm:text-xs">
+                            Out of stock
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </ScrollReveal>
                 </Link>
-                <div className="border-t border-stone-100 px-4 pb-6 pt-5 text-center">
+                <div className="border-t border-stone-100 px-2.5 pb-4 pt-3.5 text-center sm:px-4 sm:pb-6 sm:pt-5">
                   <Link href={`/products/${product.slug}`} className="block">
                     <h2
-                      className={`${sunhoneyProductNameClass} line-clamp-4 transition-opacity hover:opacity-90`}
+                      className={`${sunhoneyProductNameClass} line-clamp-4 transition-opacity hover:opacity-90 max-[380px]:tracking-[0.12em]`}
                     >
                       {product.title}
                     </h2>
                   </Link>
-                  <p className={`${sunhoneyProductPriceClass} mt-3`}>${product.price}</p>
-                  <div className="mt-4 flex justify-center">
+                  <p className={`${sunhoneyProductPriceClass} mt-2 sm:mt-3 max-[380px]:tracking-[0.14em]`}>
+                    ${product.price}
+                  </p>
+                  <div className="mt-3 flex justify-center sm:mt-4">
                     <ProductRatingBadge productId={product.id} compact />
                   </div>
-                  <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:justify-center">
+                  <div className="mt-4 flex flex-col gap-2 sm:mt-5 min-[480px]:flex-row min-[480px]:justify-center">
                     <Link
                       href={`/products/${product.slug}`}
-                      className="border border-[color:var(--logo-pink)] px-4 py-2 text-center text-xs font-medium uppercase tracking-wider text-[color:var(--logo-pink)] transition-opacity hover:opacity-80 sm:flex-1"
+                      className="border border-[color:var(--logo-pink)] px-3 py-2 text-center text-[10px] font-medium uppercase tracking-wider text-[color:var(--logo-pink)] transition-opacity hover:opacity-80 min-[480px]:flex-1 sm:px-4 sm:text-xs"
                     >
                       Details
                     </Link>
@@ -322,7 +327,7 @@ function ProductsPageInner() {
                       <button
                         type="button"
                         onClick={() => addItem(product, 1)}
-                        className="bg-[color:var(--logo-pink)] px-4 py-2 text-xs font-medium uppercase tracking-wider text-white transition-opacity hover:opacity-90 sm:flex-1"
+                        className="bg-[color:var(--logo-pink)] px-3 py-2 text-[10px] font-medium uppercase tracking-wider text-white transition-opacity hover:opacity-90 min-[480px]:flex-1 sm:px-4 sm:text-xs"
                       >
                         Add to cart
                       </button>
@@ -330,7 +335,7 @@ function ProductsPageInner() {
                       <button
                         type="button"
                         disabled
-                        className="cursor-not-allowed bg-stone-200 px-4 py-2 text-xs font-medium uppercase tracking-wider text-stone-500 sm:flex-1"
+                        className="cursor-not-allowed bg-stone-200 px-3 py-2 text-[10px] font-medium uppercase tracking-wider text-stone-500 min-[480px]:flex-1 sm:px-4 sm:text-xs"
                       >
                         Sold out
                       </button>

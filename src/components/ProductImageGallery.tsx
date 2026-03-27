@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import ScrollReveal from '@/components/ScrollReveal';
 
 type ProductImageGalleryProps = {
   images: string[];
@@ -30,26 +31,28 @@ export default function ProductImageGallery({ images, productTitle }: ProductIma
   const mainFailed = failedImages.has(selectedImageIndex);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 sm:space-y-4">
       {/* Main image display */}
-      <div className="relative aspect-[3/4] w-full overflow-hidden rounded-none border border-stone-200/80 bg-white shadow-sm">
-        {mainFailed ? (
-          <ImagePlaceholder />
-        ) : (
-          <Image 
-            src={currentImage} 
-            alt={productTitle} 
-            fill 
-            className="object-cover" 
-            priority
-            onError={() => setFailedImages(prev => new Set(prev).add(selectedImageIndex))}
-          />
-        )}
-      </div>
+      <ScrollReveal className="w-full">
+        <div className="relative aspect-[3/4] w-full overflow-hidden rounded-none border border-stone-200/80 bg-white shadow-sm">
+          {mainFailed ? (
+            <ImagePlaceholder />
+          ) : (
+            <Image
+              src={currentImage}
+              alt={productTitle}
+              fill
+              className="object-cover"
+              priority
+              onError={() => setFailedImages((prev) => new Set(prev).add(selectedImageIndex))}
+            />
+          )}
+        </div>
+      </ScrollReveal>
       
       {/* Thumbnail gallery */}
       {images.length > 1 && (
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-4 gap-1.5 sm:gap-2">
           {images.map((imageUrl, index) => (
             <button
               key={index}

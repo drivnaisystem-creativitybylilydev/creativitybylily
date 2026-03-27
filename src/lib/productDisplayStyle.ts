@@ -1,6 +1,7 @@
 /**
- * Sunhoney-style merchandising: high-contrast serif (Playfair via `font-serif`),
- * ALL CAPS, wide tracking, dusty pink — text sits in its own block under a sharp-cornered image.
+ * Sunhoney-style merchandising for the shop (`/products`) and product detail (`/products/[slug]`) only:
+ * Playfair via `font-serif`, ALL CAPS, wide tracking, dusty pink — copy under sharp-cornered images.
+ * Homepage carousel / favorites use script display fonts instead; do not import this there.
  */
 export const sunhoneyProductNameClass =
   'font-serif font-light uppercase tracking-[0.18em] text-[color:var(--sunhoney-pink)] text-center text-xs leading-snug sm:text-sm sm:tracking-[0.22em]';
