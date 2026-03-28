@@ -53,47 +53,47 @@ export default async function AdminCustomersPage() {
       </div>
 
       {/* Customers Table */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className="min-w-0 max-w-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
         {customers.length > 0 ? (
-          <div className="overflow-x-auto">
-            <table className="w-full">
+          <div className="min-w-0 p-2 sm:p-0">
+            <table className="admin-table-stack w-full">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 sm:px-6">
                     Name
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 sm:px-6">
                     Email
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 sm:px-6">
                     Phone
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 sm:px-6">
                     Orders
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 sm:px-6">
                     Total Spent
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="divide-y divide-gray-200 bg-white">
                 {customers.map((customer: any) => (
                   <tr key={customer.email} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-4 py-4 sm:px-6" data-label="Name">
                       <div className="text-sm font-medium text-gray-900">
                         {customer.firstName} {customer.lastName}
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{customer.email}</div>
+                    <td className="px-4 py-4 sm:px-6" data-label="Email">
+                      <div className="break-anywhere text-sm text-gray-900">{customer.email}</div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-4 py-4 whitespace-nowrap sm:px-6" data-label="Phone">
                       <div className="text-sm text-gray-600">{customer.phone || '-'}</div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900 font-medium">{customer.orderCount}</div>
+                    <td className="px-4 py-4 whitespace-nowrap sm:px-6" data-label="Orders">
+                      <div className="text-sm font-medium text-gray-900">{customer.orderCount}</div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-4 py-4 whitespace-nowrap sm:px-6" data-label="Total Spent">
                       <div className="text-sm font-semibold text-[color:var(--logo-pink)]">
                         ${customer.totalSpent?.toFixed(2) || '0.00'}
                       </div>

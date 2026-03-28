@@ -36,39 +36,39 @@ export default async function AdminOrdersPage() {
       </div>
 
       {/* Orders Table */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className="min-w-0 max-w-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
         {orders && orders.length > 0 ? (
-          <div className="overflow-x-auto">
-            <table className="w-full">
+          <div className="min-w-0 p-2 sm:p-0">
+            <table className="admin-table-stack w-full">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 sm:px-6">
                     Order #
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 sm:px-6">
                     Customer
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 sm:px-6">
                     Items
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 sm:px-6">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 sm:px-6">
                     Total
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 sm:px-6">
                     Date
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 sm:px-6">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="divide-y divide-gray-200 bg-white">
                 {orders.map((order: any) => (
                   <tr key={order.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-4 py-4 whitespace-nowrap sm:px-6" data-label="Order #">
                       <Link
                         href={`/admin/orders/${order.id}`}
                         className="text-sm font-medium text-[color:var(--logo-pink)] hover:opacity-80"
@@ -76,7 +76,7 @@ export default async function AdminOrdersPage() {
                         {order.order_number}
                       </Link>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-4 py-4 sm:px-6" data-label="Customer">
                       <div className="text-sm text-gray-900">
                         {order.customer_first_name} {order.customer_last_name}
                       </div>
@@ -85,13 +85,12 @@ export default async function AdminOrdersPage() {
                         <div className="text-xs text-gray-400">{order.customer_phone}</div>
                       )}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                      {/* Will show item count - need to join with order_items */}
+                    <td className="px-4 py-4 text-sm text-gray-600 whitespace-nowrap sm:px-6" data-label="Items">
                       -
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-4 py-4 whitespace-nowrap sm:px-6" data-label="Status">
                       <span
-                        className={`px-3 py-1 text-xs font-semibold rounded-full ${
+                        className={`rounded-full px-3 py-1 text-xs font-semibold ${
                           order.status === 'pending'
                             ? 'bg-yellow-100 text-yellow-800'
                             : order.status === 'processing'
@@ -106,21 +105,24 @@ export default async function AdminOrdersPage() {
                         {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
+                    <td
+                      className="px-4 py-4 text-sm font-semibold text-gray-900 whitespace-nowrap sm:px-6"
+                      data-label="Total"
+                    >
                       ${Number(order.total).toFixed(2)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-4 py-4 text-sm text-gray-500 whitespace-nowrap sm:px-6" data-label="Date">
                       {new Date(order.created_at).toLocaleDateString('en-US', {
                         month: 'short',
                         day: 'numeric',
                         year: 'numeric',
                       })}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      <div className="flex items-center gap-4">
+                    <td className="px-4 py-4 text-sm sm:px-6" data-label="Actions">
+                      <div className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-2">
                         <Link
                           href={`/admin/orders/${order.id}`}
-                          className="text-[color:var(--logo-pink)] hover:opacity-80 font-medium"
+                          className="font-medium text-[color:var(--logo-pink)] hover:opacity-80"
                         >
                           View →
                         </Link>

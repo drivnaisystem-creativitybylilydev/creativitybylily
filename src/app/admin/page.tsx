@@ -42,8 +42,8 @@ export default async function AdminDashboard() {
       <AnalyticsDashboard />
 
       {/* Recent Orders Table */}
-      <div className="mt-8 bg-white rounded-xl shadow-sm border border-gray-200">
-        <div className="p-6 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+      <div className="mt-8 min-w-0 max-w-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+        <div className="flex flex-col gap-2 border-b border-gray-200 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-6">
           <div>
             <h2 className="text-xl font-semibold text-gray-900">Recent orders</h2>
             {orderTotal !== null && (
@@ -62,32 +62,32 @@ export default async function AdminDashboard() {
             View all orders →
           </Link>
         </div>
-        <div className="overflow-x-auto">
+        <div className="min-w-0 p-2 sm:p-0">
           {orders && orders.length > 0 ? (
-            <table className="w-full">
+            <table className="admin-table-stack w-full">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 sm:px-6">
                     Order #
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 sm:px-6">
                     Customer
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 sm:px-6">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 sm:px-6">
                     Total
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 sm:px-6">
                     Date
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="divide-y divide-gray-200 bg-white">
                 {orders.map((order: any) => (
                   <tr key={order.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-4 py-4 whitespace-nowrap sm:px-6" data-label="Order #">
                       <Link
                         href={`/admin/orders/${order.id}`}
                         className="text-sm font-medium text-[color:var(--logo-pink)] hover:opacity-80"
@@ -95,15 +95,15 @@ export default async function AdminDashboard() {
                         {order.order_number}
                       </Link>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-4 py-4 sm:px-6" data-label="Customer">
                       <div className="text-sm text-gray-900">
                         {order.customer_first_name} {order.customer_last_name}
                       </div>
                       <div className="text-sm text-gray-500">{order.customer_email}</div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-4 py-4 whitespace-nowrap sm:px-6" data-label="Status">
                       <span
-                        className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                        className={`rounded-full px-2 py-1 text-xs font-semibold ${
                           order.status === 'pending'
                             ? 'bg-yellow-100 text-yellow-800'
                             : order.status === 'processing'
@@ -118,10 +118,13 @@ export default async function AdminDashboard() {
                         {order.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
+                    <td
+                      className="px-4 py-4 text-sm font-semibold text-gray-900 whitespace-nowrap sm:px-6"
+                      data-label="Total"
+                    >
                       ${Number(order.total).toFixed(2)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-4 py-4 text-sm text-gray-500 whitespace-nowrap sm:px-6" data-label="Date">
                       {new Date(order.created_at).toLocaleDateString()}
                     </td>
                   </tr>

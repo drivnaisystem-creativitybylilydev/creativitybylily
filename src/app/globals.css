@@ -77,6 +77,58 @@ body {
   word-break: break-word;
 }
 
+/* —— Admin: stack tables as labeled card rows on narrow viewports (no horizontal pan) —— */
+@media (max-width: 768px) {
+  .admin-table-stack {
+    display: block;
+    width: 100%;
+  }
+
+  .admin-table-stack thead {
+    display: none;
+  }
+
+  .admin-table-stack tbody {
+    display: block;
+  }
+
+  .admin-table-stack tbody tr {
+    display: block;
+    margin-bottom: 0.75rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    background: #fff;
+    overflow: hidden;
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
+  }
+
+  .admin-table-stack tbody td {
+    display: grid;
+    grid-template-columns: minmax(6.25rem, 34%) 1fr;
+    gap: 0.25rem 0.75rem;
+    align-items: start;
+    padding: 0.625rem 0.875rem;
+    border-bottom: 1px solid #f3f4f6;
+    font-size: 0.875rem;
+    white-space: normal;
+    word-break: break-word;
+  }
+
+  .admin-table-stack tbody td:last-child {
+    border-bottom: none;
+  }
+
+  .admin-table-stack tbody td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    font-size: 0.625rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #6b7280;
+    padding-top: 0.15rem;
+  }
+}
+
 .btn-primary {
   display: inline-flex;
   align-items: center;
