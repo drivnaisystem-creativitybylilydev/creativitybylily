@@ -5,8 +5,7 @@ import Link from 'next/link';
 import type { Product } from '@/lib/supabase/types';
 import HomepageProductCard from '@/components/HomepageProductCard';
 import { useBestsellerProductIds } from '@/hooks/useBestsellerProductIds';
-
-const headingFont = { fontFamily: 'var(--font-allura), var(--font-script), cursive' } as const;
+import { sunhoneySectionHeadingClass } from '@/lib/productDisplayStyle';
 
 export default function ProductCarousel() {
   const [activeCategory, setActiveCategory] = useState('bracelets');
@@ -45,8 +44,7 @@ export default function ProductCarousel() {
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12">
       <div className="mb-10 text-center sm:mb-12">
         <h2
-          className="mb-5 text-4xl font-normal text-[color:var(--sunhoney-pink)] sm:mb-6 sm:text-5xl"
-          style={headingFont}
+          className={`mb-5 text-center text-3xl sm:mb-6 sm:text-4xl md:text-5xl ${sunhoneySectionHeadingClass}`}
         >
           Our collection
         </h2>
@@ -86,8 +84,7 @@ export default function ProductCarousel() {
               <div className="mb-6 flex flex-col items-center justify-between gap-4 sm:mb-8 md:flex-row">
                 <div className="text-center md:text-left">
                   <h3
-                    className="mb-2 text-2xl font-normal text-[color:var(--sunhoney-pink)] sm:text-3xl md:text-left"
-                    style={headingFont}
+                    className={`mb-2 text-center text-xl sm:text-2xl md:text-left md:text-3xl ${sunhoneySectionHeadingClass}`}
                   >
                     {category.name} collection
                   </h3>

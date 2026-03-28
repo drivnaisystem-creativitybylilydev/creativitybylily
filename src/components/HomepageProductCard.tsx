@@ -6,8 +6,7 @@ import type { Product } from '@/lib/supabase/types';
 import ProductCardImageHover from '@/components/ProductCardImageHover';
 import BestsellerTag from '@/components/BestsellerTag';
 import { normalizeProductGalleryUrls } from '@/lib/productGalleryUrls';
-
-const headingFont = { fontFamily: 'var(--font-allura), var(--font-script), cursive' } as const;
+import { sunhoneyProductNameClass, sunhoneyProductPriceClass } from '@/lib/productDisplayStyle';
 
 type HomepageProductCardProps = {
   product: Product;
@@ -18,7 +17,7 @@ type HomepageProductCardProps = {
 };
 
 /**
- * Single homepage product tile — matches shop-style chrome + Allura copy; full-card hover/touch for alt image.
+ * Homepage product tile — same image chrome as shop; title/price use Sunhoney serif (matches /products).
  */
 export default function HomepageProductCard({
   product,
@@ -32,26 +31,21 @@ export default function HomepageProductCard({
   );
   const [peek, setPeek] = useState(false);
 
-  const titleClassName =
-    'mb-2 line-clamp-2 text-base font-normal text-[color:var(--sunhoney-pink)] transition-colors group-hover:opacity-90 sm:text-lg';
+  const nameClass = `${sunhoneyProductNameClass} line-clamp-4 transition-opacity hover:opacity-90 max-[380px]:tracking-[0.12em] leading-relaxed`;
 
   const title = (
     <Link href={`/products/${product.slug}`} className="block touch-manipulation">
       {titleHeading === 'h3' ? (
-        <h3 className={titleClassName} style={headingFont}>
-          {product.title}
-        </h3>
+        <h3 className={nameClass}>{product.title}</h3>
       ) : (
-        <h4 className={titleClassName} style={headingFont}>
-          {product.title}
-        </h4>
+        <h4 className={nameClass}>{product.title}</h4>
       )}
     </Link>
   );
 
   return (
     <div
-      className="group min-w-0 w-full overflow-hidden rounded-none border border-stone-200/80 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md touch-manipulation"
+      className="group min-w-0 w-full touch-manipulation overflow-hidden rounded-none border border-stone-200/80 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md"
       onMouseEnter={() => hasAltImage && setPeek(true)}
       onMouseLeave={() => setPeek(false)}
       onTouchStart={() => hasAltImage && setPeek(true)}
@@ -74,11 +68,9 @@ export default function HomepageProductCard({
           </div>
         </ProductCardImageHover>
       </Link>
-      <div className="border-t border-stone-100 px-2.5 pb-4 pt-3.5 sm:px-4 sm:pb-5 sm:pt-4">
+      <div className="border-t border-stone-100 px-2.5 pb-4 pt-3.5 text-center sm:px-4 sm:pb-5 sm:pt-4">
         {title}
-        <p className="text-base font-normal text-[color:var(--sunhoney-pink)] sm:text-lg" style={headingFont}>
-          ${product.price}
-        </p>
+        <p className={`${sunhoneyProductPriceClass} mt-3 sm:mt-4 max-[380px]:tracking-[0.14em]`}>${product.price}</p>
       </div>
     </div>
   );

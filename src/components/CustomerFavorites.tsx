@@ -5,8 +5,7 @@ import Link from 'next/link';
 import type { Product } from '@/lib/supabase/types';
 import HomepageProductCard from '@/components/HomepageProductCard';
 import { useBestsellerProductIds } from '@/hooks/useBestsellerProductIds';
-
-const headingFont = { fontFamily: 'var(--font-allura), var(--font-script), cursive' } as const;
+import { sunhoneySectionHeadingClass } from '@/lib/productDisplayStyle';
 
 export default function CustomerFavorites() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -34,10 +33,9 @@ export default function CustomerFavorites() {
     <div className="mx-auto max-w-7xl px-4 sm:px-6">
       <div className="mb-10 text-center sm:mb-12">
         <h2
-          className="mb-5 text-4xl font-normal text-[color:var(--sunhoney-pink)] sm:mb-6 sm:text-5xl"
-          style={headingFont}
+          className={`mb-5 text-center text-3xl sm:mb-6 sm:text-4xl md:text-5xl ${sunhoneySectionHeadingClass}`}
         >
-          Customer Favorites
+          Customer favorites
         </h2>
         <p className="mx-auto max-w-2xl text-base text-[color:var(--text-muted)] sm:text-lg">
           Discover our most loved pieces, handpicked by our community
