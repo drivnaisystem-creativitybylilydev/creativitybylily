@@ -6,7 +6,7 @@ export default function Footer() {
 
   return (
     <footer style={{ backgroundColor: 'var(--soft-pink)' }}>
-      <div className="max-w-7xl mx-auto px-6 py-12">
+      <div className="mx-auto max-w-7xl px-4 py-12 safe-area-x sm:px-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-8">
           {/* Brand (easter egg: click title → admin login) */}
           <div>

@@ -122,12 +122,12 @@ export default function AnalyticsDashboard() {
   return (
     <div className="space-y-6">
       {/* Date Range Selector */}
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         {(['7d', '30d', '90d', 'all'] as const).map((range) => (
           <button
             key={range}
             onClick={() => setDateRange(range)}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+            className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors sm:px-4 sm:text-base ${
               dateRange === range
                 ? 'bg-[color:var(--logo-pink)] text-white'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -205,9 +205,10 @@ export default function AnalyticsDashboard() {
       {/* Charts Row 1 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Orders Over Time */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Orders Over Time</h3>
-          <ResponsiveContainer width="100%" height={300}>
+        <div className="min-w-0 max-w-full rounded-xl border border-gray-200 bg-white p-4 shadow-sm sm:p-6">
+          <h3 className="mb-4 text-lg font-semibold text-gray-900">Orders Over Time</h3>
+          <div className="h-[260px] min-h-0 w-full min-w-0 max-w-full overflow-x-hidden sm:h-[300px]">
+          <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="date" />
@@ -218,12 +219,14 @@ export default function AnalyticsDashboard() {
               <Line type="monotone" dataKey="revenue" stroke="#3b82f6" strokeWidth={2} name="Revenue ($)" />
             </LineChart>
           </ResponsiveContainer>
+          </div>
         </div>
 
         {/* Order Status Breakdown */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Order Status Breakdown</h3>
-          <ResponsiveContainer width="100%" height={300}>
+        <div className="min-w-0 max-w-full rounded-xl border border-gray-200 bg-white p-4 shadow-sm sm:p-6">
+          <h3 className="mb-4 text-lg font-semibold text-gray-900">Order Status Breakdown</h3>
+          <div className="h-[260px] min-h-0 w-full min-w-0 max-w-full overflow-x-hidden sm:h-[300px]">
+          <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
                 data={data.orderStatusBreakdown}
@@ -255,14 +258,16 @@ export default function AnalyticsDashboard() {
               />
             </PieChart>
           </ResponsiveContainer>
+          </div>
         </div>
       </div>
 
       {/* Charts Row 2 - Carrier Breakdown */}
       {data.carrierBreakdown.length > 0 && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Shipping Labels by Carrier</h3>
-          <ResponsiveContainer width="100%" height={300}>
+        <div className="min-w-0 max-w-full rounded-xl border border-gray-200 bg-white p-4 shadow-sm sm:p-6">
+          <h3 className="mb-4 text-lg font-semibold text-gray-900">Shipping Labels by Carrier</h3>
+          <div className="h-[260px] min-h-0 w-full min-w-0 max-w-full overflow-x-hidden sm:h-[300px]">
+          <ResponsiveContainer width="100%" height="100%">
             <BarChart data={data.carrierBreakdown}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="carrier" />
@@ -271,6 +276,7 @@ export default function AnalyticsDashboard() {
               <Bar dataKey="count" fill="#ec4899" />
             </BarChart>
           </ResponsiveContainer>
+          </div>
         </div>
       )}
     </div>

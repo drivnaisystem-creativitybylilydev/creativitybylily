@@ -35,18 +35,21 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <AdminAuthWrapper>
-      <div className="min-h-screen bg-gray-50">
+      <div className="admin-shell min-h-screen bg-gray-50">
         {!isAuthPage && (
-          <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
-              <div className="flex items-center justify-between">
+          <header className="sticky top-0 z-50 border-b border-gray-200 bg-white">
+            <div className="mx-auto max-w-7xl px-4 py-4 safe-area-x sm:px-6">
+              <div className="flex min-w-0 items-center justify-between gap-2">
 
                 {/* Left: logo + desktop nav */}
-                <div className="flex items-center gap-8">
-                  <Link href="/admin" className="text-xl sm:text-2xl font-bold text-[color:var(--logo-pink)]">
+                <div className="flex min-w-0 items-center gap-4 sm:gap-8">
+                  <Link
+                    href="/admin"
+                    className="min-w-0 shrink-0 text-lg font-bold text-[color:var(--logo-pink)] sm:text-xl md:text-2xl"
+                  >
                     Admin
                   </Link>
-                  <nav className="hidden md:flex items-center gap-6">
+                  <nav className="hidden min-w-0 items-center gap-6 md:flex">
                     {NAV_LINKS.map(({ href, label, badge }) => (
                       <Link
                         key={href}
@@ -91,10 +94,19 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </div>
             </div>
 
+            {menuOpen && (
+              <button
+                type="button"
+                className="fixed inset-0 z-[60] bg-black/35 md:hidden"
+                aria-label="Close menu"
+                onClick={() => setMenuOpen(false)}
+              />
+            )}
+
             {/* Mobile drawer */}
             {menuOpen && (
-              <div className="md:hidden border-t border-gray-100 bg-white shadow-lg">
-                <nav className="max-w-7xl mx-auto px-4 py-3 flex flex-col gap-1">
+              <div className="relative z-[70] border-t border-gray-100 bg-white shadow-lg md:z-auto md:hidden">
+                <nav className="mx-auto flex max-h-[min(70vh,32rem)] max-w-7xl flex-col gap-1 overflow-y-auto px-4 py-3">
                   {NAV_LINKS.map(({ href, label, badge }) => (
                     <Link
                       key={href}
@@ -130,7 +142,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </header>
         )}
 
-        <main className={isAuthPage ? '' : 'max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8'}>
+        <main
+          className={`admin-layout-main ${isAuthPage ? '' : 'mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8'}`}
+        >
           {children}
         </main>
       </div>

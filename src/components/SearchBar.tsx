@@ -112,9 +112,9 @@ export default function SearchBar() {
 
       {/* Expanded Search Bar */}
       {isExpanded && (
-        <div className="absolute right-0 top-0 z-50 w-80 md:w-96">
-          <form onSubmit={handleSubmit} className="relative">
-            <div className="bg-white rounded-lg shadow-xl border-2 border-[color:var(--logo-pink)] overflow-hidden">
+        <div className="fixed left-3 right-3 top-[4.25rem] z-[90] w-auto max-w-[100%] sm:absolute sm:inset-auto sm:right-0 sm:top-0 sm:left-auto sm:w-96">
+          <form onSubmit={handleSubmit} className="relative box-border max-w-full">
+            <div className="box-border max-w-full overflow-hidden rounded-lg border-2 border-[color:var(--logo-pink)] bg-white shadow-xl">
               <div className="flex items-center">
                 <div className="flex-1 relative">
                   <input

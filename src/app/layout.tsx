@@ -122,9 +122,11 @@ export default function RootLayout({
       >
         <AuthErrorHandler />
         <CartProvider>
-          <Header />
-          {children}
-          <Footer />
+          <div className="flex min-h-dvh flex-col">
+            <Header />
+            <main className="site-main w-full flex-1">{children}</main>
+            <Footer />
+          </div>
         </CartProvider>
         <Analytics />
       </body>
