@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useEffect, Suspense, type CSSProperties } from 'react';
+import { useState, useEffect, useMemo, Suspense, type CSSProperties } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import type { Product } from '@/lib/supabase/types';
 import { useCart } from '@/contexts/CartContext';
@@ -13,6 +13,7 @@ import ProductCardImageHover from '@/components/ProductCardImageHover';
 import ScrollReveal from '@/components/ScrollReveal';
 import { useBestsellerProductIds } from '@/hooks/useBestsellerProductIds';
 import { sunhoneyProductNameClass, sunhoneyProductPriceClass } from '@/lib/productDisplayStyle';
+import { normalizeProductGalleryUrls } from '@/lib/productGalleryUrls';
 
 const SORT_OPTIONS = [
   { value: 'newest', label: 'Newest' },
@@ -55,6 +56,91 @@ function useDebouncedValue<T>(value: T, delay: number): T {
   return debounced;
 }
 
+function ProductsListingCard({ product, isBestseller }: { product: Product; isBestseller: boolean }) {
+  const { addItem } = useCart();
+  const hasAltImage = useMemo(
+    () => normalizeProductGalleryUrls(product.image_url, product.images).length > 1,
+    [product.image_url, product.images]
+  );
+  const [peek, setPeek] = useState(false);
+
+  return (
+    <div
+      className="group min-w-0 w-full touch-manipulation overflow-hidden rounded-none border border-stone-200/80 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md"
+      onMouseEnter={() => hasAltImage && setPeek(true)}
+      onMouseLeave={() => setPeek(false)}
+      onTouchStart={() => hasAltImage && setPeek(true)}
+      onTouchEnd={() => setPeek(false)}
+      onTouchCancel={() => setPeek(false)}
+    >
+      <Link href={`/products/${product.slug}`} className="block touch-manipulation">
+        <ScrollReveal className="block w-full">
+          <ProductCardImageHover
+            imageUrl={product.image_url}
+            images={product.images}
+            alt={product.title}
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
+            dimmed={(product.inventory_count || 0) === 0}
+            peekActive={hasAltImage ? peek : undefined}
+          >
+            {isBestseller && <BestsellerTag />}
+            <div className="pointer-events-none absolute bottom-1.5 left-1.5 z-[3] sm:bottom-2 sm:left-2">
+              <span className="bg-white/95 px-1.5 py-0.5 text-[9px] font-medium uppercase leading-tight tracking-wider text-[color:var(--text-muted)] sm:px-2 sm:text-[10px]">
+                {product.category}
+              </span>
+            </div>
+            {(product.inventory_count || 0) === 0 && (
+              <div className="pointer-events-none absolute right-1.5 top-1.5 z-[3] sm:right-2 sm:top-2">
+                <span className="bg-red-500 px-1.5 py-0.5 text-[9px] font-bold uppercase leading-tight tracking-wide text-white sm:px-2 sm:py-1 sm:text-[10px] sm:text-xs">
+                  Out of stock
+                </span>
+              </div>
+            )}
+          </ProductCardImageHover>
+        </ScrollReveal>
+      </Link>
+      <div className="border-t border-stone-100 px-2.5 pb-4 pt-3.5 text-center sm:px-4 sm:pb-6 sm:pt-5">
+        <Link href={`/products/${product.slug}`} className="block">
+          <h2
+            className={`${sunhoneyProductNameClass} line-clamp-4 transition-opacity hover:opacity-90 max-[380px]:tracking-[0.12em]`}
+          >
+            {product.title}
+          </h2>
+        </Link>
+        <p className={`${sunhoneyProductPriceClass} mt-2 sm:mt-3 max-[380px]:tracking-[0.14em]`}>${product.price}</p>
+        <div className="mt-3 flex justify-center sm:mt-4">
+          <ProductRatingBadge productId={product.id} compact />
+        </div>
+        <div className="mt-4 flex flex-col gap-2 sm:mt-5 min-[480px]:flex-row min-[480px]:justify-center">
+          <Link
+            href={`/products/${product.slug}`}
+            className="border border-[color:var(--logo-pink)] px-3 py-2 text-center text-[10px] font-medium uppercase tracking-wider text-[color:var(--logo-pink)] transition-opacity hover:opacity-80 min-[480px]:flex-1 sm:px-4 sm:text-xs"
+          >
+            Details
+          </Link>
+          {(product.inventory_count || 0) > 0 ? (
+            <button
+              type="button"
+              onClick={() => addItem(product, 1)}
+              className="bg-[color:var(--logo-pink)] px-3 py-2 text-[10px] font-medium uppercase tracking-wider text-white transition-opacity hover:opacity-90 min-[480px]:flex-1 sm:px-4 sm:text-xs"
+            >
+              Add to cart
+            </button>
+          ) : (
+            <button
+              type="button"
+              disabled
+              className="cursor-not-allowed bg-stone-200 px-3 py-2 text-[10px] font-medium uppercase tracking-wider text-stone-500 min-[480px]:flex-1 sm:px-4 sm:text-xs"
+            >
+              Sold out
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function ProductsPageInner() {
   const router = useRouter();
   const pathname = usePathname();
@@ -68,7 +154,6 @@ function ProductsPageInner() {
   const [loading, setLoading] = useState(true);
   const [searchInput, setSearchInput] = useState(urlQ);
   const debouncedSearch = useDebouncedValue(searchInput, 400);
-  const { addItem } = useCart();
   const bestsellerIds = useBestsellerProductIds();
 
   const selectedCategory = ['all', 'earrings', 'necklaces', 'bracelets', 'anklets'].includes(urlCategory)
@@ -270,76 +355,11 @@ function ProductsPageInner() {
         ) : products.length > 0 ? (
           <div className="grid w-full grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4 lg:gap-8">
             {products.map((product) => (
-              <div
+              <ProductsListingCard
                 key={product.id}
-                className="group min-w-0 w-full overflow-hidden rounded-none border border-stone-200/80 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md"
-              >
-                <Link href={`/products/${product.slug}`} className="block">
-                  <ScrollReveal className="block w-full">
-                    <ProductCardImageHover
-                      imageUrl={product.image_url}
-                      images={product.images}
-                      alt={product.title}
-                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
-                      dimmed={(product.inventory_count || 0) === 0}
-                    >
-                      {bestsellerIds.has(product.id) && <BestsellerTag />}
-                      <div className="pointer-events-none absolute bottom-1.5 left-1.5 z-[3] sm:bottom-2 sm:left-2">
-                        <span className="bg-white/95 px-1.5 py-0.5 text-[9px] font-medium uppercase leading-tight tracking-wider text-[color:var(--text-muted)] sm:px-2 sm:text-[10px]">
-                          {product.category}
-                        </span>
-                      </div>
-                      {(product.inventory_count || 0) === 0 && (
-                        <div className="pointer-events-none absolute right-1.5 top-1.5 z-[3] sm:right-2 sm:top-2">
-                          <span className="bg-red-500 px-1.5 py-0.5 text-[9px] font-bold uppercase leading-tight tracking-wide text-white sm:px-2 sm:py-1 sm:text-[10px] sm:text-xs">
-                            Out of stock
-                          </span>
-                        </div>
-                      )}
-                    </ProductCardImageHover>
-                  </ScrollReveal>
-                </Link>
-                <div className="border-t border-stone-100 px-2.5 pb-4 pt-3.5 text-center sm:px-4 sm:pb-6 sm:pt-5">
-                  <Link href={`/products/${product.slug}`} className="block">
-                    <h2
-                      className={`${sunhoneyProductNameClass} line-clamp-4 transition-opacity hover:opacity-90 max-[380px]:tracking-[0.12em]`}
-                    >
-                      {product.title}
-                    </h2>
-                  </Link>
-                  <p className={`${sunhoneyProductPriceClass} mt-2 sm:mt-3 max-[380px]:tracking-[0.14em]`}>
-                    ${product.price}
-                  </p>
-                  <div className="mt-3 flex justify-center sm:mt-4">
-                    <ProductRatingBadge productId={product.id} compact />
-                  </div>
-                  <div className="mt-4 flex flex-col gap-2 sm:mt-5 min-[480px]:flex-row min-[480px]:justify-center">
-                    <Link
-                      href={`/products/${product.slug}`}
-                      className="border border-[color:var(--logo-pink)] px-3 py-2 text-center text-[10px] font-medium uppercase tracking-wider text-[color:var(--logo-pink)] transition-opacity hover:opacity-80 min-[480px]:flex-1 sm:px-4 sm:text-xs"
-                    >
-                      Details
-                    </Link>
-                    {(product.inventory_count || 0) > 0 ? (
-                      <button
-                        type="button"
-                        onClick={() => addItem(product, 1)}
-                        className="bg-[color:var(--logo-pink)] px-3 py-2 text-[10px] font-medium uppercase tracking-wider text-white transition-opacity hover:opacity-90 min-[480px]:flex-1 sm:px-4 sm:text-xs"
-                      >
-                        Add to cart
-                      </button>
-                    ) : (
-                      <button
-                        type="button"
-                        disabled
-                        className="cursor-not-allowed bg-stone-200 px-3 py-2 text-[10px] font-medium uppercase tracking-wider text-stone-500 min-[480px]:flex-1 sm:px-4 sm:text-xs"
-                      >
-                        Sold out
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
+                product={product}
+                isBestseller={bestsellerIds.has(product.id)}
+              />
             ))}
           </div>
         ) : (

@@ -3,8 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import type { Product } from '@/lib/supabase/types';
-import BestsellerTag from '@/components/BestsellerTag';
-import ProductCardImageHover from '@/components/ProductCardImageHover';
+import HomepageProductCard from '@/components/HomepageProductCard';
 import { useBestsellerProductIds } from '@/hooks/useBestsellerProductIds';
 
 const headingFont = { fontFamily: 'var(--font-allura), var(--font-script), cursive' } as const;
@@ -107,42 +106,13 @@ export default function ProductCarousel() {
               ) : (
                 <div className="grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                   {getCategoryProducts(category.key, 8).map((product) => (
-                    <div
+                    <HomepageProductCard
                       key={product.id}
-                      className="group min-w-0 w-full overflow-hidden rounded-none border border-stone-200/80 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md"
-                    >
-                      <Link href={`/products/${product.slug}`} className="block">
-                        <ProductCardImageHover
-                          imageUrl={product.image_url}
-                          images={product.images}
-                          alt={product.title}
-                          sizes="(max-width: 640px) 50vw, (max-width: 1200px) 33vw, 25vw"
-                        >
-                          {bestsellerIds.has(product.id) && <BestsellerTag />}
-                          <div className="pointer-events-none absolute bottom-1.5 left-1.5 z-[3] sm:bottom-2 sm:left-2">
-                            <span className="bg-white/95 px-1.5 py-0.5 text-[9px] font-medium uppercase leading-tight tracking-wider text-[color:var(--text-muted)] sm:px-2 sm:text-[10px]">
-                              {product.category}
-                            </span>
-                          </div>
-                        </ProductCardImageHover>
-                      </Link>
-                      <div className="border-t border-stone-100 px-2.5 pb-4 pt-3.5 sm:px-4 sm:pb-5 sm:pt-4">
-                        <Link href={`/products/${product.slug}`} className="block">
-                          <h4
-                            className="mb-2 line-clamp-2 text-base font-normal text-[color:var(--sunhoney-pink)] transition-colors group-hover:opacity-90 sm:text-lg"
-                            style={headingFont}
-                          >
-                            {product.title}
-                          </h4>
-                        </Link>
-                        <p
-                          className="text-base font-normal text-[color:var(--sunhoney-pink)] sm:text-lg"
-                          style={headingFont}
-                        >
-                          ${product.price}
-                        </p>
-                      </div>
-                    </div>
+                      product={product}
+                      showBestseller={bestsellerIds.has(product.id)}
+                      sizes="(max-width: 640px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                      titleHeading="h4"
+                    />
                   ))}
                 </div>
               )}

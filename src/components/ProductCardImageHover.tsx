@@ -17,11 +17,16 @@ type ProductCardImageHoverProps = {
   /** Outer frame: aspect ratio, rounding, background. */
   containerClassName?: string;
   children?: React.ReactNode;
+  /**
+   * When provided, alternate image visibility follows this flag (parent handles mouse/touch on the full card).
+   * When omitted, this component handles pointer events on the image frame only.
+   */
+  peekActive?: boolean;
 };
 
 /**
- * Swaps to a second product image on hover when `images` includes another URL.
- * Uses z-index + visibility so the hidden layer never bleeds through during transitions.
+ * Shows a second product image when `peekActive` is true (or on image hover/touch internally).
+ * Instant opacity swap + z-index avoids layered bleed.
  */
 export default function ProductCardImageHover({
   imageUrl,
@@ -34,14 +39,16 @@ export default function ProductCardImageHover({
   priority = false,
   containerClassName = 'relative aspect-[3/4] overflow-hidden rounded-none bg-stone-50',
   children,
+  peekActive: peekActiveControlled,
 }: ProductCardImageHoverProps) {
-  const [hover, setHover] = useState(false);
+  const [internalPeek, setInternalPeek] = useState(false);
   const urls = useMemo(() => normalizeProductGalleryUrls(imageUrl, images), [imageUrl, images]);
   const primary = urls[0];
   const secondary = urls.length > 1 ? urls[1] : null;
-  const showSecond = Boolean(secondary && hover);
+  const controlled = peekActiveControlled !== undefined;
+  const peek = controlled ? Boolean(peekActiveControlled) : internalPeek;
+  const showSecond = Boolean(secondary && peek);
 
-  /* No opacity transition — instant swap avoids two semi-transparent layers bleeding together */
   const imgBase =
     'absolute inset-0 h-full w-full object-cover transition-transform duration-300 ease-out group-hover:scale-[1.02]';
   const dim = dimmed ? 'opacity-60' : '';
@@ -52,9 +59,24 @@ export default function ProductCardImageHover({
 
   return (
     <div
-      className={['isolate', containerClassName].filter(Boolean).join(' ')}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
+      className={['isolate touch-manipulation', containerClassName].filter(Boolean).join(' ')}
+      onMouseEnter={
+        !controlled && secondary
+          ? () => {
+              setInternalPeek(true);
+            }
+          : undefined
+      }
+      onMouseLeave={!controlled ? () => setInternalPeek(false) : undefined}
+      onTouchStart={
+        !controlled && secondary
+          ? () => {
+              setInternalPeek(true);
+            }
+          : undefined
+      }
+      onTouchEnd={!controlled ? () => setInternalPeek(false) : undefined}
+      onTouchCancel={!controlled ? () => setInternalPeek(false) : undefined}
     >
       <Image
         src={primary}
