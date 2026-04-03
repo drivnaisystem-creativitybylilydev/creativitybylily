@@ -8,6 +8,8 @@ interface ShippingLabelButtonProps {
   shippingAddress: any;
   orderItems: any[];
   hasTracking: boolean;
+  /** When false, hide generate/regenerate (Rollo-only stores). Still shows open-PDF if a label already exists. */
+  allowPurchase?: boolean;
   shipment?: {
     label_url?: string | null;
     tracking_number?: string | null;
@@ -24,6 +26,7 @@ export default function ShippingLabelButton({
   shippingAddress,
   orderItems,
   hasTracking,
+  allowPurchase = true,
   shipment,
 }: ShippingLabelButtonProps) {
   const [isGenerating, setIsGenerating] = useState(false);
@@ -121,6 +124,10 @@ export default function ShippingLabelButton({
 
   const hasExistingLabel = shipment?.label_url && shipment?.status === 'purchased';
 
+  if (!allowPurchase && !hasExistingLabel) {
+    return null;
+  }
+
   return (
     <div className="space-y-2">
       {hasExistingLabel ? (
@@ -148,35 +155,42 @@ export default function ShippingLabelButton({
               )}
             </div>
           )}
-          <button
-            onClick={handleGenerateLabel}
-            disabled={isGenerating}
-            className="w-full bg-gray-200 text-gray-700 px-6 py-2 rounded-lg text-sm font-medium hover:bg-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isGenerating ? 'Regenerating...' : 'Regenerate Label'}
-          </button>
+          {allowPurchase ? (
+            <button
+              onClick={handleGenerateLabel}
+              disabled={isGenerating}
+              className="w-full rounded-lg bg-gray-200 px-6 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {isGenerating ? 'Regenerating...' : 'Regenerate Label'}
+            </button>
+          ) : null}
         </>
-      ) : (
+      ) : allowPurchase ? (
         <button
           onClick={handleGenerateLabel}
           disabled={isGenerating}
-          className="w-full bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 py-3 font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isGenerating ? (
             <>
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
               <span>Generating Label...</span>
             </>
           ) : (
             <>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"
+                />
               </svg>
               <span>Generate label (Shippo)</span>
             </>
           )}
         </button>
-      )}
+      ) : null}
       
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-3">

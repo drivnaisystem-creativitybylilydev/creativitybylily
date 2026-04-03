@@ -51,6 +51,13 @@ export default async function OrderDetailPage({
   const shippingAddress = order.shipping_address as any;
   const billingAddress = order.billing_address as any;
 
+  /** Set ADMIN_DISABLE_SHIPPO_LABEL_PURCHASE=true when fulfillment is Rollo-only (hides generate; keeps open-PDF for old Shippo labels). */
+  const shippoPurchaseEnabled = process.env.ADMIN_DISABLE_SHIPPO_LABEL_PURCHASE !== 'true';
+  const hasPurchasedShippoLabel = Boolean(
+    shipment?.label_url && shipment?.status === 'purchased'
+  );
+  const showShippoSidebarSection = shippoPurchaseEnabled || hasPurchasedShippoLabel;
+
   return (
     <div>
       <div className="mb-8">
@@ -194,22 +201,35 @@ export default async function OrderDetailPage({
               </div>
             )}
 
-            {/* Optional Shippo label (Rollo-first copy tools are under Shipping Address) */}
-            <div className="border-t border-gray-200 pt-6 mt-6">
-              <h3 className="font-semibold text-gray-900 mb-1">Label via Shippo (optional)</h3>
-              <p className="mb-3 text-xs text-gray-600 leading-relaxed">
-                Only if you want to buy a label here. If you use the Rollo app for USPS, skip this and use
-                &quot;Ship with Rollo app&quot; above so everything stays in one shipping flow.
-              </p>
-              <ShippingLabelButton
-                orderId={id}
-                orderNumber={order.order_number}
-                shippingAddress={shippingAddress}
-                orderItems={orderItems || []}
-                hasTracking={!!order.tracking_number}
-                shipment={shipment || null}
-              />
-            </div>
+            {showShippoSidebarSection ? (
+              <div className="border-t border-gray-200 pt-6 mt-6">
+                <h3 className="mb-1 font-semibold text-gray-900">
+                  {shippoPurchaseEnabled
+                    ? 'Label via Shippo (optional)'
+                    : 'Earlier Shippo label'}
+                </h3>
+                {shippoPurchaseEnabled ? (
+                  <p className="mb-3 text-xs leading-relaxed text-gray-600">
+                    Only if you want to buy a label here. If you use the Rollo app for USPS, use &quot;Ship with
+                    Rollo app&quot; under the address instead.
+                  </p>
+                ) : (
+                  <p className="mb-3 text-xs leading-relaxed text-gray-600">
+                    This order already has a label bought through the site. You can open the PDF to reprint; new
+                    labels use the Rollo app and the copy buttons above.
+                  </p>
+                )}
+                <ShippingLabelButton
+                  orderId={id}
+                  orderNumber={order.order_number}
+                  shippingAddress={shippingAddress}
+                  orderItems={orderItems || []}
+                  hasTracking={!!order.tracking_number}
+                  allowPurchase={shippoPurchaseEnabled}
+                  shipment={shipment || null}
+                />
+              </div>
+            ) : null}
 
             {/* Tracking */}
             {order.tracking_number && (
