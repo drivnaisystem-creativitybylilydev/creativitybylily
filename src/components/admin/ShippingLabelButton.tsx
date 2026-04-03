@@ -132,10 +132,10 @@ export default function ShippingLabelButton({
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
             </svg>
-            <span>Print to Rollo (Auto-print)</span>
+            <span>Open Shippo label PDF</span>
           </button>
           <p className="text-xs text-gray-500 text-center mt-1">
-            Print dialog will open automatically. Select Rollo printer and click Print.
+            PDF opens for printing—choose your Rollo printer if you use it for labels.
           </p>
           {shipment.carrier && (
             <div className="text-xs text-gray-600 space-y-1">
@@ -172,7 +172,7 @@ export default function ShippingLabelButton({
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
               </svg>
-              <span>Generate Shipping Label</span>
+              <span>Generate label (Shippo)</span>
             </>
           )}
         </button>

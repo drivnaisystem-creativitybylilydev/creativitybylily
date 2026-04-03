@@ -2,6 +2,7 @@ import { createAdminClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import MarkAsViewed from '@/components/admin/MarkAsViewed';
 import DeleteOrderButtonInline from '@/components/admin/DeleteOrderButtonInline';
+import ExportOpenOrderAddressesButton from '@/components/admin/ExportOpenOrderAddressesButton';
 
 /** Always fresh list (avoid stale empty state after new orders). */
 export const dynamic = 'force-dynamic';
@@ -28,11 +29,12 @@ export default async function AdminOrdersPage() {
   return (
     <div>
       <MarkAsViewed type="orders" ids={orderIds} />
-      <div className="mb-8 flex items-center justify-between">
+      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="text-3xl sm:text-4xl font-light text-gray-900 mb-2">Orders</h1>
           <p className="text-gray-600">Manage and track all customer orders</p>
         </div>
+        <ExportOpenOrderAddressesButton />
       </div>
 
       {/* Orders Table */}

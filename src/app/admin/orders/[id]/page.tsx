@@ -4,6 +4,7 @@ import Link from 'next/link';
 import OrderStatusUpdate from '@/components/admin/OrderStatusUpdate';
 import ShippingLabelButton from '@/components/admin/ShippingLabelButton';
 import DeleteOrderButton from '@/components/admin/DeleteOrderButton';
+import RolloAddressHelper from '@/components/admin/RolloAddressHelper';
 
 export default async function OrderDetailPage({
   params,
@@ -132,6 +133,12 @@ export default async function OrderDetailPage({
                 <p className="mt-2 text-sm text-gray-600">Phone: {shippingAddress.phone}</p>
               )}
             </div>
+            <RolloAddressHelper
+              shippingAddress={shippingAddress}
+              orderNumber={order.order_number}
+              customerEmail={order.customer_email}
+              customerPhone={order.customer_phone}
+            />
           </div>
         </div>
 
@@ -187,9 +194,13 @@ export default async function OrderDetailPage({
               </div>
             )}
 
-            {/* Shipping Label */}
+            {/* Optional Shippo label (Rollo-first copy tools are under Shipping Address) */}
             <div className="border-t border-gray-200 pt-6 mt-6">
-              <h3 className="font-semibold text-gray-900 mb-3">Shipping Label</h3>
+              <h3 className="font-semibold text-gray-900 mb-1">Label via Shippo (optional)</h3>
+              <p className="mb-3 text-xs text-gray-600 leading-relaxed">
+                Only if you want to buy a label here. If you use the Rollo app for USPS, skip this and use
+                &quot;Ship with Rollo app&quot; above so everything stays in one shipping flow.
+              </p>
               <ShippingLabelButton
                 orderId={id}
                 orderNumber={order.order_number}
