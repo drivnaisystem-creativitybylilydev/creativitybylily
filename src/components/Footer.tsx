@@ -129,9 +129,21 @@ export default function Footer() {
           </div>
           
           {/* Copyright */}
-          <p className="text-center text-gray-900 text-sm">
-            © {currentYear} Creativity by Lily. All rights reserved.
-          </p>
+          <div className="space-y-2 text-center text-sm text-gray-900">
+            <p>© {currentYear} Creativity by Lily. All rights reserved.</p>
+            <p className="text-gray-600">
+              Website powered by{' '}
+              <a
+                href="https://drivn-ai-website.vercel.app"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[color:var(--logo-pink)] underline decoration-[color:var(--logo-pink)]/40 underline-offset-2 transition-opacity hover:opacity-80"
+              >
+                Drivn.ai
+              </a>
+              .
+            </p>
+          </div>
         </div>
       </div>
     </footer>
