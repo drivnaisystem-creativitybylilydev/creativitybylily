@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/i18n/navigation';
 import { supabase } from '@/lib/supabase/client';
 import ConfirmModal from '@/components/admin/ConfirmModal';
 import Toast from '@/components/admin/Toast';

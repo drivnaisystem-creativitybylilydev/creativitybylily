@@ -1,5 +1,5 @@
 import { createServerClient } from '@/lib/supabase/server';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import Image from 'next/image';
 
 // Force dynamic rendering to prevent stale cache

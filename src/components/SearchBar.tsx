@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import { useRouter, Link } from '@/i18n/navigation';
+import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 
 interface SearchResult {
@@ -14,6 +14,8 @@ interface SearchResult {
 }
 
 export default function SearchBar() {
+  const t = useTranslations('search');
+  const tCommon = useTranslations('common');
   const [isExpanded, setIsExpanded] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
@@ -102,7 +104,7 @@ export default function SearchBar() {
         <button
           onClick={handleExpand}
           className="text-[color:var(--logo-pink)] hover:opacity-80 transition-opacity p-2"
-          aria-label="Search"
+          aria-label={tCommon('search')}
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -117,14 +119,16 @@ export default function SearchBar() {
             <div className="box-border max-w-full overflow-hidden rounded-lg border-2 border-[color:var(--logo-pink)] bg-white shadow-xl">
               <div className="flex items-center">
                 <div className="flex-1 relative">
-                  <label htmlFor="site-search-input" className="sr-only">Search products</label>
+                  <label htmlFor="site-search-input" className="sr-only">
+                    {t('inputLabel')}
+                  </label>
                   <input
                     ref={searchInputRef}
                     id="site-search-input"
                     type="search"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search products..."
+                    placeholder={t('placeholder')}
                     className="w-full px-4 py-3 pr-10 text-gray-900 placeholder-gray-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--logo-pink)] focus-visible:ring-inset"
                   />
                   {isSearching && (
@@ -136,7 +140,7 @@ export default function SearchBar() {
                 <button
                   type="submit"
                   className="px-4 py-3 bg-[color:var(--logo-pink)] text-white hover:opacity-90 transition-opacity"
-                  aria-label="Search"
+                  aria-label={tCommon('search')}
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -150,7 +154,7 @@ export default function SearchBar() {
                     setSearchQuery('');
                   }}
                   className="px-4 py-3 text-gray-600 hover:text-gray-900 transition-colors"
-                  aria-label="Close search"
+                  aria-label={tCommon('closeSearch')}
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -194,15 +198,15 @@ export default function SearchBar() {
                             type="submit"
                             className="text-sm text-[color:var(--logo-pink)] hover:opacity-80 font-medium w-full text-left"
                           >
-                            View all {results.length} results →
+                            {t('viewAll', { count: results.length })}
                           </button>
                         </div>
                       )}
                     </div>
                   ) : searchQuery.trim() && !isSearching ? (
                     <div className="p-6 text-center text-gray-500">
-                      <p>No products found</p>
-                      <p className="text-sm mt-1">Try a different search term</p>
+                      <p>{t('noResults')}</p>
+                      <p className="text-sm mt-1">{t('hint')}</p>
                     </div>
                   ) : null}
                 </div>

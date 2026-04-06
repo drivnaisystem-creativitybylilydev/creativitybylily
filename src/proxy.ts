@@ -1,17 +1,13 @@
-import { NextResponse } from 'next/server';
+import createMiddleware from 'next-intl/middleware';
 import type { NextRequest } from 'next/server';
+import { routing } from './i18n/routing';
+
+const intlMiddleware = createMiddleware(routing);
 
 export function proxy(request: NextRequest) {
-  // Protect admin routes
-  if (request.nextUrl.pathname.startsWith('/admin')) {
-    // For now, we'll handle auth in the page components
-    // Later we can add proper session checking here
-    return NextResponse.next();
-  }
-
-  return NextResponse.next();
+  return intlMiddleware(request);
 }
 
 export const config = {
-  matcher: '/admin/:path*',
+  matcher: ['/((?!api|admin|_next|_vercel|.*\\..*).*)'],
 };

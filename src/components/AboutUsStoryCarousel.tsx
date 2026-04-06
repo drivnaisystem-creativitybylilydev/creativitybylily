@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import { ABOUT_CAROUSEL_FILES } from '@/lib/aboutCarousel';
 
 /** Shown on the first slide only (overlay + richer alt text). */

@@ -1,0 +1,54 @@
+{
+  "common": {
+    "skipToMain": "Saltar al contenido principal",
+    "search": "Buscar",
+    "closeSearch": "Cerrar búsqueda",
+    "openMenu": "Abrir menú",
+    "closeMenu": "Cerrar menú",
+    "instagram": "Instagram",
+    "youtube": "YouTube",
+    "myAccount": "Mi cuenta",
+    "signIn": "Iniciar sesión",
+    "signUp": "Registrarse",
+    "menu": "Menú",
+    "brandName": "Creativity by Lily",
+    "brandAria": "Creativity by Lily",
+    "poweredBy": "Sitio impulsado por",
+    "drivnAi": "Drivn.ai"
+  },
+  "nav": {
+    "home": "Inicio",
+    "shop": "Tienda",
+    "events": "Eventos",
+    "about": "Nosotros",
+    "contact": "Contacto"
+  },
+  "footer": {
+    "tagline": "Joyería artesanal inspirada en la belleza de Cape Cod. Cada pieza está hecha con cariño y atención al detalle.",
+    "privacyPolicy": "Política de privacidad",
+    "quickLinks": "Enlaces rápidos",
+    "customerService": "Atención al cliente",
+    "followUs": "Síguenos",
+    "returns": "Devoluciones y cambios",
+    "myAccount": "Mi cuenta",
+    "contactUs": "Contáctanos",
+    "terms": "Términos del servicio",
+    "shipping": "Envíos",
+    "cookies": "Política de cookies",
+    "copyright": "© {year} Creativity by Lily. Todos los derechos reservados.",
+    "privacy": "Privacidad y accesibilidad"
+  },
+  "search": {
+    "inputLabel": "Buscar productos",
+    "placeholder": "Buscar productos…",
+    "viewAll": "Ver los {count} resultados →",
+    "noResults": "No se encontraron productos",
+    "hint": "Prueba con otro término de búsqueda"
+  },
+  "language": {
+    "label": "Idioma",
+    "en": "English",
+    "de": "Deutsch",
+    "es": "Español"
+  }
+}

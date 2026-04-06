@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import { galleryItems } from '@/data/gallery';
 import type { Product } from '@/lib/supabase/types';
 
