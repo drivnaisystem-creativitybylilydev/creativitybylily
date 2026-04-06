@@ -1,13 +1,13 @@
 export const metadata = {
-  title: 'Privacy Policy',
-  description: 'Privacy Policy for creativity by lily',
+  title: 'Privacy Policy & Accessibility',
+  description: 'Privacy Policy and accessibility information for creativity by lily',
 };
 
 export default function PrivacyPolicyPage() {
   return (
     <div className="min-h-screen bg-[#faf8f5] py-20">
       <div className="max-w-4xl mx-auto px-6">
-        <h1 className="font-serif text-5xl font-light text-gray-900 mb-8">Privacy Policy</h1>
+        <h1 className="font-serif text-5xl font-light text-gray-900 mb-8">Privacy Policy &amp; Accessibility</h1>
         <p className="text-sm text-gray-600 mb-12">Last updated: {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
 
         <div className="bg-white rounded-2xl shadow-sm p-8 md:p-12 space-y-8 prose prose-lg max-w-none">
@@ -120,9 +120,37 @@ export default function PrivacyPolicyPage() {
           </section>
 
           <section>
-            <h2 className="font-serif text-2xl font-light text-gray-900 mb-4">10. Contact Us</h2>
+            <h2 className="font-serif text-2xl font-light text-gray-900 mb-4">10. Accessibility</h2>
+            <p className="text-gray-700 leading-relaxed mb-4">
+              We want creativity by lily to be usable for as many people as possible, including those who rely on
+              keyboards, screen readers, or browser autofill. We have implemented improvements aligned with common{' '}
+              <abbr title="Web Content Accessibility Guidelines">WCAG</abbr> 2.1 practices, including:
+            </p>
+            <ul className="list-disc list-inside text-gray-700 space-y-2 ml-4 mb-4">
+              <li>A &quot;skip to main content&quot; link for keyboard users</li>
+              <li>Clear, on-page error messages on checkout and sign-in that are connected to the relevant fields for assistive technologies</li>
+              <li>Autocomplete support on shipping and contact forms where appropriate</li>
+              <li>Search with a proper label and visible keyboard focus</li>
+              <li>A pause control for the homepage slideshow, and a single main page heading structure on the home hero</li>
+              <li>Mobile menu and confirmation dialogs that support Escape to close and clearer roles for screen readers</li>
+              <li>Distinct page titles in the browser tab for major sections (e.g. shop, cart, checkout)</li>
+            </ul>
+            <p className="text-gray-700 leading-relaxed mb-4">
+              We may continue to improve accessibility over time. If you have trouble using any part of the site,
+              please email us using the contact information below and describe what you were trying to do—we will do
+              our best to help or provide the information in another format.
+            </p>
+            <p className="text-gray-700 leading-relaxed text-sm">
+              <strong>Note:</strong> No website can guarantee compliance with every law or standard, or freedom from
+              all legal risk. These steps reflect our commitment to inclusive design and are not a formal legal
+              certification or &quot;ADA guarantee.&quot;
+            </p>
+          </section>
+
+          <section>
+            <h2 className="font-serif text-2xl font-light text-gray-900 mb-4">11. Contact Us</h2>
             <p className="text-gray-700 leading-relaxed">
-              If you have any questions about this Privacy Policy, please contact us at:
+              If you have any questions about this Privacy Policy or accessibility, please contact us at:
             </p>
             <div className="mt-4 p-4 bg-gray-50 rounded-lg">
               <p className="text-gray-700">
