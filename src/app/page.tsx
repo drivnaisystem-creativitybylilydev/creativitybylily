@@ -1,7 +1,12 @@
+import type { Metadata } from 'next';
 import dynamic from "next/dynamic";
 import { Suspense } from "react";
 import HeroSection from "@/components/HeroSection";
 import AboutUsSection from "@/components/AboutUsSection";
+
+export const metadata: Metadata = {
+  title: 'Handcrafted Jewelry from Cape Cod',
+};
 
 const DynamicProductCarousel = dynamic(() => import("@/components/ProductCarousel"), { ssr: true });
 const DynamicCustomerFavorites = dynamic(() => import("@/components/CustomerFavorites"), { ssr: true });

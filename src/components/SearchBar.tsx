@@ -113,17 +113,19 @@ export default function SearchBar() {
       {/* Expanded Search Bar */}
       {isExpanded && (
         <div className="fixed left-3 right-3 top-[4.25rem] z-[90] w-auto max-w-[100%] sm:absolute sm:inset-auto sm:right-0 sm:top-0 sm:left-auto sm:w-96">
-          <form onSubmit={handleSubmit} className="relative box-border max-w-full">
+          <form onSubmit={handleSubmit} className="relative box-border max-w-full" role="search">
             <div className="box-border max-w-full overflow-hidden rounded-lg border-2 border-[color:var(--logo-pink)] bg-white shadow-xl">
               <div className="flex items-center">
                 <div className="flex-1 relative">
+                  <label htmlFor="site-search-input" className="sr-only">Search products</label>
                   <input
                     ref={searchInputRef}
-                    type="text"
+                    id="site-search-input"
+                    type="search"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search products..."
-                    className="w-full px-4 py-3 pr-10 text-gray-900 placeholder-gray-400 focus:outline-none"
+                    className="w-full px-4 py-3 pr-10 text-gray-900 placeholder-gray-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--logo-pink)] focus-visible:ring-inset"
                   />
                   {isSearching && (
                     <div className="absolute right-3 top-1/2 -translate-y-1/2">

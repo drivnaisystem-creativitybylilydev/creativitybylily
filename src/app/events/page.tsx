@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { createServerClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -5,6 +6,8 @@ import Image from 'next/image';
 // Force dynamic rendering to prevent stale cache
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
+
+export const metadata: Metadata = { title: 'Events' };
 
 export default async function EventsPage() {
   const supabase = createServerClient();

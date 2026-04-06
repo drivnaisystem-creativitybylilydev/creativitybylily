@@ -6,6 +6,10 @@ import Link from 'next/link';
 import Image from 'next/image';
 import type { Product } from '@/lib/supabase/types';
 
+// Page title — must be exported from the same module (no metadata from client layout files)
+// Defined in the default export's sibling server segment. Since this file is 'use client'
+// the title falls back to the root template ("creativity by lily"), which is acceptable here.
+
 function SearchContent() {
   const searchParams = useSearchParams();
   const router = useRouter();

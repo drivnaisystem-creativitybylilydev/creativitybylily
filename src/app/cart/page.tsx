@@ -4,6 +4,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useCart } from '@/contexts/CartContext';
 
+// metadata is defined in a companion server file; keep this a pure client component.
+
 export default function CartPage() {
   const { items, removeItem, updateQuantity, getTotalPrice, getTotalItems, clearCart } = useCart();
   const total = getTotalPrice();

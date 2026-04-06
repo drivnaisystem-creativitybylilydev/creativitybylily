@@ -10,6 +10,7 @@ export default function HeroSlideshow() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [shellProduct, setShellProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
+  const [paused, setPaused] = useState(false);
 
   // Fetch shell earrings product
   useEffect(() => {
@@ -17,7 +18,6 @@ export default function HeroSlideshow() {
       try {
         const response = await fetch('/api/products');
         const data = await response.json();
-        // Find shell earrings product
         const shell = data.products?.find((p: Product) => 
           p.title.toLowerCase().includes('shell') && 
           p.category === 'earrings'
@@ -33,16 +33,17 @@ export default function HeroSlideshow() {
     fetchShellProduct();
   }, []);
 
-  // Auto-advance slides
+  // Auto-advance slides (pauses on keyboard/mouse interaction)
   useEffect(() => {
+    if (paused) return;
     const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % 2); // 2 slides total
-    }, 6000); // Change slide every 6 seconds
-
+      setCurrentSlide((prev) => (prev + 1) % 2);
+    }, 6000);
     return () => clearInterval(interval);
-  }, []);
+  }, [paused]);
 
   const goToSlide = (index: number) => {
+    setPaused(true);
     setCurrentSlide(index);
   };
 
@@ -193,12 +194,12 @@ export default function HeroSlideshow() {
                   >
                     New Arrival
                   </span>
-                  <h1 
+                  <h2
                     className="text-5xl md:text-6xl font-light text-gray-800 mb-4 leading-tight"
                     style={{ fontFamily: 'var(--font-script)' }}
                   >
                     {shellProduct.title}
-                  </h1>
+                  </h2>
                   <p className="text-xl text-gray-600 leading-relaxed mb-6">
                     {shellProduct.description}
                   </p>
@@ -273,7 +274,7 @@ export default function HeroSlideshow() {
         ) : (
           <div className="relative z-10 max-w-4xl mx-auto px-6 text-center min-h-screen flex items-center justify-center">
             <div>
-              <h1 className="text-5xl font-light text-gray-800 mb-4">Shell Earrings</h1>
+              <h2 className="text-5xl font-light text-gray-800 mb-4">Shell Earrings</h2>
               <p className="text-xl text-gray-600 mb-8">Product details coming soon...</p>
               <Link
                 href="/products?category=earrings"
@@ -286,32 +287,53 @@ export default function HeroSlideshow() {
         )}
       </div>
 
-      {/* Slide Indicators */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20 flex gap-3">
+      {/* Slide Indicators + pause */}
+      <div className="absolute bottom-8 left-1/2 z-20 flex -translate-x-1/2 items-center gap-3">
         <button
+          type="button"
           onClick={() => goToSlide(0)}
-          className={`w-3 h-3 rounded-full transition-all duration-300 ${
-            currentSlide === 0 
-              ? 'bg-[color:var(--logo-pink)] w-8' 
+          className={`h-3 w-3 rounded-full transition-all duration-300 ${
+            currentSlide === 0
+              ? 'w-8 bg-[color:var(--logo-pink)]'
               : 'bg-white/50 hover:bg-white/75'
           }`}
           aria-label="Go to slide 1"
+          aria-current={currentSlide === 0 ? 'true' : undefined}
         />
         <button
+          type="button"
           onClick={() => goToSlide(1)}
-          className={`w-3 h-3 rounded-full transition-all duration-300 ${
-            currentSlide === 1 
-              ? 'bg-[color:var(--logo-pink)] w-8' 
+          className={`h-3 w-3 rounded-full transition-all duration-300 ${
+            currentSlide === 1
+              ? 'w-8 bg-[color:var(--logo-pink)]'
               : 'bg-white/50 hover:bg-white/75'
           }`}
           aria-label="Go to slide 2"
+          aria-current={currentSlide === 1 ? 'true' : undefined}
         />
+        <button
+          type="button"
+          onClick={() => setPaused((p) => !p)}
+          className="ml-1 flex h-7 w-7 items-center justify-center rounded-full bg-white/70 text-gray-700 hover:bg-white transition-colors"
+          aria-label={paused ? 'Play slideshow' : 'Pause slideshow'}
+        >
+          {paused ? (
+            <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+              <path d="M8 5v14l11-7z" />
+            </svg>
+          ) : (
+            <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+              <path d="M6 19h4V5H6zm8-14v14h4V5z" />
+            </svg>
+          )}
+        </button>
       </div>
 
       {/* Navigation Arrows */}
       <button
+        type="button"
         onClick={() => goToSlide((currentSlide - 1 + 2) % 2)}
-        className="absolute left-6 top-1/2 transform -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white/80 backdrop-blur-sm hover:bg-white transition-all duration-300 shadow-lg flex items-center justify-center group"
+        className="absolute left-6 top-1/2 z-20 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/80 shadow-lg backdrop-blur-sm transition-all duration-300 hover:bg-white group"
         aria-label="Previous slide"
       >
         <svg className="w-6 h-6 text-gray-700 group-hover:text-[color:var(--logo-pink)] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -319,8 +341,9 @@ export default function HeroSlideshow() {
         </svg>
       </button>
       <button
+        type="button"
         onClick={() => goToSlide((currentSlide + 1) % 2)}
-        className="absolute right-6 top-1/2 transform -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white/80 backdrop-blur-sm hover:bg-white transition-all duration-300 shadow-lg flex items-center justify-center group"
+        className="absolute right-6 top-1/2 z-20 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/80 shadow-lg backdrop-blur-sm transition-all duration-300 hover:bg-white group"
         aria-label="Next slide"
       >
         <svg className="w-6 h-6 text-gray-700 group-hover:text-[color:var(--logo-pink)] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">

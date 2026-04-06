@@ -120,11 +120,14 @@ export default function RootLayout({
       <body
         className={`${playfair.variable} ${inter.variable} ${script.variable} ${allura.variable} antialiased`}
       >
+        <a href="#main-content" className="skip-link">
+          Skip to main content
+        </a>
         <AuthErrorHandler />
         <CartProvider>
           <div className="flex min-h-dvh flex-col">
             <Header />
-            <main className="site-main w-full flex-1">{children}</main>
+            <main id="main-content" className="site-main w-full flex-1">{children}</main>
             <Footer />
           </div>
         </CartProvider>

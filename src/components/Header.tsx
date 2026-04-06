@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase/client';
@@ -56,6 +56,17 @@ export default function Header() {
       document.body.style.overflow = '';
     };
   }, [mobileOpen]);
+
+  const handleMenuKeyDown = useCallback((e: KeyboardEvent) => {
+    if (e.key === 'Escape') setMobileOpen(false);
+  }, []);
+
+  useEffect(() => {
+    if (mobileOpen) {
+      document.addEventListener('keydown', handleMenuKeyDown);
+      return () => document.removeEventListener('keydown', handleMenuKeyDown);
+    }
+  }, [mobileOpen, handleMenuKeyDown]);
 
   return (
     <header
@@ -121,7 +132,7 @@ export default function Header() {
                 <Link
                   href="/account"
                   className="text-[color:var(--logo-pink)] transition-opacity hover:opacity-80"
-                  title="My Account"
+                  aria-label="My account"
                 >
                   <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -151,7 +162,7 @@ export default function Header() {
 
       {/* Mobile drawer overlay — fixed so it is not clipped by overflow-x containment on main */}
       {mobileOpen && (
-        <div className="fixed inset-0 z-[100] md:hidden" role="dialog" aria-modal="true" aria-label="Site menu">
+        <div className="fixed inset-0 z-[100] md:hidden" role="dialog" aria-modal="true" aria-labelledby="mobile-menu-title">
           <button
             type="button"
             className="absolute inset-0 bg-black/40 backdrop-blur-[2px]"
@@ -163,7 +174,7 @@ export default function Header() {
             style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top))' }}
           >
             <div className="flex items-center justify-between border-b border-pink-200/80 px-3 py-3">
-              <span className="font-[family-name:var(--font-script)] text-lg text-[color:var(--logo-pink)]">Menu</span>
+              <span id="mobile-menu-title" className="font-[family-name:var(--font-script)] text-lg text-[color:var(--logo-pink)]">Menu</span>
               <button
                 type="button"
                 onClick={() => setMobileOpen(false)}

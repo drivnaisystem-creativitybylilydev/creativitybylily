@@ -27,6 +27,7 @@ export default function CheckoutPage() {
   const addressInputRef = useRef<HTMLInputElement | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [formError, setFormError] = useState<string | null>(null);
   const [shippingCost, setShippingCost] = useState<number | null>(null);
   const [isCalculatingShipping, setIsCalculatingShipping] = useState(false);
   const [shippingError, setShippingError] = useState<string | null>(null);
@@ -361,20 +362,19 @@ export default function CheckoutPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    setFormError(null);
+
     if (!validateForm()) {
       return;
     }
 
-    // If Shippo reported a shipping/address error, prevent checkout until it's fixed
     if (shippingError) {
-      alert(
-        `Please double-check your shipping address so we can generate a shipping label:\n\n${shippingError}`
-      );
+      setFormError(`Please double-check your shipping address: ${shippingError}`);
       return;
     }
 
     if (items.length === 0) {
-      alert('Your cart is empty!');
+      setFormError('Your cart is empty.');
       router.push('/products');
       return;
     }
@@ -479,8 +479,9 @@ export default function CheckoutPage() {
       const data = await response.json();
       if (!response.ok) {
         if (data.error === 'Insufficient inventory' && data.details) {
-          const inventoryErrors = Array.isArray(data.details) ? data.details.join('\n') : data.details;
-          alert(`${data.message || 'Some items are no longer available:'}\n\n${inventoryErrors}\n\nPlease update your cart and try again.`);
+          const inventoryErrors = Array.isArray(data.details) ? data.details.join(' · ') : data.details;
+          setFormError(`${data.message || 'Some items are no longer available:'} ${inventoryErrors} Please update your cart and try again.`);
+          setIsProcessing(false);
           window.location.reload();
           return;
         }
@@ -492,7 +493,7 @@ export default function CheckoutPage() {
       router.push(`/checkout/confirmation?order=${data.orderNumber}`);
     } catch (error) {
       console.error('Checkout error:', error);
-      alert('There was an error processing your order. Please try again.');
+      setFormError('There was an error processing your order. Please try again.');
       setIsProcessing(false);
     }
   };
@@ -537,14 +538,17 @@ export default function CheckoutPage() {
                     type="email"
                     id="email"
                     name="email"
+                    autoComplete="email"
                     value={formData.email}
                     onChange={handleInputChange}
+                    aria-invalid={!!errors.email}
+                    aria-describedby={errors.email ? 'email-error' : undefined}
                     className={`w-full px-4 py-3 border-2 rounded-lg text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-[color:var(--logo-pink)] focus:border-[color:var(--logo-pink)] transition-all ${
                       errors.email ? 'border-red-500' : 'border-gray-300'
                     }`}
                     placeholder="your@email.com"
                   />
-                  {errors.email && <p className="text-red-600 text-sm mt-1 font-medium">{errors.email}</p>}
+                  {errors.email && <p id="email-error" className="text-red-600 text-sm mt-1 font-medium" role="alert">{errors.email}</p>}
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
@@ -556,13 +560,16 @@ export default function CheckoutPage() {
                       type="text"
                       id="firstName"
                       name="firstName"
+                      autoComplete="given-name"
                       value={formData.firstName}
                       onChange={handleInputChange}
+                      aria-invalid={!!errors.firstName}
+                      aria-describedby={errors.firstName ? 'firstName-error' : undefined}
                       className={`w-full px-4 py-3 border-2 rounded-lg text-gray-900 focus:ring-2 focus:ring-[color:var(--logo-pink)] focus:border-[color:var(--logo-pink)] transition-all ${
                         errors.firstName ? 'border-red-500' : 'border-gray-300'
                       }`}
                     />
-                    {errors.firstName && <p className="text-red-600 text-sm mt-1 font-medium">{errors.firstName}</p>}
+                    {errors.firstName && <p id="firstName-error" className="text-red-600 text-sm mt-1 font-medium" role="alert">{errors.firstName}</p>}
                   </div>
                   <div>
                     <label htmlFor="lastName" className="block text-sm font-semibold text-gray-900 mb-2">
@@ -572,13 +579,16 @@ export default function CheckoutPage() {
                       type="text"
                       id="lastName"
                       name="lastName"
+                      autoComplete="family-name"
                       value={formData.lastName}
                       onChange={handleInputChange}
+                      aria-invalid={!!errors.lastName}
+                      aria-describedby={errors.lastName ? 'lastName-error' : undefined}
                       className={`w-full px-4 py-3 border-2 rounded-lg text-gray-900 focus:ring-2 focus:ring-[color:var(--logo-pink)] focus:border-[color:var(--logo-pink)] transition-all ${
                         errors.lastName ? 'border-red-500' : 'border-gray-300'
                       }`}
                     />
-                    {errors.lastName && <p className="text-red-600 text-sm mt-1 font-medium">{errors.lastName}</p>}
+                    {errors.lastName && <p id="lastName-error" className="text-red-600 text-sm mt-1 font-medium" role="alert">{errors.lastName}</p>}
                   </div>
                 </div>
 
@@ -590,15 +600,18 @@ export default function CheckoutPage() {
                     type="text"
                     id="address"
                     name="address"
+                    autoComplete="street-address"
                     ref={addressInputRef}
                     value={formData.address}
                     onChange={handleInputChange}
+                    aria-invalid={!!errors.address}
+                    aria-describedby={errors.address ? 'address-error' : undefined}
                     className={`w-full px-4 py-3 border-2 rounded-lg text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-[color:var(--logo-pink)] focus:border-[color:var(--logo-pink)] transition-all ${
                       errors.address ? 'border-red-500' : 'border-gray-300'
                     }`}
                     placeholder="Street address"
                   />
-                  {errors.address && <p className="text-red-600 text-sm mt-1 font-medium">{errors.address}</p>}
+                  {errors.address && <p id="address-error" className="text-red-600 text-sm mt-1 font-medium" role="alert">{errors.address}</p>}
                 </div>
 
                 <div>
@@ -609,6 +622,7 @@ export default function CheckoutPage() {
                     type="text"
                     id="address2"
                     name="address2"
+                    autoComplete="address-line2"
                     value={formData.address2}
                     onChange={handleInputChange}
                     className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-[color:var(--logo-pink)] focus:border-[color:var(--logo-pink)] transition-all"
@@ -625,13 +639,16 @@ export default function CheckoutPage() {
                       type="text"
                       id="city"
                       name="city"
+                      autoComplete="address-level2"
                       value={formData.city}
                       onChange={handleInputChange}
+                      aria-invalid={!!errors.city}
+                      aria-describedby={errors.city ? 'city-error' : undefined}
                       className={`w-full px-4 py-3 border-2 rounded-lg text-gray-900 focus:ring-2 focus:ring-[color:var(--logo-pink)] focus:border-[color:var(--logo-pink)] transition-all ${
                         errors.city ? 'border-red-500' : 'border-gray-300'
                       }`}
                     />
-                    {errors.city && <p className="text-red-600 text-sm mt-1 font-medium">{errors.city}</p>}
+                    {errors.city && <p id="city-error" className="text-red-600 text-sm mt-1 font-medium" role="alert">{errors.city}</p>}
                   </div>
                   <div>
                     <label htmlFor="state" className="block text-sm font-semibold text-gray-900 mb-2">
@@ -640,8 +657,11 @@ export default function CheckoutPage() {
                     <select
                       id="state"
                       name="state"
+                      autoComplete="address-level1"
                       value={formData.state}
                       onChange={handleInputChange}
+                      aria-invalid={!!errors.state}
+                      aria-describedby={errors.state ? 'state-error' : undefined}
                       className={`w-full px-4 py-3 border-2 rounded-lg text-gray-900 bg-white focus:ring-2 focus:ring-[color:var(--logo-pink)] focus:border-[color:var(--logo-pink)] transition-all ${
                         errors.state ? 'border-red-500' : 'border-gray-300'
                       }`}
@@ -698,7 +718,7 @@ export default function CheckoutPage() {
                       <option value="WI">Wisconsin</option>
                       <option value="WY">Wyoming</option>
                     </select>
-                    {errors.state && <p className="text-red-600 text-sm mt-1 font-medium">{errors.state}</p>}
+                    {errors.state && <p id="state-error" className="text-red-600 text-sm mt-1 font-medium" role="alert">{errors.state}</p>}
                   </div>
                 </div>
 
@@ -711,14 +731,17 @@ export default function CheckoutPage() {
                       type="text"
                       id="zip"
                       name="zip"
+                      autoComplete="postal-code"
                       value={formData.zip}
                       onChange={handleInputChange}
+                      aria-invalid={!!errors.zip}
+                      aria-describedby={errors.zip ? 'zip-error' : undefined}
                       className={`w-full px-4 py-3 border-2 rounded-lg text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-[color:var(--logo-pink)] focus:border-[color:var(--logo-pink)] transition-all ${
                         errors.zip ? 'border-red-500' : 'border-gray-300'
                       }`}
                       placeholder="12345"
                     />
-                    {errors.zip && <p className="text-red-600 text-sm mt-1 font-medium">{errors.zip}</p>}
+                    {errors.zip && <p id="zip-error" className="text-red-600 text-sm mt-1 font-medium" role="alert">{errors.zip}</p>}
                   </div>
                   <div>
                     <label htmlFor="phone" className="block text-sm font-semibold text-gray-900 mb-2">
@@ -728,14 +751,17 @@ export default function CheckoutPage() {
                       type="tel"
                       id="phone"
                       name="phone"
+                      autoComplete="tel"
                       value={formData.phone}
                       onChange={handleInputChange}
+                      aria-invalid={!!errors.phone}
+                      aria-describedby={errors.phone ? 'phone-error' : undefined}
                       className={`w-full px-4 py-3 border-2 rounded-lg text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-[color:var(--logo-pink)] focus:border-[color:var(--logo-pink)] transition-all ${
                         errors.phone ? 'border-red-500' : 'border-gray-300'
                       }`}
                       placeholder="(555) 123-4567"
                     />
-                    {errors.phone && <p className="text-red-600 text-sm mt-1 font-medium">{errors.phone}</p>}
+                    {errors.phone && <p id="phone-error" className="text-red-600 text-sm mt-1 font-medium" role="alert">{errors.phone}</p>}
                   </div>
                 </div>
               </div>
@@ -881,6 +907,12 @@ export default function CheckoutPage() {
                   </span>
                 </div>
               </div>
+
+              {formError && (
+                <div role="alert" className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4">
+                  <p className="text-sm font-medium text-red-800">{formError}</p>
+                </div>
+              )}
 
               <button
                 type="submit"
