@@ -1,59 +1,110 @@
 import { createAdminClient } from '@/lib/supabase/server';
-import Link from 'next/link';
+import { resolveCustomerFromOrder } from '@/lib/orders/customerFromOrder';
+
+export const dynamic = 'force-dynamic';
+
+const PAGE_SIZE = 1000;
+
+type OrderRow = {
+  customer_email: string | null;
+  customer_first_name: string | null;
+  customer_last_name: string | null;
+  customer_phone: string | null;
+  shipping_address: unknown;
+  total: number | string | null;
+};
+
+async function fetchAllOrdersForCustomers(supabase: ReturnType<typeof createAdminClient>) {
+  const rows: OrderRow[] = [];
+  let from = 0;
+
+  for (;;) {
+    const { data, error } = await supabase
+      .from('orders')
+      .select('customer_email, customer_first_name, customer_last_name, customer_phone, shipping_address, total')
+      .order('created_at', { ascending: false })
+      .range(from, from + PAGE_SIZE - 1);
+
+    if (error) {
+      return { rows: null as OrderRow[] | null, error };
+    }
+
+    const batch = (data || []) as OrderRow[];
+    rows.push(...batch);
+    if (batch.length < PAGE_SIZE) break;
+    from += PAGE_SIZE;
+  }
+
+  return { rows, error: null as null };
+}
 
 export default async function AdminCustomersPage() {
   const supabase = createAdminClient();
 
-  // Get unique customers from orders
-  const { data: orders } = await supabase
-    .from('orders')
-    .select('customer_email, customer_first_name, customer_last_name, customer_phone')
-    .not('customer_email', 'is', null);
+  const { rows: orders, error } = await fetchAllOrdersForCustomers(supabase);
 
-  // Group by email to get unique customers
-  const customerMap = new Map();
-  orders?.forEach((order: any) => {
-    if (order.customer_email && !customerMap.has(order.customer_email)) {
-      customerMap.set(order.customer_email, {
-        email: order.customer_email,
-        firstName: order.customer_first_name,
-        lastName: order.customer_last_name,
-        phone: order.customer_phone,
-        orderCount: 1,
-      });
-    } else if (order.customer_email) {
-      const customer = customerMap.get(order.customer_email);
-      customer.orderCount += 1;
+  if (error) {
+    return (
+      <div>
+        <div className="mb-8">
+          <h1 className="mb-2 text-3xl font-light text-gray-900 sm:text-4xl">Customers</h1>
+          <p className="text-gray-600">View and manage your customer database</p>
+        </div>
+        <div className="rounded-lg border border-red-200 bg-red-50 p-4">
+          <p className="text-red-800">Error loading orders: {error.message}</p>
+        </div>
+      </div>
+    );
+  }
+
+  const customerMap = new Map<
+    string,
+    {
+      email: string;
+      firstName: string;
+      lastName: string;
+      phone: string;
+      orderCount: number;
+      totalSpent: number;
     }
-  });
+  >();
+
+  for (const order of orders || []) {
+    const resolved = resolveCustomerFromOrder(order);
+    if (!resolved) continue;
+
+    const total = Number(order.total ?? 0);
+    const existing = customerMap.get(resolved.email);
+    if (!existing) {
+      customerMap.set(resolved.email, {
+        email: resolved.email,
+        firstName: resolved.firstName,
+        lastName: resolved.lastName,
+        phone: resolved.phone,
+        orderCount: 1,
+        totalSpent: total,
+      });
+    } else {
+      existing.orderCount += 1;
+      existing.totalSpent += total;
+      if (!existing.firstName && resolved.firstName) existing.firstName = resolved.firstName;
+      if (!existing.lastName && resolved.lastName) existing.lastName = resolved.lastName;
+      if (!existing.phone && resolved.phone) existing.phone = resolved.phone;
+    }
+  }
 
   const customers = Array.from(customerMap.values());
-
-  // Get total spent per customer
-  const { data: allOrders } = await supabase
-    .from('orders')
-    .select('customer_email, total')
-    .not('customer_email', 'is', null);
-
-  customers.forEach((customer) => {
-    const customerOrders = allOrders?.filter(
-      (o: any) => o.customer_email === customer.email
-    ) || [];
-    customer.totalSpent = customerOrders.reduce(
-      (sum: number, o: any) => sum + Number(o.total),
-      0
-    );
-  });
 
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-3xl sm:text-4xl font-light text-gray-900 mb-2">Customers</h1>
-        <p className="text-gray-600">View and manage your customer database</p>
+        <h1 className="mb-2 text-3xl font-light text-gray-900 sm:text-4xl">Customers</h1>
+        <p className="text-gray-600">
+          Unique buyers derived from orders (email from order fields or shipping address).
+        </p>
       </div>
 
-      {/* Customers Table */}
-      <div className="min-w-0 max-w-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+      <div className="max-w-full min-w-0 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
         {customers.length > 0 ? (
           <div className="min-w-0 p-2 sm:p-0">
             <table className="admin-table-stack w-full">
@@ -77,25 +128,25 @@ export default async function AdminCustomersPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 bg-white">
-                {customers.map((customer: any) => (
+                {customers.map((customer) => (
                   <tr key={customer.email} className="hover:bg-gray-50">
                     <td className="px-4 py-4 sm:px-6" data-label="Name">
                       <div className="text-sm font-medium text-gray-900">
-                        {customer.firstName} {customer.lastName}
+                        {[customer.firstName, customer.lastName].filter(Boolean).join(' ') || '—'}
                       </div>
                     </td>
                     <td className="px-4 py-4 sm:px-6" data-label="Email">
                       <div className="break-anywhere text-sm text-gray-900">{customer.email}</div>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap sm:px-6" data-label="Phone">
-                      <div className="text-sm text-gray-600">{customer.phone || '-'}</div>
+                      <div className="text-sm text-gray-600">{customer.phone || '—'}</div>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap sm:px-6" data-label="Orders">
                       <div className="text-sm font-medium text-gray-900">{customer.orderCount}</div>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap sm:px-6" data-label="Total Spent">
                       <div className="text-sm font-semibold text-[color:var(--logo-pink)]">
-                        ${customer.totalSpent?.toFixed(2) || '0.00'}
+                        ${customer.totalSpent.toFixed(2)}
                       </div>
                     </td>
                   </tr>
@@ -105,19 +156,15 @@ export default async function AdminCustomersPage() {
           </div>
         ) : (
           <div className="p-12 text-center text-gray-500">
-            <p className="text-lg mb-2">No customers yet</p>
-            <p className="text-sm">Customers will appear here after they place orders.</p>
+            <p className="mb-2 text-lg">No customers yet</p>
+            <p className="text-sm">
+              We could not find an email on any order (neither saved customer columns nor{' '}
+              <code className="rounded bg-gray-100 px-1">shipping_address</code>). If you expect buyers here, run the
+              diagnostic SQL in <code className="rounded bg-gray-100 px-1">supabase/diagnose-customers-from-orders.sql</code>.
+            </p>
           </div>
         )}
       </div>
     </div>
   );
 }
-
-
-
-
-
-
-
-
