@@ -31,7 +31,8 @@ export default function OrderStatusUpdate({
         setStatus(newStatus);
         router.refresh();
       } else {
-        alert('Failed to update order status');
+        const data = await response.json().catch(() => ({}));
+        alert((data as { error?: string }).error || 'Failed to update order status');
       }
     } catch (error) {
       console.error('Error updating status:', error);
@@ -49,6 +50,11 @@ export default function OrderStatusUpdate({
     { value: 'cancelled', label: 'Cancelled', color: 'bg-red-100 text-red-800' },
   ];
 
+  /** Use the Tracking card to mark shipped (requires tracking + sends email). */
+  const selectableOptions = statusOptions.filter(
+    (o) => o.value !== 'shipped' || currentStatus === 'shipped'
+  );
+
   return (
     <div className="flex items-center gap-3">
       <label className="text-sm font-medium text-gray-700">Status:</label>
@@ -60,7 +66,7 @@ export default function OrderStatusUpdate({
           statusOptions.find((opt) => opt.value === status)?.color || ''
         } ${isUpdating ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
       >
-        {statusOptions.map((option) => (
+        {selectableOptions.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}
           </option>

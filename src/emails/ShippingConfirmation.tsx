@@ -23,6 +23,7 @@ export const ShippingConfirmationEmail = ({
   siteUrl = 'https://creativitybylilyco.com',
 }: ShippingConfirmationProps) => {
   const url = getEmailSiteUrl(siteUrl);
+  const hasTracking = Boolean(trackingNumber?.trim());
   return (
     <EmailLayout siteUrl={siteUrl}>
       <Section style={emailStyles.content}>
@@ -35,14 +36,35 @@ export const ShippingConfirmationEmail = ({
 
       <Section style={emailStyles.addressBox}>
         <Text style={emailStyles.sectionHeading}>Tracking Information</Text>
-        <Text style={trackingNumberStyle}><strong>Tracking Number:</strong> {trackingNumber}</Text>
-        {carrier && <Text style={emailStyles.paragraph}><strong>Carrier:</strong> {carrier.toUpperCase()}</Text>}
-        {estimatedDelivery && <Text style={emailStyles.paragraph}><strong>Estimated Delivery:</strong> {estimatedDelivery}</Text>}
-        <Text style={emailStyles.paragraph}>
-          <Link href={`https://tools.usps.com/go/TrackConfirmAction?tLabels=${trackingNumber}`} style={trackingLink}>
-            Track Your Package →
-          </Link>
-        </Text>
+        {hasTracking ? (
+          <>
+            <Text style={trackingNumberStyle}>
+              <strong>Tracking Number:</strong> {trackingNumber.trim()}
+            </Text>
+            {carrier && (
+              <Text style={emailStyles.paragraph}>
+                <strong>Carrier:</strong> {carrier.toUpperCase()}
+              </Text>
+            )}
+            {estimatedDelivery && (
+              <Text style={emailStyles.paragraph}>
+                <strong>Estimated Delivery:</strong> {estimatedDelivery}
+              </Text>
+            )}
+            <Text style={emailStyles.paragraph}>
+              <Link
+                href={`https://tools.usps.com/go/TrackConfirmAction?tLabels=${encodeURIComponent(trackingNumber.trim())}`}
+                style={trackingLink}
+              >
+                Track Your Package →
+              </Link>
+            </Text>
+          </>
+        ) : (
+          <Text style={emailStyles.paragraph}>
+            Your tracking number will appear in your account shortly, or we will email you again if needed.
+          </Text>
+        )}
       </Section>
 
       <Section style={{ padding: '0 24px' }}>

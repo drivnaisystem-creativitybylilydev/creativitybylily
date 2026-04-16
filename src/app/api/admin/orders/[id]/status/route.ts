@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
 import { sendShippingConfirmationEmail } from '@/lib/email';
 
+const VALID_STATUSES = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'] as const;
+type OrderStatus = (typeof VALID_STATUSES)[number];
+
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -11,19 +14,16 @@ export async function PATCH(
     const body = await request.json();
     const { status } = body;
 
-    if (!status || !['pending', 'processing', 'shipped', 'delivered', 'cancelled'].includes(status)) {
-      return NextResponse.json(
-        { error: 'Invalid status' },
-        { status: 400 }
-      );
+    if (!status || !(VALID_STATUSES as readonly string[]).includes(status)) {
+      return NextResponse.json({ error: 'Invalid status' }, { status: 400 });
     }
 
     const supabase = createAdminClient();
 
-    // Get order details before updating (for email)
-    const { data: orderData } = await supabase
+    const { data: orderData, error: fetchError } = await supabase
       .from('orders')
-      .select(`
+      .select(
+        `
         *,
         order_items (
           quantity,
@@ -31,29 +31,55 @@ export async function PATCH(
             title
           )
         )
-      `)
+      `
+      )
       .eq('id', id)
       .single();
 
-    const { error } = await supabase
-      .from('orders')
-      .update({ status })
-      .eq('id', id);
+    if (fetchError || !orderData) {
+      return NextResponse.json({ error: 'Order not found' }, { status: 404 });
+    }
 
-    if (error) {
-      console.error('Error updating order status:', error);
+    const previousStatus = orderData.status as OrderStatus;
+    const isBecomingShipped = status === 'shipped' && previousStatus !== 'shipped';
+
+    const storedTracking = (orderData.tracking_number as string | null)?.trim() || '';
+    let trackingFromBody = '';
+    if ('tracking_number' in body) {
+      const raw = body.tracking_number;
+      trackingFromBody = typeof raw === 'string' ? raw.trim() : '';
+    }
+    const mergedTracking = trackingFromBody || storedTracking;
+
+    if (isBecomingShipped && !mergedTracking) {
       return NextResponse.json(
-        { error: 'Failed to update order status' },
-        { status: 500 }
+        {
+          error:
+            'A tracking number is required when marking an order as shipped. Enter it above, then try again.',
+        },
+        { status: 400 }
       );
     }
 
-    // Send shipping confirmation email when status is set to 'shipped'
-    if (status === 'shipped' && orderData) {
+    const updatePayload: { status: OrderStatus; tracking_number?: string | null } = { status };
+    if ('tracking_number' in body) {
+      const raw = body.tracking_number;
+      updatePayload.tracking_number =
+        typeof raw === 'string' && raw.trim() ? raw.trim() : null;
+    }
+
+    const { error } = await supabase.from('orders').update(updatePayload).eq('id', id);
+
+    if (error) {
+      console.error('Error updating order status:', error);
+      return NextResponse.json({ error: 'Failed to update order status' }, { status: 500 });
+    }
+
+    const shouldSendShippedEmail = status === 'shipped' && previousStatus !== 'shipped';
+
+    if (shouldSendShippedEmail) {
       try {
         const order = orderData as any;
-        const trackingNumber = order.tracking_number || '';
-        
         const emailItems = (order.order_items || []).map((item: any) => ({
           productTitle: item.products?.title || 'Product',
           quantity: item.quantity,
@@ -61,15 +87,15 @@ export async function PATCH(
 
         await sendShippingConfirmationEmail({
           orderNumber: order.order_number,
-          customerName: `${order.customer_first_name || ''} ${order.customer_last_name || ''}`.trim() || 'Customer',
+          customerName:
+            `${order.customer_first_name || ''} ${order.customer_last_name || ''}`.trim() || 'Customer',
           customerEmail: order.customer_email,
-          trackingNumber: trackingNumber,
-          carrier: undefined, // Can be added later if stored
-          estimatedDelivery: undefined, // Can be added later if calculated
+          trackingNumber: mergedTracking,
+          carrier: undefined,
+          estimatedDelivery: undefined,
           items: emailItems,
         });
       } catch (emailError) {
-        // Don't fail the status update if email fails, just log it
         console.error('Error sending shipping confirmation email:', emailError);
       }
     }
@@ -77,17 +103,6 @@ export async function PATCH(
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error in status update:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
-
-
-
-
-
-
-
-

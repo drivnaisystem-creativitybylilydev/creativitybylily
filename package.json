@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
+    "dev:local": "next dev --turbopack -p 3000",
+    "dev:w": "next dev --webpack -p 3000",
     "gallery": "node scripts/generate-gallery.js",
     "build": "next build --turbopack",
     "start": "next start",

@@ -2,6 +2,7 @@ import { createAdminClient } from '@/lib/supabase/server';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import OrderStatusUpdate from '@/components/admin/OrderStatusUpdate';
+import OrderTrackingFulfillment from '@/components/admin/OrderTrackingFulfillment';
 import ShippingLabelButton from '@/components/admin/ShippingLabelButton';
 import DeleteOrderButton from '@/components/admin/DeleteOrderButton';
 import RolloAddressHelper from '@/components/admin/RolloAddressHelper';
@@ -191,6 +192,14 @@ export default async function OrderDetailPage({
               </div>
             </div>
 
+            <OrderTrackingFulfillment
+              orderId={id}
+              initialTracking={order.tracking_number}
+              currentStatus={order.status as 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled'}
+              shipmentCarrier={shipment?.carrier ?? null}
+              shipmentTrackingStatus={shipment?.tracking_status ?? null}
+            />
+
             {/* Payment Info */}
             {order.payment_intent_id && (
               <div className="border-t border-gray-200 pt-6 mt-6">
@@ -230,28 +239,6 @@ export default async function OrderDetailPage({
                 />
               </div>
             ) : null}
-
-            {/* Tracking */}
-            {order.tracking_number && (
-              <div className="border-t border-gray-200 pt-6 mt-6">
-                <h3 className="font-semibold text-gray-900 mb-3">Tracking Number</h3>
-                <p className="text-sm text-gray-600 font-mono break-all">{order.tracking_number}</p>
-                {shipment?.carrier && (
-                  <p className="text-xs text-gray-500 mt-1">Carrier: {shipment.carrier.toUpperCase()}</p>
-                )}
-                {shipment?.tracking_status && (
-                  <p className="text-xs text-gray-500">Status: {shipment.tracking_status}</p>
-                )}
-                <a
-                  href={`https://tools.usps.com/go/TrackConfirmAction?tLabels=${order.tracking_number}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-blue-600 hover:underline mt-2 inline-block"
-                >
-                  Track Package →
-                </a>
-              </div>
-            )}
           </div>
         </div>
       </div>

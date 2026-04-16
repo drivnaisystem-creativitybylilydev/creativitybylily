@@ -213,7 +213,7 @@ export async function POST(request: Request) {
     );
   }
 
-  let body: { to?: string; type?: string };
+  let body: { to?: string; type?: string; trackingNumber?: string; orderNumber?: string };
   try {
     body = await request.json();
   } catch {
@@ -221,6 +221,14 @@ export async function POST(request: Request) {
   }
   const to = (body.to || '').trim();
   const emailType = body.type || 'order';
+  const shippingTestTracking =
+    typeof body.trackingNumber === 'string' && body.trackingNumber.trim()
+      ? body.trackingNumber.trim()
+      : undefined;
+  const shippingTestOrderNumber =
+    typeof body.orderNumber === 'string' && body.orderNumber.trim()
+      ? body.orderNumber.trim()
+      : undefined;
   if (!to) {
     return NextResponse.json({ error: 'Body must include "to" (email address)' }, { status: 400 });
   }
@@ -281,7 +289,7 @@ export async function POST(request: Request) {
   const subjects: Record<string, string> = {
     order: `Order Confirmation - ${sampleData.orderNumber} | creativity by lily`,
     'admin-new-order': `New order: ${sampleData.orderNumber} | creativity by lily`,
-    shipping: `Your Order Has Shipped - ${sampleData.orderNumber} | creativity by lily`,
+    shipping: `Your Order Has Shipped - ${shippingTestOrderNumber ?? sampleData.orderNumber} | creativity by lily`,
     'return-request': `Return Request Received - ${sampleData.returnNumber} | creativity by lily`,
     'return-approved': `Return Approved - ${sampleData.returnNumber} | creativity by lily`,
     refund: `Refund Processed - ${sampleData.returnNumber} | creativity by lily`,
@@ -340,9 +348,9 @@ export async function POST(request: Request) {
       case 'shipping':
         emailHtml = await render(
           ShippingConfirmationEmail({
-            orderNumber: sampleData.orderNumber,
+            orderNumber: shippingTestOrderNumber ?? sampleData.orderNumber,
             customerName: sampleData.customerName,
-            trackingNumber: sampleData.trackingNumber,
+            trackingNumber: shippingTestTracking ?? sampleData.trackingNumber,
             carrier: sampleData.carrier,
             estimatedDelivery: sampleData.estimatedDelivery,
             items: sampleData.items.map((item) => ({ productTitle: item.productTitle, quantity: item.quantity })),
