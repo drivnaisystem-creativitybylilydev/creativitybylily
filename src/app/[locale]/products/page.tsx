@@ -14,6 +14,7 @@ import ProductCardImageHover from '@/components/ProductCardImageHover';
 import ScrollReveal from '@/components/ScrollReveal';
 import { useBestsellerProductIds } from '@/hooks/useBestsellerProductIds';
 import { sunhoneyProductNameClass, sunhoneyProductPriceClass } from '@/lib/productDisplayStyle';
+import { productHasVariants } from '@/lib/products/variants';
 import { normalizeProductGalleryUrls } from '@/lib/productGalleryUrls';
 
 const SORT_OPTIONS = [
@@ -119,7 +120,14 @@ function ProductsListingCard({ product, isBestseller }: { product: Product; isBe
           >
             Details
           </Link>
-          {(product.inventory_count || 0) > 0 ? (
+          {productHasVariants(product) ? (
+            <Link
+              href={`/products/${product.slug}`}
+              className="bg-[color:var(--logo-pink)] px-3 py-2 text-center text-[10px] font-medium uppercase tracking-wider text-white transition-opacity hover:opacity-90 min-[480px]:flex-1 sm:px-4 sm:text-xs"
+            >
+              Choose options
+            </Link>
+          ) : (product.inventory_count || 0) > 0 ? (
             <button
               type="button"
               onClick={() => addItem(product, 1)}

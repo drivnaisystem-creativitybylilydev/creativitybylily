@@ -2,6 +2,7 @@ import { createAdminClient } from '@/lib/supabase/server';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import ReturnStatusUpdate from '@/components/admin/ReturnStatusUpdate';
+import OrderItemOptionLabel from '@/components/admin/OrderItemOptionLabel';
 
 export default async function ReturnDetailPage({
   params,
@@ -24,7 +25,8 @@ export default async function ReturnDetailPage({
             id,
             title,
             image_url,
-            price
+            price,
+            variants
           )
         )
       )
@@ -125,6 +127,11 @@ export default async function ReturnDetailPage({
                       <p className="text-sm font-semibold text-gray-900 truncate mb-1">
                         {product?.title || 'Product'}
                       </p>
+                      <OrderItemOptionLabel
+                        variants={product?.variants}
+                        variantId={orderItem?.variant_id}
+                        className="mb-1"
+                      />
                       <p className="text-xs text-gray-600 mb-2">Quantity: {item.quantity || 1}</p>
                       <p className="text-base font-bold text-[color:var(--logo-pink)]">
                         ${((item.price || 0) * (item.quantity || 1)).toFixed(2)}
