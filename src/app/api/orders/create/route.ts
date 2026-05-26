@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
 import { sendOrderConfirmationEmail, sendAdminNewOrderNotification } from '@/lib/email';
+import { resolveVariantName } from '@/lib/orders/resolveVariantName';
 
 export async function POST(request: Request) {
   try {
@@ -226,11 +227,7 @@ export async function POST(request: Request) {
 
       if (orderItemsWithProducts) {
         const emailItems = orderItemsWithProducts.map((item: any) => {
-          const variants =
-            (item.products?.variants as Array<{ id: string; name: string }> | null) || [];
-          const variantName = item.variant_id
-            ? variants.find((v) => v.id === item.variant_id)?.name ?? null
-            : null;
+          const variantName = resolveVariantName(item.products?.variants, item.variant_id);
           return {
             productId: item.products.id,
             productTitle: item.products.title,

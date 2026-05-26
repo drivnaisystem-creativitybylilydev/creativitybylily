@@ -6,6 +6,7 @@ import OrderTrackingFulfillment from '@/components/admin/OrderTrackingFulfillmen
 import ShippingLabelButton from '@/components/admin/ShippingLabelButton';
 import DeleteOrderButton from '@/components/admin/DeleteOrderButton';
 import RolloAddressHelper from '@/components/admin/RolloAddressHelper';
+import { resolveVariantName } from '@/lib/orders/resolveVariantName';
 
 export default async function OrderDetailPage({
   params,
@@ -35,7 +36,8 @@ export default async function OrderDetailPage({
         id,
         title,
         image_url,
-        price
+        price,
+        variants
       )
     `)
     .eq('order_id', id);
@@ -96,7 +98,9 @@ export default async function OrderDetailPage({
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Order Items</h2>
             <div className="space-y-4">
-              {orderItems?.map((item: any) => (
+              {orderItems?.map((item: any) => {
+                const optionLabel = resolveVariantName(item.products?.variants, item.variant_id);
+                return (
                 <div key={item.id} className="flex gap-4 pb-4 border-b border-gray-200 last:border-0">
                   <div className="relative w-20 h-20 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
                     <img
@@ -109,6 +113,15 @@ export default async function OrderDetailPage({
                     <h3 className="font-semibold text-gray-900 mb-1">
                       {item.products?.title || 'Product'}
                     </h3>
+                    {optionLabel ? (
+                      <p className="text-sm text-gray-800 mb-1">
+                        <span className="font-medium">Option:</span> {optionLabel}
+                      </p>
+                    ) : item.variant_id ? (
+                      <p className="text-sm text-amber-700 mb-1">
+                        Option selected (ID no longer on product listing)
+                      </p>
+                    ) : null}
                     <p className="text-sm text-gray-600 mb-2">Quantity: {item.quantity}</p>
                     <p className="text-lg font-semibold text-[color:var(--logo-pink)]">
                       ${Number(item.price).toFixed(2)} each
@@ -120,7 +133,8 @@ export default async function OrderDetailPage({
                     </p>
                   </div>
                 </div>
-              ))}
+              );
+              })}
             </div>
           </div>
 
