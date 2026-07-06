@@ -160,9 +160,17 @@ type ProductsPageClientProps = {
   initialProducts: Product[];
   initialRatings: Record<string, RatingStats>;
   initialBestsellerIds: string[];
+  initialTotal: number;
+  pageSize: number;
 };
 
-function ProductsPageInner({ initialProducts, initialRatings, initialBestsellerIds }: ProductsPageClientProps) {
+function ProductsPageInner({
+  initialProducts,
+  initialRatings,
+  initialBestsellerIds,
+  initialTotal,
+  pageSize,
+}: ProductsPageClientProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -172,7 +180,9 @@ function ProductsPageInner({ initialProducts, initialRatings, initialBestsellerI
   const urlQ = searchParams.get('q') || '';
 
   const [products, setProducts] = useState<Product[]>(initialProducts);
+  const [total, setTotal] = useState(initialTotal);
   const [loading, setLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [ratings, setRatings] = useState<Record<string, RatingStats>>(initialRatings);
   const [searchInput, setSearchInput] = useState(urlQ);
   const debouncedSearch = useDebouncedValue(searchInput, 400);
@@ -219,11 +229,16 @@ function ProductsPageInner({ initialProducts, initialRatings, initialBestsellerI
         if (selectedCategory !== 'all') p.set('category', selectedCategory);
         if (sortValue !== 'newest') p.set('sort', sortValue);
         if (debouncedSearch.trim()) p.set('q', debouncedSearch.trim());
+        p.set('limit', String(pageSize));
+        p.set('offset', '0');
 
         const response = await fetch(`/api/products?${p.toString()}`);
         const data = await response.json();
         const fetchedProducts: Product[] = data.products || [];
-        if (!cancelled) setProducts(fetchedProducts);
+        if (!cancelled) {
+          setProducts(fetchedProducts);
+          setTotal(typeof data.total === 'number' ? data.total : fetchedProducts.length);
+        }
 
         // One batched call for the whole grid's star ratings, instead of each card
         // firing its own /api/reviews request (was the source of the scroll jank).
@@ -251,7 +266,38 @@ function ProductsPageInner({ initialProducts, initialRatings, initialBestsellerI
     return () => {
       cancelled = true;
     };
-  }, [selectedCategory, sortValue, debouncedSearch]);
+  }, [selectedCategory, sortValue, debouncedSearch, pageSize]);
+
+  const loadMore = async () => {
+    setLoadingMore(true);
+    try {
+      const p = new URLSearchParams();
+      if (selectedCategory !== 'all') p.set('category', selectedCategory);
+      if (sortValue !== 'newest') p.set('sort', sortValue);
+      if (debouncedSearch.trim()) p.set('q', debouncedSearch.trim());
+      p.set('limit', String(pageSize));
+      p.set('offset', String(products.length));
+
+      const response = await fetch(`/api/products?${p.toString()}`);
+      const data = await response.json();
+      const nextProducts: Product[] = data.products || [];
+      setProducts((prev) => [...prev, ...nextProducts]);
+      if (typeof data.total === 'number') setTotal(data.total);
+
+      if (nextProducts.length > 0) {
+        const ids = nextProducts.map((p) => p.id);
+        const ratingsRes = await fetch(`/api/reviews/batch-ratings?ids=${ids.join(',')}`);
+        const ratingsData = await ratingsRes.json();
+        setRatings((prev) => ({ ...prev, ...(ratingsData.ratings || {}) }));
+      }
+    } catch (error) {
+      console.error('Error loading more products:', error);
+    } finally {
+      setLoadingMore(false);
+    }
+  };
+
+  const hasMore = products.length < total;
 
   const setCategory = (category: string) => {
     const p = new URLSearchParams(searchParams.toString());
@@ -383,7 +429,9 @@ function ProductsPageInner({ initialProducts, initialRatings, initialBestsellerI
             </div>
 
             <p className="text-center text-sm font-medium tracking-wide" style={SHOP_HERO_META_STYLE}>
-              Showing {products.length} product{products.length === 1 ? '' : 's'}
+              {hasMore
+                ? `Showing ${products.length} of ${total} product${total === 1 ? '' : 's'}`
+                : `Showing ${products.length} product${products.length === 1 ? '' : 's'}`}
               {debouncedSearch.trim() ? ` matching “${debouncedSearch.trim()}”` : ''}
             </p>
           </div>
@@ -419,6 +467,19 @@ function ProductsPageInner({ initialProducts, initialRatings, initialBestsellerI
         ) : (
           <div className="text-center py-16">
             <p className="text-gray-500 text-lg">No products found. Try a different search or filter.</p>
+          </div>
+        )}
+
+        {hasMore && !loading && (
+          <div className="mt-10 flex justify-center sm:mt-12">
+            <button
+              type="button"
+              onClick={loadMore}
+              disabled={loadingMore}
+              className="rounded-full border border-[color:var(--logo-pink)] bg-white px-8 py-3 text-sm font-medium uppercase tracking-wider text-[color:var(--logo-pink)] shadow-sm transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {loadingMore ? 'Loading…' : `Load more (${total - products.length} remaining)`}
+            </button>
           </div>
         )}
       </div>

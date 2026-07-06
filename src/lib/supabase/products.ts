@@ -34,6 +34,9 @@ export async function getProductsListing(options: {
   category?: string | null;
   search?: string | null;
   sort?: ProductSortOption | null;
+  /** Applied after fetch+sort (catalog is small; DB-level range() would fight the bestseller JS sort). */
+  limit?: number;
+  offset?: number;
 }): Promise<Product[]> {
   const supabase = createServerClient();
   const sort: ProductSortOption = options.sort || 'newest';
@@ -82,7 +85,42 @@ export async function getProductsListing(options: {
     });
   }
 
+  if (typeof options.offset === 'number' || typeof options.limit === 'number') {
+    const start = options.offset || 0;
+    const end = typeof options.limit === 'number' ? start + options.limit : undefined;
+    return products.slice(start, end);
+  }
+
   return products;
+}
+
+/** Total count for a filtered listing, ignoring limit/offset (for "load more" / pagination UI). */
+export async function getProductsListingCount(options: {
+  category?: string | null;
+  search?: string | null;
+}): Promise<number> {
+  const supabase = createServerClient();
+  let query = supabase.from('products').select('*', { count: 'exact', head: true }).eq('is_active', true);
+
+  const cat = options.category?.toLowerCase();
+  if (cat && cat !== 'all' && VALID_CATEGORIES.includes(cat as (typeof VALID_CATEGORIES)[number])) {
+    query = query.eq('category', cat);
+  }
+
+  const rawQ = options.search?.trim() ?? '';
+  if (rawQ.length > 0) {
+    const safe = rawQ.replace(/%/g, '').replace(/_/g, ' ').slice(0, 100);
+    if (safe.length > 0) {
+      query = query.ilike('title', `%${safe}%`);
+    }
+  }
+
+  const { count, error } = await query;
+  if (error) {
+    console.error('Error counting products listing:', error);
+    return 0;
+  }
+  return count || 0;
 }
 
 /** Top products by sales order (for BESTSELLER badges). Empty sales → recent-first order from listing. */
