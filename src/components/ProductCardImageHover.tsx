@@ -98,8 +98,9 @@ export default function ProductCardImageHover({
           alt=""
           fill
           sizes={sizes}
-          quality={quality}
+          quality={50}
           loading={loading}
+          fetchPriority="low"
           aria-hidden
           className={`${imgBase} ${dim} ${
             showSecond

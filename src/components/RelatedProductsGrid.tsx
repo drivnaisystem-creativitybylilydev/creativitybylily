@@ -36,9 +36,6 @@ function RelatedProductTile({
       className="group block min-w-0 touch-manipulation border border-stone-200/80 bg-white shadow-sm transition-shadow duration-300 hover:shadow-md"
       onMouseEnter={() => hasAltImage && setPeek(true)}
       onMouseLeave={() => setPeek(false)}
-      onTouchStart={() => hasAltImage && setPeek(true)}
-      onTouchEnd={() => setPeek(false)}
-      onTouchCancel={() => setPeek(false)}
     >
       <ScrollReveal className="h-full">
         <ProductCardImageHover

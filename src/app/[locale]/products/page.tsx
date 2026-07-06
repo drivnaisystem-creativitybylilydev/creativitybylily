@@ -79,9 +79,6 @@ function ProductsListingCard({
       className="group min-w-0 w-full touch-manipulation overflow-hidden rounded-none border border-stone-200/80 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md"
       onMouseEnter={() => hasAltImage && setPeek(true)}
       onMouseLeave={() => setPeek(false)}
-      onTouchStart={() => hasAltImage && setPeek(true)}
-      onTouchEnd={() => setPeek(false)}
-      onTouchCancel={() => setPeek(false)}
     >
       <Link href={`/products/${product.slug}`} className="block touch-manipulation">
         <ScrollReveal className="block w-full">
