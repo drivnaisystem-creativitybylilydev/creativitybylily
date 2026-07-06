@@ -1,6 +1,7 @@
 import { Shippo } from 'shippo';
 import { createAdminClient } from '@/lib/supabase/server';
 import { sendDeliveryConfirmationEmail } from '@/lib/email';
+import { normalizeCarrier } from '@/lib/carriers';
 
 /** Returns null (instead of throwing) when SHIPPO_API_KEY isn't configured, so callers can no-op gracefully. */
 export function getShippoClient(): Shippo | null {
@@ -10,26 +11,21 @@ export function getShippoClient(): Shippo | null {
 }
 
 /**
- * Registers a tracking number with Shippo (free, works for any carrier's number even if the
- * label wasn't purchased through Shippo) and upserts a `shipments` row so tracking_number/carrier
- * are populated for Rollo-only orders that never went through generate-label.
+ * Upserts a `shipments` row with the current tracking number/carrier so tracking_number/carrier
+ * are populated for Rollo-only orders that never went through generate-label. Pure DB write, safe
+ * to call any time tracking info is saved (whether or not the order is becoming shipped).
  */
-export async function registerShipmentTracking({
+export async function upsertShipmentRecord({
   orderId,
   trackingNumber,
-  carrier = 'usps',
+  carrier,
 }: {
   orderId: string;
   trackingNumber: string;
-  carrier?: string;
+  carrier: string;
 }) {
-  const shippo = getShippoClient();
-  if (!shippo) {
-    console.warn('Shippo tracking registration skipped: SHIPPO_API_KEY not configured');
-    return;
-  }
-
   const supabase = createAdminClient();
+  const normalizedCarrier = normalizeCarrier(carrier);
 
   const { data: existingShipment } = await supabase
     .from('shipments')
@@ -42,19 +38,37 @@ export async function registerShipmentTracking({
   if (existingShipment) {
     await supabase
       .from('shipments')
-      .update({ tracking_number: trackingNumber, carrier })
+      .update({ tracking_number: trackingNumber, carrier: normalizedCarrier })
       .eq('id', existingShipment.id);
   } else {
     await supabase.from('shipments').insert({
       order_id: orderId,
       tracking_number: trackingNumber,
-      carrier,
+      carrier: normalizedCarrier,
       status: 'pending',
     });
   }
+}
+
+/**
+ * Registers a tracking number with Shippo (free, works for any carrier's number even if the
+ * label wasn't purchased through Shippo). Called on the ship transition.
+ */
+export async function registerTrackingWithShippo({
+  trackingNumber,
+  carrier,
+}: {
+  trackingNumber: string;
+  carrier: string;
+}) {
+  const shippo = getShippoClient();
+  if (!shippo) {
+    console.warn('Shippo tracking registration skipped: SHIPPO_API_KEY not configured');
+    return;
+  }
 
   try {
-    await shippo.trackingStatus.create({ carrier, trackingNumber });
+    await shippo.trackingStatus.create({ carrier: normalizeCarrier(carrier), trackingNumber });
   } catch (err) {
     // Non-fatal: the order still ships fine, just without live tracking updates.
     console.error('Error registering Shippo tracking webhook:', err);
@@ -79,7 +93,7 @@ export async function applyTrackingStatusUpdate({
 
   const { data: shipment } = await supabase
     .from('shipments')
-    .select('id, order_id')
+    .select('id, order_id, carrier')
     .eq('tracking_number', trackingNumber)
     .order('created_at', { ascending: false })
     .limit(1)
@@ -139,7 +153,7 @@ export async function applyTrackingStatusUpdate({
         `${order.customer_first_name || ''} ${order.customer_last_name || ''}`.trim() || 'Customer',
       customerEmail: order.customer_email,
       trackingNumber,
-      carrier: undefined,
+      carrier: shipment.carrier ?? undefined,
       items: emailItems,
     });
   } catch (emailError) {
@@ -177,7 +191,7 @@ export async function reconcileShippedOrders({ olderThanHours = 24 }: { olderTha
     if (!shipment.tracking_number) continue;
     checked += 1;
     try {
-      const track = await shippo.trackingStatus.get(shipment.tracking_number, shipment.carrier || 'usps');
+      const track = await shippo.trackingStatus.get(shipment.tracking_number, normalizeCarrier(shipment.carrier));
       const status = track.trackingStatus?.status;
       if (!status) continue;
 

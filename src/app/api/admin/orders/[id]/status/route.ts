@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
 import { sendShippingConfirmationEmail } from '@/lib/email';
-import { registerShipmentTracking } from '@/lib/shipping';
+import { upsertShipmentRecord, registerTrackingWithShippo } from '@/lib/shipping';
+import { normalizeCarrier } from '@/lib/carriers';
 
 const VALID_STATUSES = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'] as const;
 type OrderStatus = (typeof VALID_STATUSES)[number];
@@ -52,6 +53,18 @@ export async function PATCH(
     }
     const mergedTracking = trackingFromBody || storedTracking;
 
+    const { data: existingShipment } = await supabase
+      .from('shipments')
+      .select('carrier')
+      .eq('order_id', id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    const mergedCarrier = normalizeCarrier(
+      typeof body.carrier === 'string' ? body.carrier : existingShipment?.carrier
+    );
+
     if (isBecomingShipped && !mergedTracking) {
       return NextResponse.json(
         {
@@ -76,11 +89,19 @@ export async function PATCH(
       return NextResponse.json({ error: 'Failed to update order status' }, { status: 500 });
     }
 
+    if (mergedTracking && ('tracking_number' in body || 'carrier' in body)) {
+      try {
+        await upsertShipmentRecord({ orderId: id, trackingNumber: mergedTracking, carrier: mergedCarrier });
+      } catch (shipmentError) {
+        console.error('Error saving shipment record:', shipmentError);
+      }
+    }
+
     const shouldSendShippedEmail = status === 'shipped' && previousStatus !== 'shipped';
 
     if (shouldSendShippedEmail) {
       try {
-        await registerShipmentTracking({ orderId: id, trackingNumber: mergedTracking });
+        await registerTrackingWithShippo({ trackingNumber: mergedTracking, carrier: mergedCarrier });
       } catch (trackingError) {
         console.error('Error registering Shippo tracking:', trackingError);
       }
@@ -98,7 +119,7 @@ export async function PATCH(
             `${order.customer_first_name || ''} ${order.customer_last_name || ''}`.trim() || 'Customer',
           customerEmail: order.customer_email,
           trackingNumber: mergedTracking,
-          carrier: undefined,
+          carrier: mergedCarrier,
           estimatedDelivery: undefined,
           items: emailItems,
         });

@@ -2,6 +2,7 @@ import { Section, Text, Link } from '@react-email/components';
 import * as React from 'react';
 import { EmailLayout, EmailFooterSignature, emailStyles } from './shared/EmailLayout';
 import { getEmailSiteUrl } from './shared/emailSiteUrl';
+import { getCarrierTrackingUrl } from '@/lib/carriers';
 
 interface ShippingConfirmationProps {
   orderNumber: string;
@@ -52,10 +53,7 @@ export const ShippingConfirmationEmail = ({
               </Text>
             )}
             <Text style={emailStyles.paragraph}>
-              <Link
-                href={`https://tools.usps.com/go/TrackConfirmAction?tLabels=${encodeURIComponent(trackingNumber.trim())}`}
-                style={trackingLink}
-              >
+              <Link href={getCarrierTrackingUrl(carrier, trackingNumber)} style={trackingLink}>
                 Track Your Package →
               </Link>
             </Text>
