@@ -1,3 +1,4 @@
+import { unstable_cache } from 'next/cache';
 import { createServerClient, createAdminClient } from './server';
 import { Product } from './types';
 
@@ -123,10 +124,24 @@ export async function getProductsListingCount(options: {
   return count || 0;
 }
 
+/**
+ * Bestseller ranking needs a full products query plus a full order_items scan - cheap on this
+ * catalog's size, but redundant to redo on every single page request. Bestseller status doesn't
+ * need to be real-time, so cache it for a few minutes instead of paying that cost per request.
+ */
+const getCachedBestsellerProductIds = unstable_cache(
+  async (limit: number) => {
+    const products = await getProductsListing({ sort: 'bestseller' });
+    return products.slice(0, limit).map((p) => p.id);
+  },
+  ['bestseller-product-ids'],
+  { revalidate: 300 }
+);
+
 /** Top products by sales order (for BESTSELLER badges). Empty sales → recent-first order from listing. */
 export async function getBestsellerProductIdSet(limit = 36): Promise<Set<string>> {
-  const products = await getProductsListing({ sort: 'bestseller' });
-  return new Set(products.slice(0, limit).map((p) => p.id));
+  const ids = await getCachedBestsellerProductIds(limit);
+  return new Set(ids);
 }
 
 /**

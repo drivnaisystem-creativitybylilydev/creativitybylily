@@ -25,13 +25,15 @@ export default async function ProductsPage({
     ? (params.sort as ProductSortOption)
     : 'newest';
 
-  const [initialProducts, total, initialBestsellerIdSet] = await Promise.all([
-    getProductsListing({ category, search: q, sort, limit: PAGE_SIZE, offset: 0 }),
+  const initialProducts = await getProductsListing({ category, search: q, sort, limit: PAGE_SIZE, offset: 0 });
+
+  // These three are independent of each other (ratings only needs the ids we already have),
+  // so run them together instead of one-after-another to keep the critical path to two round trips.
+  const [total, initialBestsellerIdSet, initialRatings] = await Promise.all([
     getProductsListingCount({ category, search: q }),
     getBestsellerProductIdSet(),
+    getBatchRatings(initialProducts.map((p) => p.id)),
   ]);
-
-  const initialRatings = await getBatchRatings(initialProducts.map((p) => p.id));
 
   return (
     <ProductsPageClient
