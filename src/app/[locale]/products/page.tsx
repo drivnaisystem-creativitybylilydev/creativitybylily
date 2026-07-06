@@ -58,7 +58,15 @@ function useDebouncedValue<T>(value: T, delay: number): T {
   return debounced;
 }
 
-function ProductsListingCard({ product, isBestseller }: { product: Product; isBestseller: boolean }) {
+function ProductsListingCard({
+  product,
+  isBestseller,
+  ratingStats,
+}: {
+  product: Product;
+  isBestseller: boolean;
+  ratingStats?: { average_rating: number; total_reviews: number } | null;
+}) {
   const { addItem } = useCart();
   const hasAltImage = useMemo(
     () => normalizeProductGalleryUrls(product.image_url, product.images).length > 1,
@@ -111,7 +119,7 @@ function ProductsListingCard({ product, isBestseller }: { product: Product; isBe
         </Link>
         <p className={`${sunhoneyProductPriceClass} mt-2 sm:mt-3 max-[380px]:tracking-[0.14em]`}>${product.price}</p>
         <div className="mt-3 flex justify-center sm:mt-4">
-          <ProductRatingBadge productId={product.id} compact />
+          <ProductRatingBadge productId={product.id} compact stats={ratingStats ?? null} />
         </div>
         <div className="mt-4 flex flex-col gap-2 sm:mt-5 min-[480px]:flex-row min-[480px]:justify-center">
           <Link
@@ -161,6 +169,7 @@ function ProductsPageInner() {
 
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [ratings, setRatings] = useState<Record<string, { average_rating: number; total_reviews: number }>>({});
   const [searchInput, setSearchInput] = useState(urlQ);
   const debouncedSearch = useDebouncedValue(searchInput, 400);
   const bestsellerIds = useBestsellerProductIds();
@@ -200,7 +209,24 @@ function ProductsPageInner() {
 
         const response = await fetch(`/api/products?${p.toString()}`);
         const data = await response.json();
-        if (!cancelled) setProducts(data.products || []);
+        const fetchedProducts: Product[] = data.products || [];
+        if (!cancelled) setProducts(fetchedProducts);
+
+        // One batched call for the whole grid's star ratings, instead of each card
+        // firing its own /api/reviews request (was the source of the scroll jank).
+        if (fetchedProducts.length > 0) {
+          setRatings({});
+          fetch(`/api/reviews/batch-ratings?ids=${fetchedProducts.map((p) => p.id).join(',')}`)
+            .then((r) => r.json())
+            .then((d) => {
+              if (!cancelled) setRatings(d.ratings || {});
+            })
+            .catch(() => {
+              if (!cancelled) setRatings({});
+            });
+        } else if (!cancelled) {
+          setRatings({});
+        }
       } catch (error) {
         console.error('Error fetching products:', error);
         if (!cancelled) setProducts([]);
@@ -368,6 +394,7 @@ function ProductsPageInner() {
                 key={product.id}
                 product={product}
                 isBestseller={bestsellerIds.has(product.id)}
+                ratingStats={ratings[product.id]}
               />
             ))}
           </div>

@@ -7,7 +7,6 @@ import { useTranslations } from 'next-intl';
 import { supabase } from '@/lib/supabase/client';
 import CartIcon from './CartIcon';
 import SearchBar from './SearchBar';
-import LanguageSwitcher from './LanguageSwitcher';
 
 const NAV_ITEMS = [
   { href: '/', key: 'home' as const },
@@ -125,9 +124,6 @@ export default function Header() {
         </nav>
 
         <div className="ml-auto flex min-w-0 shrink-0 items-center gap-1.5 sm:gap-2 md:gap-4">
-          <div className="hidden md:block">
-            <LanguageSwitcher />
-          </div>
           <SearchBar />
           <a
             href="https://www.instagram.com/creativitybylily.co/"
@@ -202,9 +198,6 @@ export default function Header() {
               </button>
             </div>
             <nav className="flex flex-1 flex-col overflow-y-auto px-2 py-4">
-              <div className="px-4 py-2 md:hidden">
-                <LanguageSwitcher />
-              </div>
               {navLinks.map(({ href, label }) => (
                 <Link
                   key={href}
