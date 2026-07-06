@@ -18,7 +18,7 @@ export default function CustomerFavorites() {
         const response = await fetch('/api/products');
         const data = await response.json();
         const allProducts = data.products || [];
-        setProducts(allProducts.slice(0, 9));
+        setProducts(allProducts.slice(0, 8));
       } catch (error) {
         console.error('Error fetching products:', error);
       } finally {
@@ -53,7 +53,7 @@ export default function CustomerFavorites() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
             {products.map((product) => (
               <HomepageProductCard
                 key={product.id}

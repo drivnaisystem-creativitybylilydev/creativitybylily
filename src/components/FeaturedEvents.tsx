@@ -29,7 +29,7 @@ export default async function FeaturedEvents() {
         .order('start_date', { ascending: true })
         .limit(4);
 
-  const events = featuredEvents || upcomingEvents || [];
+  const events = featuredEvents && featuredEvents.length > 0 ? featuredEvents : upcomingEvents || [];
 
   if (!events || events.length === 0) {
     return null;
@@ -89,7 +89,7 @@ export default async function FeaturedEvents() {
                   isFirst ? 'md:col-span-2 lg:col-span-1 border-[color:var(--logo-pink)]/30' : 'border-gray-200'
                 }`}
               >
-                {event.image_url ? (
+                {event.image_url && (
                   <div className={`relative bg-gray-100 ${isFirst ? 'aspect-[16/9]' : 'aspect-video'}`}>
                     <Image
                       src={event.image_url}
@@ -104,12 +104,6 @@ export default async function FeaturedEvents() {
                       </div>
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                  </div>
-                ) : (
-                  <div className={`relative ${isFirst ? 'aspect-[16/9]' : 'aspect-video'} bg-gradient-to-br from-[color:var(--logo-pink)]/20 to-pink-100 flex items-center justify-center`}>
-                    <svg className="w-16 h-16 text-[color:var(--logo-pink)]/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
                   </div>
                 )}
                 <div className={`p-6 ${isFirst ? 'lg:p-8' : ''}`}>

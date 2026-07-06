@@ -216,6 +216,47 @@ body {
   animation-play-state: paused;
 }
 
+/* "Our Collection" flowing rows — A rows drift left-to-right, B rows right-to-left */
+@keyframes marquee-ltr {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0%);
+  }
+}
+
+@keyframes marquee-rtl {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee-ltr {
+  animation: marquee-ltr 48s linear infinite;
+  width: fit-content;
+}
+
+.animate-marquee-rtl {
+  animation: marquee-rtl 48s linear infinite;
+  width: fit-content;
+}
+
+.animate-marquee-ltr:hover,
+.animate-marquee-rtl:hover {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee-ltr,
+  .animate-marquee-rtl {
+    animation: none;
+  }
+}
+
 @keyframes aboutCarouselFadeIn {
   from {
     opacity: 0;
