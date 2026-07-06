@@ -3,6 +3,7 @@ import { render } from '@react-email/render';
 import { Resend } from 'resend';
 import { OrderConfirmationEmail } from '@/emails/OrderConfirmation';
 import { ShippingConfirmationEmail } from '@/emails/ShippingConfirmation';
+import { DeliveryConfirmationEmail } from '@/emails/DeliveryConfirmation';
 import { ReturnRequestReceivedEmail } from '@/emails/ReturnRequestReceived';
 import { ReturnApprovedEmail } from '@/emails/ReturnApproved';
 import { RefundProcessedEmail } from '@/emails/RefundProcessed';
@@ -110,6 +111,22 @@ export async function GET(request: Request) {
         );
         break;
 
+      case 'delivery':
+        emailHtml = await render(
+          DeliveryConfirmationEmail({
+            orderNumber: sampleData.orderNumber,
+            customerName: sampleData.customerName,
+            trackingNumber: sampleData.trackingNumber,
+            carrier: sampleData.carrier,
+            items: sampleData.items.map((item) => ({
+              productTitle: item.productTitle,
+              quantity: item.quantity,
+            })),
+            siteUrl,
+          })
+        );
+        break;
+
       case 'return-request':
         emailHtml = await render(
           ReturnRequestReceivedEmail({
@@ -180,7 +197,7 @@ export async function GET(request: Request) {
 
       default:
         return NextResponse.json(
-          { error: 'Invalid email type. Use: order, admin-new-order, shipping, return-request, return-approved, refund' },
+          { error: 'Invalid email type. Use: order, admin-new-order, shipping, delivery, return-request, return-approved, refund' },
           { status: 400 }
         );
     }
@@ -290,13 +307,14 @@ export async function POST(request: Request) {
     order: `Order Confirmation - ${sampleData.orderNumber} | creativity by lily`,
     'admin-new-order': `New order: ${sampleData.orderNumber} | creativity by lily`,
     shipping: `Your Order Has Shipped - ${shippingTestOrderNumber ?? sampleData.orderNumber} | creativity by lily`,
+    delivery: `Your Order Has Arrived - ${shippingTestOrderNumber ?? sampleData.orderNumber} | creativity by lily`,
     'return-request': `Return Request Received - ${sampleData.returnNumber} | creativity by lily`,
     'return-approved': `Return Approved - ${sampleData.returnNumber} | creativity by lily`,
     refund: `Refund Processed - ${sampleData.returnNumber} | creativity by lily`,
   };
   if (!subjects[emailType]) {
     return NextResponse.json(
-      { error: 'Invalid type. Use: order, admin-new-order, shipping, return-request, return-approved, refund' },
+      { error: 'Invalid type. Use: order, admin-new-order, shipping, delivery, return-request, return-approved, refund' },
       { status: 400 }
     );
   }
@@ -353,6 +371,18 @@ export async function POST(request: Request) {
             trackingNumber: shippingTestTracking ?? sampleData.trackingNumber,
             carrier: sampleData.carrier,
             estimatedDelivery: sampleData.estimatedDelivery,
+            items: sampleData.items.map((item) => ({ productTitle: item.productTitle, quantity: item.quantity })),
+            siteUrl,
+          })
+        );
+        break;
+      case 'delivery':
+        emailHtml = await render(
+          DeliveryConfirmationEmail({
+            orderNumber: shippingTestOrderNumber ?? sampleData.orderNumber,
+            customerName: sampleData.customerName,
+            trackingNumber: shippingTestTracking ?? sampleData.trackingNumber,
+            carrier: sampleData.carrier,
             items: sampleData.items.map((item) => ({ productTitle: item.productTitle, quantity: item.quantity })),
             siteUrl,
           })

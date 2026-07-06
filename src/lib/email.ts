@@ -5,6 +5,7 @@ import { ReturnRequestReceivedEmail } from '@/emails/ReturnRequestReceived';
 import { ReturnApprovedEmail } from '@/emails/ReturnApproved';
 import { RefundProcessedEmail } from '@/emails/RefundProcessed';
 import { ShippingConfirmationEmail } from '@/emails/ShippingConfirmation';
+import { DeliveryConfirmationEmail } from '@/emails/DeliveryConfirmation';
 import { AdminNewOrderEmail } from '@/emails/AdminNewOrderEmail';
 
 // Lazy initialization - only create Resend client when needed
@@ -445,6 +446,67 @@ export async function sendShippingConfirmationEmail({
       from: process.env.RESEND_FROM_EMAIL,
       to: customerEmail,
       subject: `Your Order Has Shipped - ${orderNumber} | creativity by lily`,
+      html: emailHtml,
+    });
+
+    if (error) {
+      console.error('Error sending email:', error);
+      return { success: false, error };
+    }
+
+    return { success: true, data };
+  } catch (error) {
+    console.error('Error rendering/sending email:', error);
+    return { success: false, error };
+  }
+}
+
+// Delivery Confirmation Email
+interface SendDeliveryConfirmationParams {
+  orderNumber: string;
+  customerName: string;
+  customerEmail: string;
+  trackingNumber: string;
+  carrier?: string;
+  items: Array<{
+    productTitle: string;
+    quantity: number;
+  }>;
+}
+
+export async function sendDeliveryConfirmationEmail({
+  orderNumber,
+  customerName,
+  customerEmail,
+  trackingNumber,
+  carrier,
+  items,
+}: SendDeliveryConfirmationParams) {
+  const client = getResendClient();
+  if (!client || !process.env.RESEND_FROM_EMAIL) {
+    console.log('📧 [DEV MODE] Delivery Confirmation Email would be sent:');
+    console.log('   To:', customerEmail);
+    console.log('   Order:', orderNumber);
+    console.log('   Tracking:', trackingNumber);
+    return { success: true, data: { devMode: true } };
+  }
+
+  try {
+    const emailHtml = await render(
+      DeliveryConfirmationEmail({
+        orderNumber,
+        customerName,
+        trackingNumber,
+        carrier,
+        items,
+        siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://creativitybylilyco.com',
+      })
+    );
+
+    const { data, error } = await client.emails.send({
+      from: process.env.RESEND_FROM_EMAIL,
+      to: customerEmail,
+      subject: `Your Order Has Arrived - ${orderNumber} | creativity by lily`,
       html: emailHtml,
     });
 

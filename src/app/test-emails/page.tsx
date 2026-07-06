@@ -20,6 +20,7 @@ export default function TestEmailsPage() {
       description: 'Sent to ADMIN_ORDER_NOTIFY_EMAIL when a sale completes',
     },
     { value: 'shipping', label: 'Shipping Confirmation', description: 'Sent when order ships' },
+    { value: 'delivery', label: 'Delivery Confirmation', description: 'Sent when USPS scans the package delivered' },
     { value: 'return-request', label: 'Return Request Received', description: 'Sent when customer submits return' },
     { value: 'return-approved', label: 'Return Approved', description: 'Sent when admin approves return' },
     { value: 'refund', label: 'Refund Processed', description: 'Sent when refund is processed' },
@@ -72,7 +73,7 @@ export default function TestEmailsPage() {
               setSendResult(null);
               try {
                 const payload: Record<string, string> = { to: sendTo.trim(), type: sendType };
-                if (sendType === 'shipping') {
+                if (sendType === 'shipping' || sendType === 'delivery') {
                   if (testTrackingNumber.trim()) payload.trackingNumber = testTrackingNumber.trim();
                   if (testOrderNumber.trim()) payload.orderNumber = testOrderNumber.trim();
                 }
@@ -118,7 +119,7 @@ export default function TestEmailsPage() {
                 ))}
               </select>
             </label>
-            {sendType === 'shipping' && (
+            {(sendType === 'shipping' || sendType === 'delivery') && (
               <div className="flex w-full flex-col gap-2 sm:flex-row sm:flex-wrap">
                 <label className="flex min-w-[200px] flex-1 flex-col gap-1">
                   <span className="text-sm font-medium text-gray-700">Test tracking (optional)</span>

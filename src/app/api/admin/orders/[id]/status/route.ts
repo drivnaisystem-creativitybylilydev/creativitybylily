@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
 import { sendShippingConfirmationEmail } from '@/lib/email';
+import { registerShipmentTracking } from '@/lib/shipping';
 
 const VALID_STATUSES = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'] as const;
 type OrderStatus = (typeof VALID_STATUSES)[number];
@@ -78,6 +79,12 @@ export async function PATCH(
     const shouldSendShippedEmail = status === 'shipped' && previousStatus !== 'shipped';
 
     if (shouldSendShippedEmail) {
+      try {
+        await registerShipmentTracking({ orderId: id, trackingNumber: mergedTracking });
+      } catch (trackingError) {
+        console.error('Error registering Shippo tracking:', trackingError);
+      }
+
       try {
         const order = orderData as any;
         const emailItems = (order.order_items || []).map((item: any) => ({
