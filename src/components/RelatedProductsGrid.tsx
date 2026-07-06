@@ -33,7 +33,7 @@ function RelatedProductTile({
   return (
     <Link
       href={`/products/${recommendedProduct.slug}`}
-      className="group block min-w-0 touch-manipulation border border-stone-200/80 bg-white shadow-sm transition-shadow duration-300 hover:shadow-md"
+      className="group block min-w-0 touch-manipulation border border-stone-200/80 bg-white shadow-sm transition-transform duration-300 hover:-translate-y-0.5"
       onMouseEnter={() => hasAltImage && setPeek(true)}
       onMouseLeave={() => setPeek(false)}
     >
