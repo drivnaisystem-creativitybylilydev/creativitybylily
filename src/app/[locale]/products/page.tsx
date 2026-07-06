@@ -383,12 +383,17 @@ function ProductsPageInner() {
       </div>
 
       <div className={`mx-auto w-full max-w-none pb-12 pt-4 sm:pb-16 sm:pt-6 ${pagePad}`}>
-        {loading ? (
+        {loading && products.length === 0 ? (
           <div className="py-12 text-center sm:py-16">
             <p className="text-base text-gray-500 sm:text-lg">Loading products...</p>
           </div>
         ) : products.length > 0 ? (
-          <div className="grid w-full grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4 lg:gap-8">
+          <div
+            aria-busy={loading}
+            className={`grid w-full grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4 lg:gap-8 transition-opacity duration-150 ${
+              loading ? 'pointer-events-none opacity-50' : 'opacity-100'
+            }`}
+          >
             {products.map((product) => (
               <ProductsListingCard
                 key={product.id}
