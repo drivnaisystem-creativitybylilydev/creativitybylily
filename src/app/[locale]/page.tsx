@@ -1,16 +1,17 @@
 import type { Metadata } from 'next';
-import dynamic from "next/dynamic";
+import nextDynamic from "next/dynamic";
 import { Suspense } from "react";
 import HeroSection from "@/components/HeroSection";
 import AboutUsSection from "@/components/AboutUsSection";
+import FeaturedReviewsStrip from "@/components/FeaturedReviewsStrip";
 
 export const metadata: Metadata = {
   title: 'Handcrafted Jewelry from Cape Cod',
 };
 
-const DynamicProductCarousel = dynamic(() => import("@/components/ProductCarousel"), { ssr: true });
-const DynamicCustomerFavorites = dynamic(() => import("@/components/CustomerFavorites"), { ssr: true });
-const DynamicFeaturedEvents = dynamic(() => import("@/components/FeaturedEvents"), { ssr: true });
+const DynamicProductCarousel = nextDynamic(() => import("@/components/ProductCarousel"), { ssr: true });
+const DynamicCustomerFavorites = nextDynamic(() => import("@/components/CustomerFavorites"), { ssr: true });
+const DynamicFeaturedEvents = nextDynamic(() => import("@/components/FeaturedEvents"), { ssr: true });
 
 export default function Home() {
   return (
@@ -78,6 +79,11 @@ export default function Home() {
       {/* Product Carousel Section - lazy loaded */}
       <section className="py-20" style={{ backgroundColor: 'var(--soft-pink)' }}>
         <DynamicProductCarousel />
+      </section>
+
+      {/* Featured Reviews - only renders once reviews are marked "Featured" in /admin/reviews */}
+      <section className="py-4 bg-white">
+        <FeaturedReviewsStrip />
       </section>
 
       {/* Contact anchor - Footer is handled by layout */}

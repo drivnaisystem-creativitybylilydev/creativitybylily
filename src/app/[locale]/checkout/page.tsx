@@ -32,7 +32,15 @@ export default function CheckoutPage() {
   const [isCalculatingShipping, setIsCalculatingShipping] = useState(false);
   const [shippingError, setShippingError] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
+  const [storePaused, setStorePaused] = useState(false);
   const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+
+  useEffect(() => {
+    fetch('/api/store-status')
+      .then((res) => res.json())
+      .then((data) => setStorePaused(!!data.store_paused))
+      .catch(() => {});
+  }, []);
   
   // Square payment state
   const [squarePayment, setSquarePayment] = useState<any>(null);
@@ -493,7 +501,11 @@ export default function CheckoutPage() {
       router.push(`/checkout/confirmation?order=${data.orderNumber}`);
     } catch (error) {
       console.error('Checkout error:', error);
-      setFormError('There was an error processing your order. Please try again.');
+      setFormError(
+        error instanceof Error && error.message
+          ? error.message
+          : 'There was an error processing your order. Please try again.'
+      );
       setIsProcessing(false);
     }
   };
@@ -914,12 +926,24 @@ export default function CheckoutPage() {
                 </div>
               )}
 
+              {storePaused && (
+                <div role="alert" className="mb-4 rounded-lg border border-[color:var(--logo-pink)]/30 bg-pink-50 p-4">
+                  <p className="text-sm font-medium text-[color:var(--logo-pink)]">
+                    Orders are paused right now — you can&rsquo;t complete checkout, but your cart will be saved.
+                  </p>
+                </div>
+              )}
+
               <button
                 type="submit"
-                disabled={isProcessing || !cardElementLoaded}
+                disabled={isProcessing || !cardElementLoaded || storePaused}
                 className="w-full bg-[color:var(--logo-pink)] text-white px-8 py-4 rounded-full font-medium hover:opacity-90 transition-opacity duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isProcessing ? 'Processing Payment...' : `Complete Order - $${total.toFixed(2)}`}
+                {storePaused
+                  ? 'Orders Paused'
+                  : isProcessing
+                  ? 'Processing Payment...'
+                  : `Complete Order - $${total.toFixed(2)}`}
               </button>
               {!cardElementLoaded && (
               <p className="text-xs text-gray-500 text-center mt-2">

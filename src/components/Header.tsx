@@ -7,6 +7,7 @@ import { useTranslations } from 'next-intl';
 import { supabase } from '@/lib/supabase/client';
 import CartIcon from './CartIcon';
 import SearchBar from './SearchBar';
+import PauseAnnouncementBar from './PauseAnnouncementBar';
 
 const NAV_ITEMS = [
   { href: '/', key: 'home' as const },
@@ -169,6 +170,8 @@ export default function Header() {
           <CartIcon />
         </div>
       </div>
+
+      <PauseAnnouncementBar />
 
       {mobileOpen && (
         <div className="fixed inset-0 z-[100] md:hidden" role="dialog" aria-modal="true" aria-labelledby="mobile-menu-title">

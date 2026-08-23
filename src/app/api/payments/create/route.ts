@@ -1,9 +1,18 @@
 import { NextResponse } from 'next/server';
+import { getSiteSettings } from '@/lib/site-settings';
 
 export async function POST(request: Request) {
   try {
     console.log('=== Payment API Called ===');
-    
+
+    const settings = await getSiteSettings();
+    if (settings.store_paused) {
+      return NextResponse.json(
+        { error: 'The shop is temporarily closed and not accepting new orders right now.' },
+        { status: 503 }
+      );
+    }
+
     // Verify environment variables are set
     if (!process.env.SQUARE_ACCESS_TOKEN || !process.env.SQUARE_LOCATION_ID) {
       console.error('❌ Square credentials not configured');

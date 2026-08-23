@@ -13,6 +13,8 @@ const NAV_LINKS = [
   { href: '/admin/customers', label: 'Customers', badge: null },
   { href: '/admin/events', label: 'Events', badge: 'events' as const },
   { href: '/admin/returns', label: 'Returns', badge: 'returns' as const },
+  { href: '/admin/reviews', label: 'Reviews', badge: null },
+  { href: '/admin/settings', label: 'Settings', badge: null },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

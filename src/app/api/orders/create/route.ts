@@ -2,9 +2,18 @@ import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
 import { sendOrderConfirmationEmail, sendAdminNewOrderNotification } from '@/lib/email';
 import { resolveVariantName } from '@/lib/orders/resolveVariantName';
+import { getSiteSettings } from '@/lib/site-settings';
 
 export async function POST(request: Request) {
   try {
+    const settings = await getSiteSettings();
+    if (settings.store_paused) {
+      return NextResponse.json(
+        { error: 'The shop is temporarily closed and not accepting new orders right now.' },
+        { status: 503 }
+      );
+    }
+
     let body;
     try {
       body = await request.json();
