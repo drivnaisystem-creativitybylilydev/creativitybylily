@@ -1,11 +1,15 @@
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
+import { requireAdmin } from '@/lib/supabase/require-admin';
 
 /**
  * GET /api/admin/settings
  * Fetch site settings (store pause state + message) for the admin dashboard.
  */
-export async function GET() {
+export async function GET(request: Request) {
+  const auth = await requireAdmin(request);
+  if (auth.error) return auth.error;
+
   try {
     const supabase = createAdminClient();
     const { data, error } = await supabase
@@ -31,6 +35,9 @@ export async function GET() {
  * Update store_paused and/or pause_message.
  */
 export async function PATCH(request: Request) {
+  const auth = await requireAdmin(request);
+  if (auth.error) return auth.error;
+
   try {
     const body = await request.json();
     const update: { store_paused?: boolean; pause_message?: string | null } = {};

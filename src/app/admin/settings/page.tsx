@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { adminFetch } from '@/lib/supabase/admin-fetch';
 
 export default function AdminSettingsPage() {
   const [paused, setPaused] = useState(false);
@@ -10,7 +11,7 @@ export default function AdminSettingsPage() {
   const [savedAt, setSavedAt] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch('/api/admin/settings')
+    adminFetch('/api/admin/settings')
       .then((res) => res.json())
       .then((data) => {
         if (data.settings) {
@@ -25,7 +26,7 @@ export default function AdminSettingsPage() {
     setSaving(true);
     setSavedAt(null);
     try {
-      const response = await fetch('/api/admin/settings', {
+      const response = await adminFetch('/api/admin/settings', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ store_paused: nextPaused, pause_message: message.trim() || null }),
