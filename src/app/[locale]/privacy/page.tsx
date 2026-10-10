@@ -14,7 +14,7 @@ export default function PrivacyPolicyPage() {
           <section>
             <h2 className="font-serif text-2xl font-light text-gray-900 mb-4">1. Introduction</h2>
             <p className="text-gray-700 leading-relaxed">
-              Welcome to creativity by lily ("we," "our," or "us"). We are committed to protecting your privacy and ensuring you have a positive experience on our website. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website creativitybylily.com.
+              Welcome to creativity by lily ("we," "our," or "us"). We are committed to protecting your privacy and ensuring you have a positive experience on our website. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website creativitybylilyco.com.
             </p>
           </section>
 

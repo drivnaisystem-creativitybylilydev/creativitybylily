@@ -29,7 +29,7 @@ const allura = Allura({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://creativitybylily.com'),
+  metadataBase: new URL('https://creativitybylilyco.com'),
   title: {
     default: 'creativity by lily - Handcrafted Jewelry from Cape Cod',
     template: '%s | creativity by lily',
@@ -64,7 +64,7 @@ export const metadata: Metadata = {
     title: 'creativity by lily - Handcrafted Jewelry from Cape Cod',
     description:
       'Contemporary, minimal handcrafted jewelry from Cape Cod. Discover our collection of unique pieces designed to bring coastal elegance to your style.',
-    url: 'https://creativitybylily.com',
+    url: 'https://creativitybylilyco.com',
     siteName: 'creativity by lily',
     images: [
       {
@@ -108,8 +108,8 @@ export default function RootLayout({
               '@type': 'Organization',
               name: 'creativity by lily',
               description: 'Contemporary, minimal handcrafted jewelry from Cape Cod',
-              url: 'https://creativitybylily.com',
-              logo: 'https://creativitybylily.com/brand_logo.webp',
+              url: 'https://creativitybylilyco.com',
+              logo: 'https://creativitybylilyco.com/brand_logo.webp',
               sameAs: ['https://instagram.com/creativitybylily'],
               contactPoint: {
                 '@type': 'ContactPoint',

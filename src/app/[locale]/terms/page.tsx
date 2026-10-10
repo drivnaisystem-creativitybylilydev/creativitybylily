@@ -14,7 +14,7 @@ export default function TermsOfServicePage() {
           <section>
             <h2 className="font-serif text-2xl font-light text-gray-900 mb-4">1. Agreement to Terms</h2>
             <p className="text-gray-700 leading-relaxed">
-              By accessing or using creativitybylily.com (the "Website"), you agree to be bound by these Terms of Service ("Terms"). If you disagree with any part of these terms, you may not access the Website.
+              By accessing or using creativitybylilyco.com (the "Website"), you agree to be bound by these Terms of Service ("Terms"). If you disagree with any part of these terms, you may not access the Website.
             </p>
           </section>
 
@@ -151,7 +151,7 @@ export default function TermsOfServicePage() {
               <p className="text-gray-700">
                 <strong>creativity by lily</strong><br />
                 Email: creativitybylilyco@gmail.com<br />
-                Website: creativitybylily.com
+                Website: creativitybylilyco.com
               </p>
             </div>
           </section>

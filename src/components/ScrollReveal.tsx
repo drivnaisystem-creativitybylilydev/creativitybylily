@@ -7,19 +7,21 @@ type ScrollRevealProps = {
   className?: string;
   /** 0–1: portion of element visible before revealing */
   threshold?: number;
+  /** Skip the fade-in for above-the-fold content so it paints (and counts for LCP) immediately. */
+  immediate?: boolean;
 };
 
 /**
  * Fades and slides content in when it enters the viewport, out when it leaves
  * (IntersectionObserver). Respects prefers-reduced-motion.
  */
-export default function ScrollReveal({ children, className = '', threshold = 0.12 }: ScrollRevealProps) {
+export default function ScrollReveal({ children, className = '', threshold = 0.12, immediate = false }: ScrollRevealProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(immediate);
 
   useEffect(() => {
     const el = ref.current;
-    if (!el) return;
+    if (!el || immediate) return;
 
     if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       setVisible(true);
@@ -34,7 +36,7 @@ export default function ScrollReveal({ children, className = '', threshold = 0.1
     );
     obs.observe(el);
     return () => obs.disconnect();
-  }, [threshold]);
+  }, [threshold, immediate]);
 
   return (
     <div

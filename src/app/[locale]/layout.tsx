@@ -8,6 +8,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import AuthErrorHandler from '@/components/AuthErrorHandler';
 import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import LocaleHtmlLang from '@/components/LocaleHtmlLang';
 
 export function generateStaticParams() {
@@ -47,6 +48,7 @@ export default async function LocaleLayout({
         </div>
       </CartProvider>
       <Analytics />
+      <SpeedInsights />
     </NextIntlClientProvider>
   );
 }

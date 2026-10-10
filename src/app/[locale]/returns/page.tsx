@@ -146,7 +146,7 @@ export default function ReturnsPage() {
               <p className="text-gray-700">
                 <strong>creativity by lily</strong><br />
                 Email: <a href="mailto:creativitybylilyco@gmail.com" className="text-[color:var(--logo-pink)] hover:underline">creativitybylilyco@gmail.com</a><br />
-                Website: creativitybylily.com
+                Website: creativitybylilyco.com
               </p>
             </div>
           </section>

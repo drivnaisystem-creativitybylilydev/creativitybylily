@@ -62,7 +62,9 @@ function ProductsListingCard({
   product,
   isBestseller,
   ratingStats,
+  priority = false,
 }: {
+  priority?: boolean;
   product: Product;
   isBestseller: boolean;
   ratingStats?: RatingStats | null;
@@ -82,7 +84,7 @@ function ProductsListingCard({
       onMouseLeave={() => setPeek(false)}
     >
       <Link href={`/products/${product.slug}`} className="block touch-manipulation">
-        <ScrollReveal className="block w-full">
+        <ScrollReveal className="block w-full" immediate={priority}>
           <ProductCardImageHover
             imageUrl={product.image_url}
             images={product.images}
@@ -90,6 +92,7 @@ function ProductsListingCard({
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
             dimmed={(product.inventory_count || 0) === 0}
             peekActive={hasAltImage ? peek : undefined}
+            priority={priority}
           >
             {isBestseller && <BestsellerTag />}
             <div className="pointer-events-none absolute bottom-1.5 left-1.5 z-[3] sm:bottom-2 sm:left-2">
@@ -455,12 +458,13 @@ function ProductsPageInner({
               loading ? 'pointer-events-none opacity-50' : 'opacity-100'
             }`}
           >
-            {products.map((product) => (
+            {products.map((product, index) => (
               <ProductsListingCard
                 key={product.id}
                 product={product}
                 isBestseller={bestsellerIds.has(product.id)}
                 ratingStats={ratings[product.id]}
+                priority={index < 4}
               />
             ))}
           </div>
