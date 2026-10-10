@@ -1,7 +1,8 @@
-export const metadata = {
+import { pageMetadata } from '@/lib/seo';
+export const generateMetadata = pageMetadata('/terms', {
   title: 'Terms of Service',
   description: 'Terms of Service for creativity by lily',
-};
+});
 
 export default function TermsOfServicePage() {
   return (

@@ -1,6 +1,6 @@
-import type { Metadata } from 'next';
+import { pageMetadata } from '@/lib/seo';
 
-export const metadata: Metadata = { title: 'Shop All Jewelry' };
+export const generateMetadata = pageMetadata('/products', { title: 'Shop All Jewelry' });
 
 export default function ProductsLayout({ children }: { children: React.ReactNode }) {
   return <>{children}</>;

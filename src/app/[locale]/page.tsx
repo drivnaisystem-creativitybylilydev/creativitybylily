@@ -1,13 +1,13 @@
-import type { Metadata } from 'next';
 import nextDynamic from "next/dynamic";
 import { Suspense } from "react";
 import HeroSection from "@/components/HeroSection";
 import AboutUsSection from "@/components/AboutUsSection";
 import FeaturedReviewsStrip from "@/components/FeaturedReviewsStrip";
+import { pageMetadata } from '@/lib/seo';
 
-export const metadata: Metadata = {
+export const generateMetadata = pageMetadata('', {
   title: 'Handcrafted Jewelry from Cape Cod',
-};
+});
 
 const DynamicProductCarousel = nextDynamic(() => import("@/components/ProductCarousel"), { ssr: true });
 const DynamicCustomerFavorites = nextDynamic(() => import("@/components/CustomerFavorites"), { ssr: true });

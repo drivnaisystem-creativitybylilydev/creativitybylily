@@ -1,7 +1,8 @@
-export const metadata = {
+import { pageMetadata } from '@/lib/seo';
+export const generateMetadata = pageMetadata('/cookies', {
   title: 'Cookie Policy',
   description: 'Cookie policy for creativity by lily',
-};
+});
 
 export default function CookiePolicyPage() {
   return (

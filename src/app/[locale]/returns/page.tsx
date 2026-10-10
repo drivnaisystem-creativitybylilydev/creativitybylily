@@ -1,10 +1,11 @@
 import { Link } from '@/i18n/navigation';
 import StartReturnButton from '@/components/StartReturnButton';
+import { pageMetadata } from '@/lib/seo';
 
-export const metadata = {
+export const generateMetadata = pageMetadata('/returns', {
   title: 'Returns & Exchanges',
   description: 'Returns and exchanges policy for creativity by lily',
-};
+});
 
 export default function ReturnsPage() {
   return (

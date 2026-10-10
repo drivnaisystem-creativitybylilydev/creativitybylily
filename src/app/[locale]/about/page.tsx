@@ -1,11 +1,12 @@
 import { Link } from '@/i18n/navigation';
 import AboutUsStoryCarousel from '@/components/AboutUsStoryCarousel';
 import { OurStoryContent } from '@/components/OurStoryContent';
+import { pageMetadata } from '@/lib/seo';
 
-export const metadata = {
+export const generateMetadata = pageMetadata('/about', {
   title: 'Our Story | Creativity by Lily',
   description: 'The story behind Creativity By Lily Co — coastal-inspired, hypoallergenic jewelry.',
-};
+});
 
 export default function AboutPage() {
   return (

@@ -1,7 +1,8 @@
-export const metadata = {
+import { pageMetadata } from '@/lib/seo';
+export const generateMetadata = pageMetadata('/shipping', {
   title: 'Shipping Policy',
   description: 'Shipping and delivery policy for creativity by lily',
-};
+});
 
 export default function ShippingPolicyPage() {
   return (

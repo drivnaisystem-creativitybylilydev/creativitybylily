@@ -4,5 +4,18 @@
       "path": "/api/cron/reconcile-tracking",
       "schedule": "0 12 * * *"
     }
+  ],
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "creativitybylily.vercel.app"
+        }
+      ],
+      "destination": "https://creativitybylilyco.com/:path*",
+      "permanent": true
+    }
   ]
 }

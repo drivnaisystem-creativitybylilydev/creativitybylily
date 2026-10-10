@@ -1,7 +1,8 @@
-export const metadata = {
+import { pageMetadata } from '@/lib/seo';
+export const generateMetadata = pageMetadata('/privacy', {
   title: 'Privacy Policy & Accessibility',
   description: 'Privacy Policy and accessibility information for creativity by lily',
-};
+});
 
 export default function PrivacyPolicyPage() {
   return (

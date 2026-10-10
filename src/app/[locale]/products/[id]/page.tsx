@@ -1,3 +1,4 @@
+import { canonicalUrl } from '@/lib/seo';
 import { Link } from "@/i18n/navigation";
 import { notFound } from "next/navigation";
 import {
@@ -22,7 +23,7 @@ type PageProps = {
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { id } = await params;
+  const { locale, id } = await params;
   const product = await getProductBySlug(id);
   
   if (!product) {
@@ -33,6 +34,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: product.title,
+    alternates: { canonical: canonicalUrl(locale, `/products/${id}`) },
     description: `${product.description} Handcrafted on Cape Cod. ${product.title} - $${product.price}`,
     openGraph: {
       title: `${product.title} | creativity by lily`,
