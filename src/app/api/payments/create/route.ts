@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSiteSettings } from '@/lib/site-settings';
+import { computeOrderTotals, CheckoutPricingError } from '@/lib/checkout-pricing';
 
 export async function POST(request: Request) {
   try {
@@ -29,11 +30,11 @@ export async function POST(request: Request) {
     console.log('  Environment:', process.env.SQUARE_ENV || 'production (default)');
     console.log('  Location ID:', process.env.SQUARE_LOCATION_ID);
     console.log('  Access Token present:', !!process.env.SQUARE_ACCESS_TOKEN);
-    console.log('  Access Token prefix:', process.env.SQUARE_ACCESS_TOKEN?.substring(0, 8) + '...');
 
     console.log('Parsing request body...');
     const body = await request.json();
-    const { sourceId, idempotencyKey, amount, currency = 'USD' } = body;
+    const { sourceId, idempotencyKey, amount, items } = body;
+    const currency = 'USD';
 
     // Log incoming payment request (safe - no card details)
     console.log('💳 Payment Request Received:');
@@ -43,11 +44,10 @@ export async function POST(request: Request) {
     console.log('  Currency:', currency);
 
     // Validate required fields
-    if (!sourceId || !idempotencyKey || !amount) {
+    if (!sourceId || !idempotencyKey) {
       console.error('❌ Missing required fields:', { 
         hasSourceId: !!sourceId, 
         hasIdempotencyKey: !!idempotencyKey, 
-        hasAmount: !!amount 
       });
       return NextResponse.json(
         { error: 'Missing required payment information' },
@@ -55,18 +55,19 @@ export async function POST(request: Request) {
       );
     }
 
-    // Validate amount is a positive number
-    if (typeof amount !== 'number' || amount <= 0) {
-      console.error('❌ Invalid amount:', amount);
+    // The charge is priced from the database, never from the browser. `amount` is only the total the
+    // shopper was shown, used to catch a stale cart before we take their money.
+    const totals = await computeOrderTotals(items);
+    if (typeof amount !== 'number' || Math.abs(amount - totals.total) > 0.01) {
+      console.error('❌ Total mismatch:', { shown: amount, server: totals.total });
       return NextResponse.json(
-        { error: 'Invalid payment amount' },
-        { status: 400 }
+        { error: 'Prices have changed since you loaded this page. Please refresh your cart and try again.' },
+        { status: 409 }
       );
     }
 
     console.log('All fields validated, preparing payment...');
-    // Convert amount to cents
-    const amountInCents = Math.round(amount * 100);
+    const amountInCents = totals.totalCents;
 
     // Log payment request details (safe - no secrets)
     console.log('📤 Preparing Square API request:');
@@ -137,6 +138,12 @@ export async function POST(request: Request) {
       },
     });
   } catch (error: any) {
+    if (error instanceof CheckoutPricingError) {
+      return NextResponse.json(
+        { error: error.message, details: error.details },
+        { status: error.status }
+      );
+    }
     // Enhanced error logging
     console.error('❌ Payment processing exception caught:');
     console.error('Error type:', error?.constructor?.name);

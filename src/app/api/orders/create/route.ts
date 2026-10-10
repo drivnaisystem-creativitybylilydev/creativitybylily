@@ -3,6 +3,7 @@ import { createAdminClient } from '@/lib/supabase/server';
 import { sendOrderConfirmationEmail, sendAdminNewOrderNotification } from '@/lib/email';
 import { resolveVariantName } from '@/lib/orders/resolveVariantName';
 import { getSiteSettings } from '@/lib/site-settings';
+import { computeOrderTotals, CheckoutPricingError } from '@/lib/checkout-pricing';
 
 export async function POST(request: Request) {
   try {
@@ -30,10 +31,6 @@ export async function POST(request: Request) {
       items,
       shippingAddress,
       billingAddress,
-      subtotal,
-      tax,
-      shippingCost = 0,
-      total,
       paymentId, // Square payment ID
     } = body;
 
@@ -52,6 +49,58 @@ export async function POST(request: Request) {
       );
     }
 
+    // Prices come from the database, and the order is only created for a payment Square confirms.
+    if (!paymentId || typeof paymentId !== 'string') {
+      return NextResponse.json({ error: 'Payment is required' }, { status: 400 });
+    }
+    let totals;
+    try {
+      totals = await computeOrderTotals(items);
+    } catch (e) {
+      if (e instanceof CheckoutPricingError) {
+        return NextResponse.json(
+          { error: e.message, details: e.details, message: e.details ? 'Some items in your cart are no longer available in the requested quantity. Please update your cart and try again.' : undefined },
+          { status: e.status }
+        );
+      }
+      throw e;
+    }
+    const { subtotal, tax, shipping: shippingCost, total } = totals;
+
+    const squareBase = process.env.SQUARE_ENV === 'sandbox'
+      ? 'https://connect.squareupsandbox.com'
+      : 'https://connect.squareup.com';
+    const paymentRes = await fetch(`${squareBase}/v2/payments/${encodeURIComponent(paymentId)}`, {
+      headers: {
+        'Square-Version': '2024-12-18',
+        Authorization: `Bearer ${process.env.SQUARE_ACCESS_TOKEN}`,
+      },
+    });
+    const paymentJson = await paymentRes.json().catch(() => null);
+    const squarePayment = paymentJson?.payment;
+    if (squarePayment) {
+      if (
+        !['COMPLETED', 'APPROVED'].includes(squarePayment.status) ||
+        squarePayment.amount_money?.amount !== totals.totalCents
+      ) {
+        console.error('Payment verification failed:', { paymentId, status: squarePayment.status, expected: totals.totalCents, got: squarePayment.amount_money?.amount });
+        return NextResponse.json(
+          { error: 'We could not confirm your payment for this order. If you were charged, please contact us.' },
+          { status: 402 }
+        );
+      }
+    } else if (paymentRes.status === 404) {
+      console.error('Payment verification failed: unknown payment id', paymentId);
+      return NextResponse.json(
+        { error: 'We could not confirm your payment for this order. If you were charged, please contact us.' },
+        { status: 402 }
+      );
+    } else {
+      // Square itself couldn't be reached or didn't answer. The customer has already paid, so don't
+      // lose their order over it; flag loudly so it can be checked by hand.
+      console.error('PAYMENT VERIFICATION UNAVAILABLE, order accepted unverified:', { paymentId, status: paymentRes.status });
+    }
+
     // Create admin client (bypasses RLS)
     let supabase;
     try {
@@ -62,6 +111,17 @@ export async function POST(request: Request) {
         { error: 'Server configuration error', details: error?.message },
         { status: 500 }
       );
+    }
+
+    // One payment can only ever back one order
+    const { data: existingOrder } = await supabase
+      .from('orders')
+      .select('id')
+      .eq('payment_id', paymentId)
+      .limit(1)
+      .maybeSingle();
+    if (existingOrder) {
+      return NextResponse.json({ error: 'This payment has already been used for an order' }, { status: 409 });
     }
 
     // Validate inventory before creating order
@@ -173,12 +233,12 @@ export async function POST(request: Request) {
     }
 
     // Create order items
-    const orderItems = items.map((item: any) => ({
+    const orderItems = totals.items.map((item) => ({
       order_id: order.id,
       product_id: item.productId,
-      variant_id: item.variantId || null,
+      variant_id: item.variantId,
       quantity: item.quantity,
-      price: item.price,
+      price: item.unitPrice,
     }));
 
     const { error: itemsError } = await supabase

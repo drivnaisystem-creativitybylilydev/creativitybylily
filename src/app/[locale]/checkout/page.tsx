@@ -410,7 +410,11 @@ export default function CheckoutPage() {
           sourceId: tokenResult.token,
           idempotencyKey,
           amount: total,
-          currency: 'USD',
+          items: items.map(item => ({
+            productId: item.product.id,
+            variantId: item.variantId,
+            quantity: item.quantity,
+          })),
         }),
       });
       const paymentData = await paymentResponse.json();
