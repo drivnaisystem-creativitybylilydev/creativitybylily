@@ -21,6 +21,15 @@ type ShippingFormData = {
   sameAsShipping: boolean;
 };
 
+const reportCheckoutProblem = (stage: 'sdk_load' | 'sdk_init' | 'tokenize', message?: string, code?: string) => {
+  fetch('/api/checkout-alert', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ stage, message, code }),
+    keepalive: true,
+  }).catch(() => {});
+};
+
 export default function CheckoutPage() {
   const router = useRouter();
   const { items, getTotalPrice, getTotalItems, clearCart } = useCart();
@@ -133,6 +142,7 @@ export default function CheckoutPage() {
     };
     script.onerror = (error) => {
       console.error('Failed to load Square script:', error);
+      reportCheckoutProblem('sdk_load', 'Square script failed to load');
       setPaymentError('Failed to load payment system. Please check your internet connection and refresh the page.');
     };
     document.body.appendChild(script);
@@ -178,6 +188,7 @@ export default function CheckoutPage() {
     } catch (error: any) {
       console.error('Error initializing Square:', error);
       console.error('Square object:', (window as any).Square);
+      reportCheckoutProblem('sdk_init', error?.message);
       setPaymentError(`Failed to initialize payment system: ${error?.message || 'Unknown error'}`);
     }
   };
@@ -399,6 +410,7 @@ export default function CheckoutPage() {
       // Tokenize the card
       const tokenResult = await squarePayment.tokenize();
       if (tokenResult.status !== 'OK') {
+        reportCheckoutProblem('tokenize', tokenResult.errors?.[0]?.detail, tokenResult.errors?.[0]?.code);
         throw new Error(tokenResult.errors?.[0]?.detail || 'Failed to process payment information');
       }
 

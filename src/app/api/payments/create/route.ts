@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
 import { getSiteSettings } from '@/lib/site-settings';
 import { computeOrderTotals, CheckoutPricingError } from '@/lib/checkout-pricing';
+import { sendCheckoutAlert } from '@/lib/checkout-alerts';
 
-export async function POST(request: Request) {
+async function handlePayment(request: Request) {
   try {
     console.log('=== Payment API Called ===');
 
@@ -167,4 +168,29 @@ export async function POST(request: Request) {
       { status: 500 }
     );
   }
+}
+
+export async function POST(request: Request) {
+  const response = await handlePayment(request);
+  try {
+    const body = await response.clone().json().catch(() => null);
+    if (response.ok && body?.success) {
+      await sendCheckoutAlert({
+        level: 'success',
+        stage: 'payment',
+        summary: `card payment went through ($${((body.payment?.amount?.amount ?? 0) / 100).toFixed(2)})`,
+        details: { paymentId: body.payment?.id, squareStatus: body.payment?.status },
+      });
+    } else if (!response.ok && (body?.category || response.status >= 500) && response.status !== 503) {
+      await sendCheckoutAlert({
+        level: 'failure',
+        stage: 'payment',
+        summary: `payment failed (${body?.code || response.status})`,
+        details: { httpStatus: response.status, error: body?.error, category: body?.category, code: body?.code },
+      });
+    }
+  } catch {
+    // alerting must never affect the customer's checkout
+  }
+  return response;
 }

@@ -4,8 +4,9 @@ import { sendOrderConfirmationEmail, sendAdminNewOrderNotification } from '@/lib
 import { resolveVariantName } from '@/lib/orders/resolveVariantName';
 import { getSiteSettings } from '@/lib/site-settings';
 import { computeOrderTotals, CheckoutPricingError } from '@/lib/checkout-pricing';
+import { sendCheckoutAlert } from '@/lib/checkout-alerts';
 
-export async function POST(request: Request) {
+async function handleOrder(request: Request) {
   try {
     const settings = await getSiteSettings();
     if (settings.store_paused) {
@@ -377,3 +378,30 @@ export async function POST(request: Request) {
   }
 }
 
+
+export async function POST(request: Request) {
+  const paymentId = await request.clone().json().then((b) => b?.paymentId).catch(() => undefined);
+  const response = await handleOrder(request);
+  try {
+    const body = await response.clone().json().catch(() => null);
+    if (response.ok && body?.success) {
+      await sendCheckoutAlert({
+        level: 'success',
+        stage: 'order',
+        summary: `order ${body.orderNumber} created`,
+        details: { orderNumber: body.orderNumber, paymentId },
+      });
+    } else if (!response.ok && paymentId && response.status !== 503) {
+      // A payment exists but no order was saved: the customer may have been charged for nothing.
+      await sendCheckoutAlert({
+        level: 'critical',
+        stage: 'order',
+        summary: 'PAID BUT NO ORDER, check Square and refund or fix by hand',
+        details: { httpStatus: response.status, error: body?.error, paymentId },
+      });
+    }
+  } catch {
+    // alerting must never affect the customer's checkout
+  }
+  return response;
+}
