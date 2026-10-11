@@ -9,5 +9,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!api|admin|tracking-automation|hero-preview|_next|_vercel|.*\\..*).*)'],
+  matcher: ['/((?!api|admin|tracking-automation|_next|_vercel|.*\\..*).*)'],
 };
