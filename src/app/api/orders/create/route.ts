@@ -384,14 +384,7 @@ export async function POST(request: Request) {
   const response = await handleOrder(request);
   try {
     const body = await response.clone().json().catch(() => null);
-    if (response.ok && body?.success) {
-      await sendCheckoutAlert({
-        level: 'success',
-        stage: 'order',
-        summary: `order ${body.orderNumber} created`,
-        details: { orderNumber: body.orderNumber, paymentId },
-      });
-    } else if (!response.ok && paymentId && response.status !== 503) {
+    if (!response.ok && paymentId && response.status !== 503) {
       // A payment exists but no order was saved: the customer may have been charged for nothing.
       await sendCheckoutAlert({
         level: 'critical',

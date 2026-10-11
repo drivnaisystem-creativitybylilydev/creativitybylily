@@ -174,14 +174,7 @@ export async function POST(request: Request) {
   const response = await handlePayment(request);
   try {
     const body = await response.clone().json().catch(() => null);
-    if (response.ok && body?.success) {
-      await sendCheckoutAlert({
-        level: 'success',
-        stage: 'payment',
-        summary: `card payment went through ($${((body.payment?.amount?.amount ?? 0) / 100).toFixed(2)})`,
-        details: { paymentId: body.payment?.id, squareStatus: body.payment?.status },
-      });
-    } else if (!response.ok && (body?.category || response.status >= 500) && response.status !== 503) {
+    if (!response.ok && (body?.category || response.status >= 500) && response.status !== 503) {
       await sendCheckoutAlert({
         level: 'failure',
         stage: 'payment',
