@@ -107,7 +107,7 @@ export default function AboutUsStoryCarousel({ variant = 'full', fillColumn = fa
                       ? '(max-width: 1024px) 100vw, 50vw'
                       : '(max-width: 640px) 100vw, 480px'
                 }
-                priority={index === 0}
+                priority={index === 0 && !isTeaser}
               />
               <div
                 className="pointer-events-none absolute inset-0"

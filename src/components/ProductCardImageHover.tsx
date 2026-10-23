@@ -22,6 +22,8 @@ type ProductCardImageHoverProps = {
    * When omitted, this component handles pointer events on the image frame only.
    */
   peekActive?: boolean;
+  /** Set false to skip the hover image entirely (e.g. moving marquee tiles) so it is never downloaded. */
+  enableSecondary?: boolean;
 };
 
 /**
@@ -40,11 +42,12 @@ export default function ProductCardImageHover({
   containerClassName = 'relative aspect-[3/4] overflow-hidden rounded-none bg-stone-50',
   children,
   peekActive: peekActiveControlled,
+  enableSecondary = true,
 }: ProductCardImageHoverProps) {
   const [internalPeek, setInternalPeek] = useState(false);
   const urls = useMemo(() => normalizeProductGalleryUrls(imageUrl, images), [imageUrl, images]);
   const primary = urls[0];
-  const secondary = urls.length > 1 ? urls[1] : null;
+  const secondary = enableSecondary && urls.length > 1 ? urls[1] : null;
   const controlled = peekActiveControlled !== undefined;
   const peek = controlled ? Boolean(peekActiveControlled) : internalPeek;
   const showSecond = Boolean(secondary && peek);

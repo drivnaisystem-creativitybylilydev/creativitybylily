@@ -43,12 +43,17 @@ function MarqueeRow({
     <div className="overflow-hidden">
       <div className={`flex gap-4 ${direction === 'ltr' ? 'animate-marquee-ltr' : 'animate-marquee-rtl'}`}>
         {items.map((product, index) => (
-          <div key={`${product.id}-${index}`} className="w-40 shrink-0 sm:w-48 md:w-56">
+          <div
+            key={`${product.id}-${index}`}
+            className="w-40 shrink-0 sm:w-48 md:w-56"
+            aria-hidden={index >= products.length ? true : undefined}
+          >
             <HomepageProductCard
               product={product}
               showBestseller={bestsellerIds.has(product.id)}
               sizes="(max-width: 640px) 160px, (max-width: 768px) 192px, 224px"
               titleHeading="h3"
+              compact
             />
           </div>
         ))}

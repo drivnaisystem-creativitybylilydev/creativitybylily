@@ -2,6 +2,22 @@
 
 import { useEffect, useState } from 'react';
 
+// One request per page load, shared by every component that asks (the homepage uses this hook twice).
+let inflight: Promise<string[]> | null = null;
+
+function fetchBestsellerIds(): Promise<string[]> {
+  if (!inflight) {
+    inflight = fetch('/api/products?sort=bestseller&limit=36')
+      .then((r) => r.json())
+      .then((d) => ((d.products ?? []) as { id: string }[]).map((p) => p.id))
+      .catch(() => {
+        inflight = null;
+        return [];
+      });
+  }
+  return inflight;
+}
+
 /**
  * Product ids from sort=bestseller (API order). Used for BESTSELLER badges where applicable.
  */
@@ -10,18 +26,9 @@ export function useBestsellerProductIds() {
 
   useEffect(() => {
     let cancelled = false;
-    (async () => {
-      try {
-        const r = await fetch('/api/products?sort=bestseller&limit=36');
-        const d = await r.json();
-        if (!cancelled) {
-          const list = (d.products ?? []) as { id: string }[];
-          setIds(new Set(list.map((p) => p.id)));
-        }
-      } catch {
-        if (!cancelled) setIds(new Set());
-      }
-    })();
+    fetchBestsellerIds().then((list) => {
+      if (!cancelled) setIds(new Set(list));
+    });
     return () => {
       cancelled = true;
     };

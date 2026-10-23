@@ -29,7 +29,10 @@ export async function GET(request: Request) {
     // Only pagination callers ("load more") need the total; skip the extra count query otherwise.
     const total = typeof limit === 'number' ? await getProductsListingCount({ category, search: q }) : undefined;
 
-    return NextResponse.json({ products, total });
+    return NextResponse.json(
+      { products, total },
+      { headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300' } }
+    );
   } catch (error) {
     console.error('Error fetching products:', error);
     return NextResponse.json(

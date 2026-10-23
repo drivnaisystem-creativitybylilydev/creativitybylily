@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 
 const HERO_IMAGES = [
-  "/hero-section-images/IMG_5220.PNG",
+  "/hero-section-images/IMG_5220.jpg",
   "/hero-section-images/IMG_5221.jpg",
   "/hero-section-images/IMG_5222.jpg",
   "/hero-section-images/IMG_5223.jpg",
@@ -50,7 +50,7 @@ export default function HeroSection() {
 
   useEffect(() => {
     if (!mounted) return;
-    setSlotImages(pickRandomSlots());
+    // No reshuffle on mount: it threw away the images the server already preloaded and re-downloaded them.
     const t = setInterval(rotate, ROTATE_INTERVAL_MS);
     return () => clearInterval(t);
   }, [mounted, rotate]);
@@ -77,16 +77,17 @@ export default function HeroSection() {
             alt="Creativity by Lily"
             fill
             className="object-cover transition-opacity duration-700"
-            sizes="100vw"
+            sizes="(max-width: 767px) 100vw, 1px"
             priority
-            quality={85}
+            fetchPriority="high"
+            quality={70}
           />
         </div>
 
         {/* Desktop only: top row */}
         <div className="hidden md:flex relative w-full aspect-[16/5] min-h-[200px] max-h-[360px]">
           <div className="hero-image-container relative flex-1 min-w-0 h-full">
-            <Image src={topLeft} alt="Creativity by Lily" fill className="object-cover transition-opacity duration-700" sizes="50vw" priority quality={82} />
+            <Image src={topLeft} alt="Creativity by Lily" fill className="object-cover transition-opacity duration-700" sizes="50vw" loading="lazy" quality={70} />
           </div>
           <div
             className="flex-shrink-0 w-12 h-full"
@@ -96,14 +97,14 @@ export default function HeroSection() {
             }}
           />
           <div className="hero-image-container relative flex-1 min-w-0 h-full">
-            <Image src={topRight} alt="Creativity by Lily" fill className="object-cover transition-opacity duration-700" sizes="50vw" quality={80} />
+            <Image src={topRight} alt="Creativity by Lily" fill className="object-cover transition-opacity duration-700" sizes="50vw" loading="lazy" quality={70} />
           </div>
         </div>
 
         {/* Desktop only: bottom row */}
         <div className="hidden md:flex relative w-full aspect-[16/5] min-h-[160px] max-h-[300px]">
           <div className="hero-image-container relative flex-1 min-w-0 h-full">
-            <Image src={bottomLeft} alt="Creativity by Lily jewelry" fill className="object-cover transition-opacity duration-700" sizes="33vw" loading="lazy" quality={80} />
+            <Image src={bottomLeft} alt="Creativity by Lily jewelry" fill className="object-cover transition-opacity duration-700" sizes="33vw" loading="lazy" quality={70} />
           </div>
           <div
             className="flex-shrink-0 w-2 md:w-5 h-full"
@@ -113,7 +114,7 @@ export default function HeroSection() {
             }}
           />
           <div className="hero-image-container relative flex-1 min-w-0 h-full">
-            <Image src={bottomCenter} alt="Creativity by Lily jewelry" fill className="object-cover transition-opacity duration-700" sizes="33vw" loading="lazy" quality={80} />
+            <Image src={bottomCenter} alt="Creativity by Lily jewelry" fill className="object-cover transition-opacity duration-700" sizes="33vw" loading="lazy" quality={70} />
           </div>
           <div
             className="flex-shrink-0 w-2 md:w-5 h-full"
@@ -123,7 +124,7 @@ export default function HeroSection() {
             }}
           />
           <div className="hero-image-container relative flex-1 min-w-0 h-full">
-            <Image src={bottomRight} alt="Creativity by Lily jewelry" fill className="object-cover transition-opacity duration-700" sizes="33vw" loading="lazy" quality={80} />
+            <Image src={bottomRight} alt="Creativity by Lily jewelry" fill className="object-cover transition-opacity duration-700" sizes="33vw" loading="lazy" quality={70} />
           </div>
         </div>
       </div>

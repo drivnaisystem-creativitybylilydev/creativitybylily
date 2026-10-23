@@ -14,6 +14,8 @@ type HomepageProductCardProps = {
   sizes: string;
   /** Section heading level for the product title (favorites: h3, collection grid: h4). */
   titleHeading: 'h3' | 'h4';
+  /** Marquee tiles are small and constantly moving: lower quality and no hover image. */
+  compact?: boolean;
 };
 
 /**
@@ -24,10 +26,11 @@ export default function HomepageProductCard({
   showBestseller,
   sizes,
   titleHeading,
+  compact = false,
 }: HomepageProductCardProps) {
   const hasAltImage = useMemo(
-    () => normalizeProductGalleryUrls(product.image_url, product.images).length > 1,
-    [product.image_url, product.images]
+    () => !compact && normalizeProductGalleryUrls(product.image_url, product.images).length > 1,
+    [compact, product.image_url, product.images]
   );
   const [peek, setPeek] = useState(false);
 
@@ -55,6 +58,8 @@ export default function HomepageProductCard({
           images={product.images}
           alt={product.title}
           sizes={sizes}
+          quality={compact ? 60 : undefined}
+          enableSecondary={!compact}
           peekActive={hasAltImage ? peek : undefined}
         >
           {showBestseller && <BestsellerTag />}
