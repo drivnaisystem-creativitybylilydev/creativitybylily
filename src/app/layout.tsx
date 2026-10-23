@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Playfair_Display, Inter, Dancing_Script, Allura } from 'next/font/google';
+import { Playfair_Display, Inter, Dancing_Script } from 'next/font/google';
 import './globals.css';
 
 const playfair = Playfair_Display({
@@ -18,13 +18,6 @@ const script = Dancing_Script({
   variable: '--font-script',
   subsets: ['latin'],
   weight: ['400', '700'],
-  display: 'swap',
-});
-
-const allura = Allura({
-  weight: '400',
-  variable: '--font-allura',
-  subsets: ['latin'],
   display: 'swap',
 });
 
@@ -122,7 +115,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${playfair.variable} ${inter.variable} ${script.variable} ${allura.variable} antialiased`}
+        className={`${playfair.variable} ${inter.variable} ${script.variable} antialiased`}
       >
         {children}
       </body>
